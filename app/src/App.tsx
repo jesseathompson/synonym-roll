@@ -1,31 +1,29 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import cinnamonRoll from './assets/cinnamonroll.png';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { Container } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './styles/global.css';
+
+import { Navigation } from './components/Navigation';
+import { Home } from './pages/Home';
+import { Play } from './pages/Play';
+import { GameStateProvider } from './context/GameStateContext';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        {/* <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a> */}
-      </div>
-      <h1>Synonym Roll</h1>
-      <div className="card">
-      <img src={cinnamonRoll} alt="Cinnamon Roll" />
-      </div>
-      <p className="game-owners">
-        A game created and owned by Lisa Thompson and Jesse Thompson
-      </p>
-    </>
-  )
+    <GameStateProvider>
+      <Router>
+        <div className="d-flex flex-column min-vh-100">
+          <Navigation />
+          <Container fluid className="flex-grow-1 px-0">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/play" element={<Play />} />
+            </Routes>
+          </Container>
+        </div>
+      </Router>
+    </GameStateProvider>
+  );
 }
 
-export default App
+export default App;
