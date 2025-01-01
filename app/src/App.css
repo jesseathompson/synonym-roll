@@ -5,6 +5,17 @@
   text-align: center;
 }
 
+@font-face {
+  font-family: 'KissMe'; /* Name the font */
+  src: url('/KgKissMeSlowly-MEXx.ttf') format('truetype'); /* Path to the font in the public folder */
+}
+
+h1 {
+  font-family: 'KissMe', sans-serif;
+  font-size: 92px;
+  color: peru;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
