@@ -14,7 +14,7 @@ export const Home = () => {
     <Container className="py-5">
       <Row className="justify-content-center text-center">
         <Col md={8} lg={6}>
-          <h1 className="game-title mb-4">Game Title</h1>
+          <h1 className="game-title mb-4">Synonym Roll</h1>
           
           <div className="stats-display mb-4">
             {todayCompleted ? (

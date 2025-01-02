@@ -1,10 +1,11 @@
 /* Global styles */
 :root {
-  --primary-color: #4A90E2;
-  --text-primary: #2C3E50;
-  --text-secondary: #95A5A6;
-  --bg-light: #FFFFFF;
-  --bg-dark: #1A1A1A;
+  --primary-color: #582a0b; /* Warm brown for the cinnamon roll crust */
+  --text-primary: #331E10; /* Dark brown for text on the crust */
+  --text-secondary: #C19A6B; /* Lighter brown for secondary text */
+  --bg-light: #fefdf8; /* Cream color for the background */
+  --bg-dark: #331E10; /* Dark brown for darker backgrounds */
+  --bs-body-color: #331E10;
   --font-game: 'Outfit', sans-serif;
 }
 
@@ -53,13 +54,21 @@ body {
 }
 
 /* Game title styles */
+
+@font-face {
+  font-family: 'KissMe'; /* Name the font */
+  src: url('/KgKissMeSlowly-MEXx.ttf') format('truetype'); /* Path to the font in the public folder */
+}
+
 .game-title {
-  font-family: var(--font-game);
+  /* font-family: var(--font-game); */
+  font-family: 'KissMe';
   font-weight: 700;
-  font-size: 2.5rem;
+  font-size: 4.5rem;
   color: var(--primary-color);
   margin-bottom: 0;
   text-decoration: none;
+  text-align: center;
 }
 
 .game-title:hover {
@@ -90,13 +99,18 @@ body {
 .btn-game {
   font-family: var(--font-game);
   font-weight: 600;
-  padding: 0.75rem 2rem;
+  padding: 0.25rem 1rem;
   border-radius: 8px;
   transition: transform 0.2s;
+  background-color: var(--bg-light);
+border-color: var(--primary-color);
+color: var(--primary-color);
+margin: .1rem;
 }
 
 .btn-game:hover {
   transform: translateY(-2px);
+  background-color: var(--bg-dark);
 }
 
 /* Modal styles */
@@ -119,7 +133,7 @@ body {
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .game-title {
-    font-size: 1.75rem;
+    font-size: 2.25rem;
   }
   
   .game-container {
@@ -201,3 +215,10 @@ body {
   justify-content: center;
   align-items: center;
 } 
+
+.p-2 {
+  background-color: aqua;
+  padding: 1;
+  border: #331E10;
+}
+

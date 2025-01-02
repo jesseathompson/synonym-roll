@@ -1,4 +1,4 @@
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Stack } from 'react-bootstrap';
 import { useGameState } from '../context/GameStateContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShare } from '@fortawesome/free-solid-svg-icons';
@@ -30,7 +30,7 @@ export const Play = () => {
 
   const handleShare = async () => {
     const shareText = generateShareText({
-      title: 'Game Title',
+      title: 'Synonym Roll',
       dayNumber: puzzleNumber,
       streak,
       stats: {
@@ -89,16 +89,30 @@ export const Play = () => {
               ) : (
                 <div className="game-content">
                   {/* TODO: Replace with your actual game content */}
-                  <p className="mb-4">This is a placeholder for your game content.</p>
+                  <Stack gap={1}>
+                  <div className="p-2">Start: {puzzle.start}</div>
+                  <div className="p-2">{currentSynonyms?.sort().map((synonym, index) => (
+        <Button
+          key={index}
+          // variant="secondary"
+          className="btn-game"
+          onClick={() => (synonym)}
+        >
+          {synonym}
+        </Button>
+      ))}</div>
+                  <div className="p-2">End: {puzzle.end}</div>
+                  </Stack>
+                  {/* <p className="mb-4">This is a placeholder for your game content.</p>
                   <p className="mb-4">Start: {puzzle.start}, End: {puzzle.end}</p>
-                  <p className="mb-4">Synonyms: {currentSynonyms?.sort().join(', ')}</p>
+                  <p className="mb-4">Synonyms: {currentSynonyms?.sort().join(', ')}</p> */}
                   <Button
                     variant="primary"
                     size="lg"
                     className="btn-game"
                     onClick={handleComplete}
                   >
-                    Complete Puzzle
+                    Don't Click
                   </Button>
                 </div>
               )}
