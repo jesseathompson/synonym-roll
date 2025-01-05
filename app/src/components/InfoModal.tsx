@@ -14,27 +14,25 @@ export const InfoModal = ({ show, onHide }: InfoModalProps) => {
       <Modal.Body>
         {/* TODO: Replace with your game's instructions */}
         <p>
-          Explain the game rules and mechanics here. Make it clear and
-          concise so players can quickly understand how to play your game.
+        Transform the starting word into the ending word by selecting synonyms, aiming to create the shortest path possible.
         </p>
         
-        <h5 className="mt-4">Features</h5>
+        <h5 className="mt-4">More Features Coming Soon!</h5>
         <ul className="list-unstyled">
-          <li>• Feature 1 description</li>
-          <li>• Feature 2 description</li>
-          <li>• Feature 3 description</li>
+          <li>• Dark Mode</li>
+          <li>• Scoring</li>
+          <li>• Share</li>
         </ul>
 
         <hr />
         
         <small className="text-muted">
-          Created with React Game Base Template
           <br />
-          © {new Date().getFullYear()} Your Name
+          © {new Date().getFullYear()} Lisa Thompson & Jesse Thompson
         </small>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="primary" onClick={onHide}>
+        <Button className='btn-game' variant="primary" onClick={onHide}>
           Close
         </Button>
       </Modal.Footer>

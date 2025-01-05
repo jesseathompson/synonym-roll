@@ -1,6 +1,6 @@
-import { Modal, Form, Button } from 'react-bootstrap';
-import { useGameState } from '../context/GameStateContext';
-import { useTheme } from '../hooks/useTheme';
+import { Modal, Form, Button } from "react-bootstrap";
+import { useGameState } from "../context/GameStateContext";
+import { useTheme } from "../hooks/useTheme";
 
 interface SettingsModalProps {
   show: boolean;
@@ -12,7 +12,7 @@ export const SettingsModal = ({ show, onHide }: SettingsModalProps) => {
   const { theme, toggleTheme } = useTheme();
 
   const handleReset = () => {
-    if (window.confirm('Are you sure you want to reset all game progress?')) {
+    if (window.confirm("Are you sure you want to reset all game progress?")) {
       resetGameState();
       onHide();
     }
@@ -27,11 +27,11 @@ export const SettingsModal = ({ show, onHide }: SettingsModalProps) => {
         <Form>
           <Form.Group className="mb-4">
             <Form.Label>Theme</Form.Label>
-            <Form.Check 
+            <Form.Check
               type="switch"
               id="theme-switch"
               label={`${theme.charAt(0).toUpperCase() + theme.slice(1)} Mode`}
-              checked={theme === 'dark'}
+              checked={theme === "dark"}
               onChange={toggleTheme}
             />
           </Form.Group>
@@ -40,16 +40,13 @@ export const SettingsModal = ({ show, onHide }: SettingsModalProps) => {
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button 
-          variant="danger"
-          onClick={handleReset}
-        >
+        <Button className="btn-game" variant="danger" onClick={handleReset}>
           Reset Progress
         </Button>
-        <Button variant="primary" onClick={onHide}>
+        <Button className="btn-game" variant="primary" onClick={onHide}>
           Close
         </Button>
       </Modal.Footer>
     </Modal>
   );
-}; 
+};

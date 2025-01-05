@@ -3,22 +3,23 @@
   --primary-color: #411f07; /* Warm brown for the cinnamon roll crust */
   --text-primary: #411f07; /* Dark brown for text on the crust */
   --text-secondary: #c19a6b; /* Lighter brown for secondary text */
+  --text-shadow: #c19a6b;
   --bg-light: #fefdf8; /* Cream color for the background */
   --bg-dark: #411f07; /* Dark brown for darker backgrounds */
   --bs-body-color: #411f07;
   --font-game: "Outfit", sans-serif;
 }
 
-
 [data-bs-theme="dark"] {
   /* --text-primary: #ecf0f1;
   --text-secondary: #bdc3c7; */
-  --primary-color: #411f07; /* Warm brown for the cinnamon roll crust */
-  --text-primary: #411f07; /* Dark brown for text on the crust */
-  --text-secondary: #c19a6b; /* Lighter brown for secondary text */
-  --bg-light: #fefdf8; /* Cream color for the background */
-  --bg-dark: #411f07; /* Dark brown for darker backgrounds */
-  --bs-body-color: #411f07;
+  --primary-color: #fefdf8; /* Warm brown for the cinnamon roll crust */
+  --text-primary: #f1dfc9; /* Dark brown for text on the crust */
+  --text-secondary: #f1dfc9; /* Lighter brown for secondary text */
+  --text-shadow: #000000;
+  --bg-light: #411f07; /* Cream color for the background */
+  --bg-dark: #fefdf8; /* Dark brown for darker backgrounds */
+  --bs-body-color: #c19a6b;
   --font-game: "Outfit", sans-serif;
 }
 
@@ -48,7 +49,7 @@ body {
 .start-word,
 .end-word {
   text-transform: uppercase;
-  text-shadow: 2px 2px 6px var(--text-secondary);
+  text-shadow: 2px 2px 6px var(--text-shadow);
   /* color: lime; */
   font-size: larger;
 }
@@ -56,7 +57,7 @@ body {
 .step-word {
   /* text-transform: uppercase; */
   /* text-shadow: 2px 2px 6px var(--text-secondary); */
-  text-shadow: 1px 1px 3px var(--text-secondary);
+  text-shadow: 1px 1px 3px var(--text-shadow);
   /* color: aqua; */
 }
 
@@ -64,8 +65,6 @@ body {
   color: aqua;
   display: none;
 }
-
-
 
 /* Navigation styles */
 .navbar {
@@ -89,7 +88,7 @@ body {
 }
 
 .nav-icons .nav-link:hover {
-  color: var(--primary-color);
+  color: var(--text-secondary);
   transform: translateY(-2px);
 }
 
@@ -160,6 +159,7 @@ body {
   border-radius: 12px;
   border: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background-color: var(--bg-light);
 }
 
 .modal-game .modal-header {
