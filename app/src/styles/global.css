@@ -1,11 +1,11 @@
 /* Global styles */
 :root {
-  --primary-color: #582a0b; /* Warm brown for the cinnamon roll crust */
-  --text-primary: #331E10; /* Dark brown for text on the crust */
+  --primary-color: #411f07; /* Warm brown for the cinnamon roll crust */
+  --text-primary: #411f07; /* Dark brown for text on the crust */
   --text-secondary: #C19A6B; /* Lighter brown for secondary text */
   --bg-light: #fefdf8; /* Cream color for the background */
-  --bg-dark: #331E10; /* Dark brown for darker backgrounds */
-  --bs-body-color: #331E10;
+  --bg-dark: #411f07; /* Dark brown for darker backgrounds */
+  --bs-body-color: #411f07;
   --font-game: 'Outfit', sans-serif;
 }
 
@@ -25,6 +25,36 @@ body {
 
 [data-bs-theme='dark'] body {
   background-color: var(--bg-dark);
+}
+
+.start-end, .end-word {
+  padding: 1;
+  border-radius: 12px;
+  border: none;
+  font-size: 1.25rem;
+  font-family: var(--font-game);
+  font-weight: 600;
+}
+
+.start-word, .end-word {
+text-transform: uppercase;
+text-shadow: 2px 2px 6px var(--text-secondary);
+/* color: lime; */
+font-size: larger;
+
+}
+
+
+.step-word {
+  /* text-transform: uppercase; */
+  /* text-shadow: 2px 2px 6px var(--text-secondary); */
+  text-shadow: 1px 1px 3px var(--text-secondary);
+/* color: aqua; */
+}
+
+.ignore-start-word {
+  color: aqua;
+  display: none;
 }
 
 /* Navigation styles */
@@ -79,8 +109,9 @@ body {
 .game-container {
   min-height: 60vh;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); */
   background-color: var(--bg-light);
+  border-width: 0;
 }
 
 [data-bs-theme='dark'] .game-container {
@@ -106,6 +137,8 @@ body {
 border-color: var(--primary-color);
 color: var(--primary-color);
 margin: .1rem;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
 }
 
 .btn-game:hover {
@@ -138,6 +171,7 @@ margin: .1rem;
   
   .game-container {
     min-height: 70vh;
+    margin-bottom: 300px;
   }
 
   .nav-icons .nav-link {
@@ -216,9 +250,5 @@ margin: .1rem;
   align-items: center;
 } 
 
-.p-2 {
-  background-color: aqua;
-  padding: 1;
-  border: #331E10;
-}
+
 
