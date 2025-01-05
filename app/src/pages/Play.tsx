@@ -20,7 +20,7 @@ export const Play = () => {
   const [minSteps, setMinSteps] = useState(
     wordGraph.findShortestPathLengthBiDirectional(puzzle.start, puzzle.end)
   );
-  const addStep = (event: Event) => {
+  const addStep = (event: React.MouseEvent<HTMLButtonElement>) => {
     const word = (event.target as HTMLInputElement).value;
     const synonyms = wordGraph.getSynonyms(word);
     if (word === puzzle.end) {
@@ -28,7 +28,7 @@ export const Play = () => {
     } else {
       setSteps((steps) => [...steps, word]);
       setCurrentSynonyms(() => synonyms);
-      setMinSteps(() =>
+      setMinSteps(() => 
         wordGraph.findShortestPathLengthBiDirectional(word, puzzle.end)
       );
     }
@@ -147,7 +147,7 @@ export const Play = () => {
                           // variant="secondary"
                           className="btn-game"
                           value={synonym}
-                          onClick={() =>addStep}
+                          onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) =>addStep(e)}
                         >
                           {synonym}
                         </Button>
