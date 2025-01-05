@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import wordData from './processed_thesaurus.json';
+import { thesaurus } from './processed_thesaurus';
 
 interface WordDataEntry {
     word: string;
@@ -30,7 +30,7 @@ function findPathWithMinDegrees(startWord: string, n: number): GameResult | null
         }
 
         if (depth < n) {
-            const wordObject = (wordData as WordDataEntry[]).find(obj => obj.word === word);
+            const wordObject = (thesaurus as WordDataEntry[]).find(obj => obj.word === word);
             if (wordObject) {
                 const synonyms = wordObject.synonyms;
                 if (synonyms) {
@@ -51,7 +51,7 @@ function findPathWithMinDegrees(startWord: string, n: number): GameResult | null
     };
 }
 
-async function writeGamesToStream(outputPath: string, maxGames: number = 100): Promise<void> {
+async function writeGamesToStream(outputPath: string, maxGames: number = 200): Promise<void> {
     console.log(`Finding games`);
 
     const outputStream = fs.createWriteStream(outputPath, { encoding: 'utf8' });
@@ -60,7 +60,7 @@ async function writeGamesToStream(outputPath: string, maxGames: number = 100): P
     let gamesWritten = 0;
     let isFirstGame = true;
 
-    const wordList = wordData as WordDataEntry[]; // Type assertion for easier access
+    const wordList = thesaurus as WordDataEntry[]; // Type assertion for easier access
     const wordListLength = wordList.length;
 
     if (wordListLength === 0) {
