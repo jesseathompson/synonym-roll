@@ -14,32 +14,38 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      working-directory: ./app
+      
       - uses: actions/checkout@v4
       
       - name: Set up Node.js
+        working-directory: ./app
         uses: actions/setup-node@v3
         with:
           node-version: '22'
           cache: 'npm'
           
       - name: Set deployment variables
+        working-directory: ./app
         run: |
           echo "VITE_BASE_URL=/${{ github.event.repository.name }}" >> $GITHUB_ENV
           
       - name: Install dependencies
+        working-directory: ./app
         run: npm ci
         
       - name: Build
+        working-directory: ./app
         env:
           # Pass repository info to Vite for base URL
           VITE_REPO_NAME: ${{ github.event.repository.name }}
         run: npm run build
         
       - name: Setup Pages
+        working-directory: ./app
         uses: actions/configure-pages@v3
         
       - name: Upload artifact
+        working-directory: ./app
         uses: actions/upload-pages-artifact@v2
         with:
           path: './dist'
