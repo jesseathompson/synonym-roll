@@ -20,8 +20,8 @@ export const Play = () => {
   const [minSteps, setMinSteps] = useState(
     wordGraph.findShortestPathLengthBiDirectional(puzzle.start, puzzle.end)
   );
-  const addStep = (event: MouseEvent) => {
-    const word = event.target.value;
+  const addStep = (event: Event) => {
+    const word = (event.target as HTMLInputElement).value;
     const synonyms = wordGraph.getSynonyms(word);
     if (word === puzzle.end) {
       window.confirm("YOU WIN!!!");
@@ -147,7 +147,7 @@ export const Play = () => {
                           // variant="secondary"
                           className="btn-game"
                           value={synonym}
-                          onClick={addStep}
+                          onClick={() =>addStep}
                         >
                           {synonym}
                         </Button>
@@ -158,7 +158,7 @@ export const Play = () => {
                       <div className="end-word">{puzzle.end}</div>
                       <Button
                         variant="primary"
-                        size="md"
+                        // size="md"
                         className="btn-game"
                         onClick={removeStep}
                       >
