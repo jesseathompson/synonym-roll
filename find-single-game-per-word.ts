@@ -92,5 +92,5 @@ async function writeGamesToStream(outputPath: string, maxGames: number = 200): P
     console.log(`Successfully wrote ${gamesWritten} games to ${outputPath}`);
 }
 
-const outputFile = './games_streamed.json';
+const outputFile = './app/games/games.json';
 writeGamesToStream(outputFile);
