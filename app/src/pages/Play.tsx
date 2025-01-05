@@ -23,7 +23,7 @@ export const Play = () => {
   const addStep = (event: MouseEvent) => {
     const word = event.target.value;
     const synonyms = wordGraph.getSynonyms(word);
-    if (synonyms?.includes(puzzle.end)) {
+    if (word === puzzle.end) {
       window.confirm("YOU WIN!!!");
     } else {
       setSteps((steps) => [...steps, word]);
