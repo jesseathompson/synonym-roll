@@ -2,16 +2,24 @@
 :root {
   --primary-color: #411f07; /* Warm brown for the cinnamon roll crust */
   --text-primary: #411f07; /* Dark brown for text on the crust */
-  --text-secondary: #C19A6B; /* Lighter brown for secondary text */
+  --text-secondary: #c19a6b; /* Lighter brown for secondary text */
   --bg-light: #fefdf8; /* Cream color for the background */
   --bg-dark: #411f07; /* Dark brown for darker backgrounds */
   --bs-body-color: #411f07;
-  --font-game: 'Outfit', sans-serif;
+  --font-game: "Outfit", sans-serif;
 }
 
-[data-bs-theme='dark'] {
-  --text-primary: #ECF0F1;
-  --text-secondary: #BDC3C7;
+
+[data-bs-theme="dark"] {
+  /* --text-primary: #ecf0f1;
+  --text-secondary: #bdc3c7; */
+  --primary-color: #411f07; /* Warm brown for the cinnamon roll crust */
+  --text-primary: #411f07; /* Dark brown for text on the crust */
+  --text-secondary: #c19a6b; /* Lighter brown for secondary text */
+  --bg-light: #fefdf8; /* Cream color for the background */
+  --bg-dark: #411f07; /* Dark brown for darker backgrounds */
+  --bs-body-color: #411f07;
+  --font-game: "Outfit", sans-serif;
 }
 
 body {
@@ -23,11 +31,12 @@ body {
   color: var(--text-primary);
 }
 
-[data-bs-theme='dark'] body {
+/* [data-bs-theme="dark"] body {
   background-color: var(--bg-dark);
-}
+} */
 
-.start-end, .end-word {
+.start-end,
+.end-word {
   padding: 1;
   border-radius: 12px;
   border: none;
@@ -36,26 +45,27 @@ body {
   font-weight: 600;
 }
 
-.start-word, .end-word {
-text-transform: uppercase;
-text-shadow: 2px 2px 6px var(--text-secondary);
-/* color: lime; */
-font-size: larger;
-
+.start-word,
+.end-word {
+  text-transform: uppercase;
+  text-shadow: 2px 2px 6px var(--text-secondary);
+  /* color: lime; */
+  font-size: larger;
 }
-
 
 .step-word {
   /* text-transform: uppercase; */
   /* text-shadow: 2px 2px 6px var(--text-secondary); */
   text-shadow: 1px 1px 3px var(--text-secondary);
-/* color: aqua; */
+  /* color: aqua; */
 }
 
 .ignore-start-word {
   color: aqua;
   display: none;
 }
+
+
 
 /* Navigation styles */
 .navbar {
@@ -86,13 +96,13 @@ font-size: larger;
 /* Game title styles */
 
 @font-face {
-  font-family: 'KissMe'; /* Name the font */
-  src: url('/KgKissMeSlowly-MEXx.ttf') format('truetype'); /* Path to the font in the public folder */
+  font-family: "KissMe"; /* Name the font */
+  src: url("/KgKissMeSlowly-MEXx.ttf") format("truetype"); /* Path to the font in the public folder */
 }
 
 .game-title {
   /* font-family: var(--font-game); */
-  font-family: 'KissMe';
+  font-family: "KissMe";
   font-weight: 700;
   font-size: 4.5rem;
   color: var(--primary-color);
@@ -114,10 +124,10 @@ font-size: larger;
   border-width: 0;
 }
 
-[data-bs-theme='dark'] .game-container {
+/* [data-bs-theme="dark"] .game-container {
   background-color: var(--bg-dark);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
+} */
 
 /* Stats display */
 .stats-display {
@@ -134,11 +144,10 @@ font-size: larger;
   border-radius: 8px;
   transition: transform 0.2s;
   background-color: var(--bg-light);
-border-color: var(--primary-color);
-color: var(--primary-color);
-margin: .1rem;
-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  margin: 0.1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn-game:hover {
@@ -168,7 +177,7 @@ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   .game-title {
     font-size: 2.25rem;
   }
-  
+
   .game-container {
     min-height: 70vh;
     margin-bottom: 300px;
@@ -181,15 +190,16 @@ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
 /* Theme transitions */
 * {
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.1s ease, color 0.1s ease;
 }
 
 /* High contrast support */
 @media (prefers-contrast: high) {
-  .card, .modal-content {
+  .card,
+  .modal-content {
     border-width: 2px;
   }
-  
+
   .btn {
     border-width: 2px;
   }
@@ -226,10 +236,10 @@ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background-color: var(--bg-light);
 }
 
-[data-bs-theme='dark'] .home-card {
+/* [data-bs-theme="dark"] .home-card {
   background-color: var(--bg-dark);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
+} */
 
 /* Game content */
 .game-content {
@@ -248,7 +258,4 @@ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   flex-direction: column;
   justify-content: center;
   align-items: center;
-} 
-
-
-
+}

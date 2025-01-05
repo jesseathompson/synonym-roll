@@ -1,7 +1,7 @@
 import { Container, Row, Col, Card, Button, Stack } from "react-bootstrap";
 import { useGameState } from "../context/GameStateContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faShare } from "@fortawesome/free-solid-svg-icons";
+import { faShare, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { generateShareText, shareResults } from "../utils/shareUtils";
 import { getTodaysPuzzle, getTodaysSeed } from "../utils/gameUtils";
 import { WordGraph } from "../utils/wordGraph";
@@ -81,10 +81,11 @@ export const Play = () => {
         <Col xs={12} md={10} lg={8}>
           <Card className="game-container text-center">
             {/* Card Body Start */}
+
             <Card.Body>
-              <div className="stats-display mb-2">
+              {/* <div className="stats-display mb-2">
                 <span>Daily Puzzle #{puzzleNumber}</span>
-              </div>
+              </div> */}
 
               {todayCompleted ? (
                 <div className="completed-state">
@@ -126,16 +127,17 @@ export const Play = () => {
                     <div className="start-end">
                       Starting Word:
                       <div className="start-word">{puzzle.start}</div>
-                      {steps.map((word, index) => (
-                        <div
-                          key={index}
-                          className={
-                            index === 0 ? "ignore-start-word" : "step-word"
-                          }
-                        >
-                          {word}
-                        </div>
-                      ))}
+                      <div className="steps-container">
+                        {steps.map((word, index) => {
+                          if (index === 0) return null;
+                          return (
+                            <span key={index} className="step-word">
+                              {word}
+                              {index < steps.length - 1 && " > "}{" "}
+                            </span>
+                          );
+                        })}
+                      </div>
                     </div>
 
                     <div className="syn-words">
@@ -152,22 +154,38 @@ export const Play = () => {
                       ))}
                     </div>
                     <div className="start-end">
-                      {minSteps} Ending Word:
+                      {minSteps} steps to Ending Word:
                       <div className="end-word">{puzzle.end}</div>
+                      <Button
+                        variant="primary"
+                        size="md"
+                        className="btn-game"
+                        onClick={removeStep}
+                      >
+                        <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
+                        Go Back
+                      </Button>
                     </div>
                   </Stack>
 
-                  <Button
-                    variant="primary"
-                    size="md"
-                    className="btn-game"
-                    onClick={removeStep}
-                  >
-                    Go Back
-                  </Button>
+                  <span>
+                    {/* <div className="floating-steps">{minSteps} Steps Left</div> */}
+                    {/* <Button variant="primary" size="md" className="btn-game">
+                      {minSteps} Words To Go
+                    </Button> */}
+                    {/* <Button
+                      variant="primary"
+                      size="md"
+                      className="btn-game"
+                      onClick={removeStep}
+                    >
+                      <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
+                      Go Back
+                    </Button> */}
+                  </span>
 
                   <div>
-                    <Button
+                    {/* <Button
                       variant="primary"
                       size="md"
                       className="btn-game"
@@ -178,7 +196,7 @@ export const Play = () => {
                       }
                     >
                       log solution
-                    </Button>
+                    </Button> */}
                     {/* <Button
                       variant="primary"
                       size="sm"
