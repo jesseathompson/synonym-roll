@@ -1,7 +1,7 @@
-import { Container, Row, Col, Button, Card } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { useGameState } from '../hooks/useGameState';
-import { getTodaysSeed } from '../utils/gameUtils';
+import { Container, Row, Col, Button, Card } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { useGameState } from "../hooks/useGameState";
+import { getTodaysSeed } from "../utils/gameUtils";
 
 export const Home = () => {
   const { gameState } = useGameState();
@@ -14,19 +14,17 @@ export const Home = () => {
     <Container className="py-5">
       <Row className="justify-content-center text-center">
         <Col md={8} lg={6}>
-          <h1 className="game-title mb-4">Game Title</h1>
-          
+          <h1 className="game-title mb-4">Synonym Roll</h1>
+
           <div className="stats-display mb-4">
             {todayCompleted ? (
               <div>
                 Come back tomorrow for the next puzzle!
                 <br />
                 <small className="text-muted">
-                  {streak === 1 ? (
-                    "You've started your streak!"
-                  ) : (
-                    `${streak} day streak! Keep it going!`
-                  )}
+                  {streak === 1
+                    ? "You've started your streak!"
+                    : `${streak} day streak! Keep it going!`}
                 </small>
               </div>
             ) : (
@@ -60,7 +58,9 @@ export const Home = () => {
                     className="btn-game"
                     disabled={todayCompleted}
                   >
-                    {todayCompleted ? 'Come Back Tomorrow' : 'Play Today\'s Puzzle'}
+                    {todayCompleted
+                      ? "Come Back Tomorrow"
+                      : "Play Today's Puzzle"}
                   </Button>
                 </Link>
               </div>
@@ -70,4 +70,4 @@ export const Home = () => {
       </Row>
     </Container>
   );
-}; 
+};

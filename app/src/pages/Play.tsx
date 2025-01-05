@@ -1,18 +1,49 @@
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
-import { useGameState } from '../context/GameStateContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShare } from '@fortawesome/free-solid-svg-icons';
-import { generateShareText, shareResults } from '../utils/shareUtils';
-import { getTodaysPuzzle, getTodaysSeed } from '../utils/gameUtils';
-import { WordGraph } from '../utils/wordGraph';
-import { useState } from 'react';
-const wordGraph = new WordGraph()
+import { Container, Row, Col, Card, Button, Stack } from "react-bootstrap";
+import { useGameState } from "../context/GameStateContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faShare } from "@fortawesome/free-solid-svg-icons";
+import { generateShareText, shareResults } from "../utils/shareUtils";
+import { getTodaysPuzzle, getTodaysSeed } from "../utils/gameUtils";
+import { WordGraph } from "../utils/wordGraph";
+import { useState } from "react";
+const wordGraph = new WordGraph();
+
 export const Play = () => {
   const { gameState, updateGameState } = useGameState();
-  const { todayCompleted, gamesPlayed, streak, maxStreak, winRate, wins } = gameState;
+  const { todayCompleted, gamesPlayed, streak, maxStreak, winRate, wins } =
+    gameState;
   const [puzzle, setPuzzle] = useState(getTodaysPuzzle());
-  const [currentSynonyms, setCurrentSynonyms] = useState(wordGraph.getSynonyms(puzzle.start));
-
+  const [currentSynonyms, setCurrentSynonyms] = useState(
+    wordGraph.getSynonyms(puzzle.start)
+  );
+  const [steps, setSteps] = useState<string[]>([puzzle.start]);
+  const [minSteps, setMinSteps] = useState(
+    wordGraph.findShortestPathLengthBiDirectional(puzzle.start, puzzle.end)
+  );
+  const addStep = (event: MouseEvent) => {
+    const word = event.target.value;
+    const synonyms = wordGraph.getSynonyms(word);
+    if (synonyms?.includes(puzzle.end)) {
+      window.confirm("YOU WIN!!!");
+    } else {
+      setSteps((steps) => [...steps, word]);
+      setCurrentSynonyms(() => synonyms);
+      setMinSteps(() =>
+        wordGraph.findShortestPathLengthBiDirectional(word, puzzle.end)
+      );
+    }
+  };
+  const removeStep = () => {
+    if (steps.length > 1) {
+      const word = steps[steps.length - 2];
+      console.log(word);
+      setSteps((steps) => [...steps.slice(0, -1)]);
+      setCurrentSynonyms(() => wordGraph.getSynonyms(word));
+      setMinSteps(() =>
+        wordGraph.findShortestPathLengthBiDirectional(word, puzzle.end)
+      );
+    }
+  };
   // Get today's puzzle number
   const puzzleNumber = Math.floor((getTodaysSeed() % 1000000) / 100);
 
@@ -24,13 +55,13 @@ export const Play = () => {
       gamesPlayed: newGamesPlayed,
       wins: newWins,
       winRate: newWins / newGamesPlayed,
-      maxStreak: Math.max(maxStreak, streak)
+      maxStreak: Math.max(maxStreak, streak),
     });
   };
 
   const handleShare = async () => {
     const shareText = generateShareText({
-      title: 'Game Title',
+      title: "Synonym Roll",
       dayNumber: puzzleNumber,
       streak,
       stats: {
@@ -38,7 +69,7 @@ export const Play = () => {
         winRate,
         currentStreak: streak,
         maxStreak,
-      }
+      },
     });
 
     await shareResults(shareText);
@@ -49,22 +80,24 @@ export const Play = () => {
       <Row className="justify-content-center">
         <Col xs={12} md={10} lg={8}>
           <Card className="game-container text-center">
+            {/* Card Body Start */}
             <Card.Body>
-              <div className="stats-display mb-4">
+              <div className="stats-display mb-2">
                 <span>Daily Puzzle #{puzzleNumber}</span>
               </div>
 
               {todayCompleted ? (
                 <div className="completed-state">
-                  <h4 className="mb-4">Daily puzzle completed!</h4>
-                  
-                  <div className="stats-grid mb-4">
+                  <h4 className="mb-2">Daily puzzle completed!</h4>
+                  <div className="stats-grid mb-2">
                     <div className="stat-item">
                       <div className="stat-value">{gamesPlayed}</div>
                       <div className="stat-label">Played</div>
                     </div>
                     <div className="stat-item">
-                      <div className="stat-value">{Math.round(winRate * 100)}%</div>
+                      <div className="stat-value">
+                        {Math.round(winRate * 100)}%
+                      </div>
                       <div className="stat-label">Win Rate</div>
                     </div>
                     <div className="stat-item">
@@ -76,9 +109,8 @@ export const Play = () => {
                       <div className="stat-label">Best</div>
                     </div>
                   </div>
-
-                  <Button 
-                    variant="primary" 
+                  <Button
+                    variant="primary"
                     className="btn-game"
                     onClick={handleShare}
                   >
@@ -87,19 +119,75 @@ export const Play = () => {
                   </Button>
                 </div>
               ) : (
+                // Playing Game
+
                 <div className="game-content">
-                  {/* TODO: Replace with your actual game content */}
-                  <p className="mb-4">This is a placeholder for your game content.</p>
-                  <p className="mb-4">Start: {puzzle.start}, End: {puzzle.end}</p>
-                  <p className="mb-4">Synonyms: {currentSynonyms?.sort().join(', ')}</p>
+                  <Stack gap={1}>
+                    <div className="start-end">
+                      Starting Word:
+                      <div className="start-word">{puzzle.start}</div>
+                      {steps.map((word, index) => (
+                        <div
+                          key={index}
+                          className={
+                            index === 0 ? "ignore-start-word" : "step-word"
+                          }
+                        >
+                          {word}
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="syn-words">
+                      {currentSynonyms?.sort().map((synonym, index) => (
+                        <Button
+                          key={index}
+                          // variant="secondary"
+                          className="btn-game"
+                          value={synonym}
+                          onClick={addStep}
+                        >
+                          {synonym}
+                        </Button>
+                      ))}
+                    </div>
+                    <div className="start-end">
+                      {minSteps} Ending Word:
+                      <div className="end-word">{puzzle.end}</div>
+                    </div>
+                  </Stack>
+
                   <Button
                     variant="primary"
-                    size="lg"
+                    size="md"
                     className="btn-game"
-                    onClick={handleComplete}
+                    onClick={removeStep}
                   >
-                    Complete Puzzle
+                    Go Back
                   </Button>
+
+                  <div>
+                    <Button
+                      variant="primary"
+                      size="md"
+                      className="btn-game"
+                      onClick={() =>
+                        console.log(
+                          wordGraph.findPath(puzzle.start, puzzle.end)
+                        )
+                      }
+                    >
+                      log solution
+                    </Button>
+                    {/* <Button
+                      variant="primary"
+                      size="sm"
+                      className="btn-game"
+                      onClick={handleComplete}
+                    >
+                      Don't Click
+                    </Button> */}
+                  </div>
                 </div>
               )}
             </Card.Body>
@@ -108,4 +196,4 @@ export const Play = () => {
       </Row>
     </Container>
   );
-}; 
+};
