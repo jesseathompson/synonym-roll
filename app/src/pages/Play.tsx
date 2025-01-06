@@ -273,7 +273,7 @@ export const Play = () => {
                   <div>
                     <Button
                       variant="primary"
-                      size="md"
+                      // size="md"
                       className="btn-game"
                       onClick={() =>
                         console.log(
