@@ -1,11 +1,19 @@
-import { Container, Row, Col, Card, Button, Stack } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Stack,
+  Collapse,
+} from "react-bootstrap";
 import { useGameState } from "../context/GameStateContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShare, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { generateShareText, shareResults } from "../utils/shareUtils";
 import { getTodaysPuzzle, getTodaysSeed } from "../utils/gameUtils";
 import { WordGraph } from "../utils/wordGraph";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 const wordGraph = new WordGraph();
 
 export const Play = () => {
@@ -20,15 +28,37 @@ export const Play = () => {
   const [minSteps, setMinSteps] = useState(
     wordGraph.findShortestPathLengthBiDirectional(puzzle.start, puzzle.end)
   );
+
+  const [elapsedTime, setElapsedTime] = useState(0); // Track elapsed time
+  const [hasGameStarted, setHasGameStarted] = useState(false); // Check if the game has started
+  const timerRef = useRef<NodeJS.Timeout | null>(null); // Store timer reference
+
+  useEffect(() => {
+    // Cleanup the timer when the component unmounts
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  const startTimer = () => {
+    if (!hasGameStarted) {
+      setHasGameStarted(true);
+      timerRef.current = setInterval(() => {
+        setElapsedTime((prev) => prev + 1);
+      }, 1000);
+    }
+  };
   const addStep = (event: React.MouseEvent<HTMLButtonElement>) => {
+    startTimer(); // Start the timer on the first synonym button click
     const word = (event.target as HTMLInputElement).value;
     const synonyms = wordGraph.getSynonyms(word);
     if (word === puzzle.end) {
-      window.confirm("YOU WIN!!!");
+      handleComplete();
+      // window.confirm("YOU WIN!!!");
     } else {
       setSteps((steps) => [...steps, word]);
       setCurrentSynonyms(() => synonyms);
-      setMinSteps(() => 
+      setMinSteps(() =>
         wordGraph.findShortestPathLengthBiDirectional(word, puzzle.end)
       );
     }
@@ -48,6 +78,7 @@ export const Play = () => {
   const puzzleNumber = Math.floor((getTodaysSeed() % 1000000) / 100);
 
   const handleComplete = () => {
+    if (timerRef.current) clearInterval(timerRef.current); // Stop the timer
     const newGamesPlayed = gamesPlayed + 1;
     const newWins = wins + 1;
     updateGameState({
@@ -88,41 +119,94 @@ export const Play = () => {
               </div> */}
 
               {todayCompleted ? (
-                <div className="completed-state">
-                  <h4 className="mb-2">Daily puzzle completed!</h4>
-                  <div className="stats-grid mb-2">
-                    <div className="stat-item">
-                      <div className="stat-value">{gamesPlayed}</div>
-                      <div className="stat-label">Played</div>
-                    </div>
-                    <div className="stat-item">
-                      <div className="stat-value">
-                        {Math.round(winRate * 100)}%
+                <div className="game-content">
+                  <div className="completed-state">
+                    <h4>
+                      You completed the puzzle in {Math.floor(elapsedTime / 60)}
+                      :{(elapsedTime % 60).toString().padStart(2, "0")} and{" "}
+                      {steps.length - 1} steps:
+                    </h4>
+
+                    <div className="start-word">{puzzle.start}</div>
+                    {steps.map((word, index) => {
+                      if (index === 0) return null;
+                      return (
+                        <span key={index} className="step-word">
+                          {word}
+                          {index < steps.length - 1}
+                        </span>
+                      );
+                    })}
+                    <div className="end-word">{puzzle.end}</div>
+
+                    <div className="score-grid">
+                      <div className="score-item">
+                        <div className="score-value">
+                          {Math.floor(elapsedTime / 60)}:
+                          {(elapsedTime % 60).toString().padStart(2, "0")}
+                        </div>
+                        <div className="score-label">Time</div>
                       </div>
-                      <div className="stat-label">Win Rate</div>
+
+                      <div className="score-item">
+                        <div className="score-value">{steps.length - 1}</div>
+                        <div className="score-label">Steps</div>
+                      </div>
+                      <div className="stat-item">
+                        <div className="stat-value">
+                          {Math.round(winRate * 100)}%
+                        </div>
+                        <div className="stat-label">Win Rate</div>
+                      </div>
+                      <div className="stat-item">
+                        <div className="stat-value">{gamesPlayed}</div>
+                        <div className="stat-label">Played</div>
+                      </div>
                     </div>
-                    <div className="stat-item">
-                      <div className="stat-value">{streak}</div>
-                      <div className="stat-label">Streak</div>
+
+                    <div className="stats-grid mb-2">
+                      {/* <div className="stat-item">
+                        <div className="stat-value">
+                          {Math.round(winRate * 100)}%
+                        </div>
+                        <div className="stat-label">Win Rate</div>
+                      </div>
+                      <div className="stat-item">
+                        <div className="stat-value">{gamesPlayed}</div>
+                        <div className="stat-label">Played</div>
+                      </div> */}
+
+                      {/* <div className="stat-item">
+                        <div className="stat-value">{streak}</div>
+                        <div className="stat-label">Streak</div>
+                      </div> */}
+                      {/* <div className="stat-item">
+                        <div className="stat-value">{maxStreak}</div>
+                        <div className="stat-label">Best</div>
+                      </div> */}
                     </div>
-                    <div className="stat-item">
-                      <div className="stat-value">{maxStreak}</div>
-                      <div className="stat-label">Best</div>
-                    </div>
+                    <Button
+                      variant="primary"
+                      className="btn-game"
+                      onClick={handleShare}
+                    >
+                      <FontAwesomeIcon icon={faShare} className="me-2" />
+                      Share Result
+                    </Button>
                   </div>
-                  <Button
-                    variant="primary"
-                    className="btn-game"
-                    onClick={handleShare}
-                  >
-                    <FontAwesomeIcon icon={faShare} className="me-2" />
-                    Share Result
-                  </Button>
                 </div>
               ) : (
                 // Playing Game
 
                 <div className="game-content">
+                  {/* Display Timer */}
+                  <div className="timer">
+                    <h4>
+                      Time Elapsed: {Math.floor(elapsedTime / 60)}:
+                      {(elapsedTime % 60).toString().padStart(2, "0")}
+                    </h4>
+                  </div>
+
                   <Stack gap={1}>
                     <div className="start-end">
                       Starting Word:
@@ -147,7 +231,9 @@ export const Play = () => {
                           // variant="secondary"
                           className="btn-game"
                           value={synonym}
-                          onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) =>addStep(e)}
+                          onClick={(
+                            e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+                          ) => addStep(e)}
                         >
                           {synonym}
                         </Button>
@@ -185,7 +271,7 @@ export const Play = () => {
                   </span>
 
                   <div>
-                    {/* <Button
+                    <Button
                       variant="primary"
                       size="md"
                       className="btn-game"
@@ -196,15 +282,15 @@ export const Play = () => {
                       }
                     >
                       log solution
-                    </Button> */}
-                    {/* <Button
+                    </Button>
+                    <Button
                       variant="primary"
                       size="sm"
                       className="btn-game"
                       onClick={handleComplete}
                     >
                       Don't Click
-                    </Button> */}
+                    </Button>
                   </div>
                 </div>
               )}

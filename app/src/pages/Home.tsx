@@ -19,12 +19,12 @@ export const Home = () => {
           <div className="stats-display mb-4">
             {todayCompleted ? (
               <div>
-                Come back tomorrow for the next puzzle!
+                Come back tomorrow for a new game!
                 <br />
                 <small className="text-muted">
                   {streak === 1
-                    ? "You've started your streak!"
-                    : `${streak} day streak! Keep it going!`}
+                    ? "You've started your Roll streak!"
+                    : `You're on a ${streak} day Roll! Keep Rollin'!`}
                 </small>
               </div>
             ) : (
@@ -32,7 +32,7 @@ export const Home = () => {
                 Daily Puzzle #{puzzleNumber} is ready!
                 <br />
                 <small className="text-muted">
-                  {streak > 0 && `${streak} day streak - don't break it!`}
+                  {streak > 0 && `You're on a ${streak} day Roll! Keep Rollin'!`}
                 </small>
               </div>
             )}
@@ -41,7 +41,7 @@ export const Home = () => {
           <Card className="home-card">
             <Card.Body>
               <p className="mb-4">
-                A new puzzle every day. Complete it to maintain your streak!
+                A new word game every day. Complete it to maintain your Roll!
               </p>
 
               {lastPlayed && (

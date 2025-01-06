@@ -19,9 +19,9 @@ export const InfoModal = ({ show, onHide }: InfoModalProps) => {
         
         <h5 className="mt-4">More Features Coming Soon!</h5>
         <ul className="list-unstyled">
-          <li>• Dark Mode</li>
-          <li>• Scoring</li>
+          <li>• Scores</li>
           <li>• Share</li>
+          <li>• Streaks</li>
         </ul>
 
         <hr />

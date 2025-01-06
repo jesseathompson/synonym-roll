@@ -1,6 +1,6 @@
-import { getTodaysSeed } from './gameUtils';
+import { getTodaysSeed } from "./gameUtils";
 
-type ResultEmoji = '⬛' | '🟨' | '🟩' | '🟦' | '🟥' | '⬜'; // Add more as needed
+type ResultEmoji = "⬛" | "🟨" | "🟩" | "🟦" | "🟥" | "⬜"; // Add more as needed
 
 interface ShareOptions {
   title: string;
@@ -27,7 +27,7 @@ interface GameStats {
  * @returns Formatted string of emojis
  */
 export const generateResultGrid = (grid: ResultEmoji[][]): string => {
-  return grid.map(row => row.join('')).join('\n');
+  return grid.map((row) => row.join("")).join("\n");
 };
 
 /**
@@ -39,7 +39,7 @@ const formatTime = (ms: number): string => {
   const seconds = Math.floor(ms / 1000);
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
 };
 
 /**
@@ -60,7 +60,7 @@ export const generateShareText = ({
 
   // Title and day number
   lines.push(`${title} #${dayNumber}`);
-  lines.push('');
+  lines.push("");
 
   // Score and streak if provided
   if (score !== undefined) {
@@ -75,18 +75,20 @@ export const generateShareText = ({
 
   // Add grid if provided
   if (grid) {
-    lines.push('');
+    lines.push("");
     lines.push(generateResultGrid(grid));
   }
 
   // Add stats comparison if provided
   if (stats) {
-    lines.push('');
-    lines.push('📊 Stats:');
+    lines.push("");
+    lines.push("📊 Stats:");
+    lines.push(`Today's Time: ${stats.currentStreak}`);
+    lines.push(`Steps Taken: ${stats.maxStreak}`);
     lines.push(`Games Played: ${stats.gamesPlayed}`);
     lines.push(`Win Rate: ${Math.round(stats.winRate * 100)}%`);
-    lines.push(`Current Streak: ${stats.currentStreak}`);
-    lines.push(`Max Streak: ${stats.maxStreak}`);
+    // lines.push(`Current Streak: ${stats.currentStreak}`);
+    // lines.push(`Max Streak: ${stats.maxStreak}`);
     if (stats.averageScore !== undefined) {
       lines.push(`Average Score: ${stats.averageScore.toFixed(1)}`);
     }
@@ -95,7 +97,7 @@ export const generateShareText = ({
     }
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 };
 
 /**
@@ -104,16 +106,19 @@ export const generateShareText = ({
  * @param url Optional URL to share
  * @returns Promise that resolves when sharing is complete
  */
-export const shareResults = async (text: string, url?: string): Promise<void> => {
+export const shareResults = async (
+  text: string,
+  url?: string
+): Promise<void> => {
   if (navigator.share) {
     try {
       await navigator.share({
         text,
         url,
-        title: 'Game Results',
+        title: "Game Results",
       });
     } catch (err) {
-      if (err instanceof Error && err.name !== 'AbortError') {
+      if (err instanceof Error && err.name !== "AbortError") {
         await navigator.clipboard.writeText(text);
       }
     }
@@ -128,23 +133,55 @@ export const shareResults = async (text: string, url?: string): Promise<void> =>
  * @param friendStats Friend's game stats
  * @returns Comparison text
  */
-export const compareStats = (myStats: GameStats, friendStats: GameStats): string => {
-  const lines: string[] = [];
-  lines.push('📊 Stats Comparison:');
-  lines.push('');
-  lines.push('           You  Friend');
-  lines.push(`Games:     ${myStats.gamesPlayed.toString().padStart(3)} ${friendStats.gamesPlayed.toString().padStart(6)}`);
-  lines.push(`Win Rate:  ${(myStats.winRate * 100).toFixed(0).padStart(3)}% ${(friendStats.winRate * 100).toFixed(0).padStart(5)}%`);
-  lines.push(`Streak:    ${myStats.currentStreak.toString().padStart(3)} ${friendStats.currentStreak.toString().padStart(6)}`);
-  lines.push(`Best:      ${myStats.maxStreak.toString().padStart(3)} ${friendStats.maxStreak.toString().padStart(6)}`);
-  
-  if (myStats.averageScore !== undefined && friendStats.averageScore !== undefined) {
-    lines.push(`Avg Score: ${myStats.averageScore.toFixed(1).padStart(3)} ${friendStats.averageScore.toFixed(1).padStart(6)}`);
-  }
-  
-  if (myStats.bestTime !== undefined && friendStats.bestTime !== undefined) {
-    lines.push(`Best Time: ${formatTime(myStats.bestTime).padStart(3)} ${formatTime(friendStats.bestTime).padStart(6)}`);
-  }
-  
-  return lines.join('\n');
-}; 
+// export const compareStats = (
+//   myStats: GameStats,
+//   friendStats: GameStats
+// ): string => {
+//   const lines: string[] = [];
+//   lines.push("📊 Stats Comparison:");
+//   lines.push("");
+//   lines.push("           You  Friend");
+//   lines.push(
+//     `Games:     ${myStats.gamesPlayed
+//       .toString()
+//       .padStart(3)} ${friendStats.gamesPlayed.toString().padStart(6)}`
+//   );
+//   lines.push(
+//     `Win Rate:  ${(myStats.winRate * 100).toFixed(0).padStart(3)}% ${(
+//       friendStats.winRate * 100
+//     )
+//       .toFixed(0)
+//       .padStart(5)}%`
+//   );
+//   lines.push(
+//     `Streak:    ${myStats.currentStreak
+//       .toString()
+//       .padStart(3)} ${friendStats.currentStreak.toString().padStart(6)}`
+//   );
+//   lines.push(
+//     `Best:      ${myStats.maxStreak
+//       .toString()
+//       .padStart(3)} ${friendStats.maxStreak.toString().padStart(6)}`
+//   );
+
+//   if (
+//     myStats.averageScore !== undefined &&
+//     friendStats.averageScore !== undefined
+//   ) {
+//     lines.push(
+//       `Avg Score: ${myStats.averageScore
+//         .toFixed(1)
+//         .padStart(3)} ${friendStats.averageScore.toFixed(1).padStart(6)}`
+//     );
+//   }
+
+//   if (myStats.bestTime !== undefined && friendStats.bestTime !== undefined) {
+//     lines.push(
+//       `Best Time: ${formatTime(myStats.bestTime).padStart(3)} ${formatTime(
+//         friendStats.bestTime
+//       ).padStart(6)}`
+//     );
+//   }
+
+//   return lines.join("\n");
+// };
