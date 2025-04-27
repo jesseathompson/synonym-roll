@@ -1,15 +1,7 @@
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Button,
-  Stack,
-  Collapse,
-} from "react-bootstrap";
+import { Container, Row, Col, Card, Button, Stack, Alert } from "react-bootstrap";
 import { useGameState } from "../context/GameStateContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faShare, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faShare, faArrowLeft, faLightbulb } from "@fortawesome/free-solid-svg-icons";
 import { generateShareText, shareResults } from "../utils/shareUtils";
 import { getTodaysPuzzle, getTodaysSeed } from "../utils/gameUtils";
 import { WordGraph } from "../utils/wordGraph";
@@ -22,7 +14,7 @@ export const Play = () => {
     gameState;
   const [puzzle, setPuzzle] = useState(getTodaysPuzzle());
   const [currentSynonyms, setCurrentSynonyms] = useState(
-    wordGraph.getSynonyms(puzzle.start)
+    wordGraph.getSynonyms(puzzle.start, puzzle.end) || []
   );
   const [steps, setSteps] = useState<string[]>([puzzle.start]);
   const [minSteps, setMinSteps] = useState(
@@ -51,7 +43,7 @@ export const Play = () => {
   const addStep = (event: React.MouseEvent<HTMLButtonElement>) => {
     startTimer(); // Start the timer on the first synonym button click
     const word = (event.target as HTMLInputElement).value;
-    const synonyms = wordGraph.getSynonyms(word);
+    const synonyms = wordGraph.getSynonyms(word, puzzle.end) || [];
     if (word === puzzle.end) {
       handleComplete();
       // window.confirm("YOU WIN!!!");
@@ -68,7 +60,7 @@ export const Play = () => {
       const word = steps[steps.length - 2];
       console.log(word);
       setSteps((steps) => [...steps.slice(0, -1)]);
-      setCurrentSynonyms(() => wordGraph.getSynonyms(word));
+      setCurrentSynonyms(wordGraph.getSynonyms(word, puzzle.end) || []);
       setMinSteps(() =>
         wordGraph.findShortestPathLengthBiDirectional(word, puzzle.end)
       );
@@ -234,10 +226,21 @@ export const Play = () => {
                           onClick={(
                             e: React.MouseEvent<HTMLButtonElement, MouseEvent>
                           ) => addStep(e)}
+                          onClick={(
+                            e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+                          ) => addStep(e)}
                         >
                           {synonym}
                         </Button>
                       ))}
+                      
+                      {/* Display warning when no valid path exists */}
+                      {noPathWarning && (
+                        <Alert variant="warning" className="mt-3">
+                          <FontAwesomeIcon icon={faLightbulb} className="me-2" />
+                          {noPathWarning}
+                        </Alert>
+                      )}
                     </div>
                     <div className="start-end">
                       {minSteps} steps to Ending Word:

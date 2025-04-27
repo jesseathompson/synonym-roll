@@ -1,20 +1,32 @@
-import puzzles from '../../games/games.json'
+import playableGames from '../../games/playable_games/playable_games.json';
+
+interface PlayableGame {
+  start_word: string;
+  end_word: string;
+  path_length: number;
+  avg_synonymy_score: number;
+  min_edge_synonymy: number;
+  start_frequency: number;
+  end_frequency: number;
+}
 
 /**
  * Get a deterministic puzzle for today's date
- * @param puzzles Array of available puzzles
- * @param offset Optional offset to shift the puzzle sequence
- * @returns Today's puzzle
+ * @returns Today's puzzle with start and end words
  */
-// export const getTodaysPuzzle = <T>(puzzles: T[], offset = 0): T => {
-  export const getTodaysPuzzle = <T>(): any => {
+export const getTodaysPuzzle = () => {
   const today = new Date();
   const daysSinceEpoch = Math.floor(today.getTime() / (24 * 60 * 60 * 1000));
+  
+  // Get a deterministic game based on the current day
+  const games = playableGames.games as PlayableGame[];
+  const gameIndex = daysSinceEpoch % games.length;
+  const game = games[gameIndex];
 
-  const randomIndex = Math.floor(Math.random() * puzzles.length);
-
-  // return puzzles[(daysSinceEpoch + offset) % puzzles.length];
-  return puzzles[randomIndex]
+  return {
+    start: game.start_word,
+    end: game.end_word
+  };
 };
 
 /**
@@ -77,4 +89,4 @@ export const seededShuffle = <T>(array: T[], seed: number): T[] => {
 export const getTodaysSeed = (): number => {
   const today = new Date();
   return today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-}; 
+};
