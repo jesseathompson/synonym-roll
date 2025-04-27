@@ -24,6 +24,7 @@ export const Play = () => {
   const [elapsedTime, setElapsedTime] = useState(0); // Track elapsed time
   const [hasGameStarted, setHasGameStarted] = useState(false); // Check if the game has started
   const timerRef = useRef<NodeJS.Timeout | null>(null); // Store timer reference
+  const [noPathWarning, setNoPathWarning] = useState<string | null>(null); // Warning for invalid paths
 
   useEffect(() => {
     // Cleanup the timer when the component unmounts
@@ -223,9 +224,6 @@ export const Play = () => {
                           // variant="secondary"
                           className="btn-game"
                           value={synonym}
-                          onClick={(
-                            e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-                          ) => addStep(e)}
                           onClick={(
                             e: React.MouseEvent<HTMLButtonElement, MouseEvent>
                           ) => addStep(e)}
