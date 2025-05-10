@@ -46,7 +46,7 @@ jobs:
         
       - name: Upload artifact
         # working-directory: ./app
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: './app/dist'
           
