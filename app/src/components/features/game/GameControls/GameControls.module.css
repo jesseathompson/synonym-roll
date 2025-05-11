@@ -1,0 +1,77 @@
+.game-controls {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: var(--spacing-md, 1rem) 0;
+}
+
+.game-controls__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm, 0.5rem);
+  justify-content: center;
+  align-items: center;
+}
+
+.game-controls__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  min-width: 120px;
+}
+
+.game-controls__button--back {
+  background-color: var(--primary-color, #5c62d6);
+  border-color: var(--primary-color, #5c62d6);
+  color: white;
+}
+
+.game-controls__button--back:hover,
+.game-controls__button--back:focus {
+  background-color: var(--secondary-color, #8287e0);
+  border-color: var(--secondary-color, #8287e0);
+}
+
+.game-controls__button--share {
+  background-color: var(--primary-color, #5c62d6);
+  border-color: var(--primary-color, #5c62d6);
+  color: white;
+}
+
+.game-controls__button--share:hover,
+.game-controls__button--share:focus {
+  background-color: var(--secondary-color, #8287e0);
+  border-color: var(--secondary-color, #8287e0);
+}
+
+.game-controls__button--reset {
+  background-color: transparent;
+  border-color: var(--text-color, #333333);
+  color: var(--text-color, #333333);
+}
+
+.game-controls__button--reset:hover,
+.game-controls__button--reset:focus {
+  background-color: #f0f0f0;
+  border-color: var(--text-color, #333333);
+}
+
+.game-controls__icon {
+  margin-right: 0.5rem;
+}
+
+/* Media queries for responsive layout */
+@media (max-width: 576px) {
+  .game-controls__buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .game-controls__button {
+    width: 100%;
+  }
+}
