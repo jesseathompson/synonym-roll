@@ -6,8 +6,8 @@ Create a reusable `SynonymList` component that displays a grid of buttons for sy
 ## Component Details
 
 ### Location
-`src/components/features/game/SynonymList/SynonymList.tsx`
-`src/components/features/game/SynonymList/SynonymList.module.css`
+`app/src/components/features/game/SynonymList/SynonymList.tsx`
+`app/src/components/features/game/SynonymList/SynonymList.module.css`
 
 ### Props Interface
 ```tsx

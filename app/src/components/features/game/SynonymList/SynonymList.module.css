@@ -1,0 +1,81 @@
+/* SynonymList.module.css */
+.synonym-list__container {
+  width: 100%;
+  margin: 10px 0;
+}
+
+.synonym-list__grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.synonym-list__item {
+  margin: 5px;
+  display: inline-block;
+  /* The WordTile component already handles the styling of individual tiles */
+}
+
+/* Empty state */
+.synonym-list__empty {
+  text-align: center;
+  padding: 2rem;
+  font-family: var(--font-game, "Outfit", sans-serif);
+  color: var(--text-secondary, #c19a6b);
+  font-weight: 500;
+  font-size: 1.25rem;
+}
+
+/* Loading state */
+.synonym-list__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.synonym-list__loading-text {
+  font-family: var(--font-game, "Outfit", sans-serif);
+  color: var(--text-secondary, #c19a6b);
+  font-weight: 500;
+  font-size: 1.25rem;
+}
+
+.synonym-list__loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(193, 154, 107, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--primary-color, #411f07);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .synonym-list__grid {
+    margin: 0 -3px; /* Smaller negative margin for mobile */
+  }
+  
+  .synonym-list__item {
+    margin: 3px;
+  }
+}
+
+@media (min-width: 992px) {
+  .synonym-list__grid {
+    margin: 0 -7px; /* Larger negative margin for desktop */
+  }
+  
+  .synonym-list__item {
+    margin: 7px;
+  }
+}
