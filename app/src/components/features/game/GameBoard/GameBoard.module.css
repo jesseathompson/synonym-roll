@@ -1,0 +1,58 @@
+/* GameBoard.module.css */
+.game-board {
+  min-height: 60vh;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: var(--bg-light, #fefdf8);
+  border-width: 0;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.game-board--completed {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.game-board__title {
+  font-family: var(--font-game, "Outfit", sans-serif);
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--text-primary, #411f07);
+  margin-bottom: var(--spacing-md, 1rem);
+  padding-top: 0.5rem;
+}
+
+.game-board__content {
+  display: flex;
+  flex-direction: column;
+  min-height: 50vh;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-md, 1rem) 0;
+}
+
+.game-board__content--completed {
+  justify-content: flex-start;
+  padding-top: var(--spacing-lg, 2rem);
+}
+
+/* Responsive styles */
+@media (max-width: 576px) {
+  .game-board {
+    min-height: 70vh;
+  }
+  
+  .game-board__title {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .game-board__title {
+    font-size: 1.4rem;
+  }
+  
+  .game-board__content {
+    padding: var(--spacing-lg, 2rem) 0;
+  }
+}
