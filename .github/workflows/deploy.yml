@@ -2,61 +2,59 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: main 
-  workflow_dispatch:
+    branches:
+      - main  # Set this to your default branch name (main or master)
+  workflow_dispatch:  # Allow manual triggering
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      
-      - uses: actions/checkout@v4
-      
-      - name: Set up Node.js
-        # working-directory: ./app
-        uses: actions/setup-node@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
-          
-      - name: Set deployment variables
-        working-directory: ./app
-        run: |
-          echo "VITE_BASE_URL=/${{ github.event.repository.name }}" >> $GITHUB_ENV
-          
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "app/package-lock.json"
+
       - name: Install dependencies
-        working-directory: ./app
-        run: npm ci
-        
+        run: cd app && npm ci
+
       - name: Build
-        working-directory: ./app
-        env:
-          # Pass repository info to Vite for base URL
-          VITE_REPO_NAME: ${{ github.event.repository.name }}
-        run: npm run build
+        run: |
+          cd app
+          # Set the repository name for proper base path
+          export VITE_REPO_NAME="synonym-roll"
+          npm run build
         
       - name: Setup Pages
-        # working-directory: ./app
-        uses: actions/configure-pages@v3
+        uses: actions/configure-pages@v4
         
       - name: Upload artifact
-        # working-directory: ./app
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './app/dist'
-          
+          path: "./app/dist"
+
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     needs: build
     runs-on: ubuntu-latest
-    environment:
-      name: 'github-pages'
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v3 
+        uses: actions/deploy-pages@v4
