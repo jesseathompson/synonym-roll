@@ -1,0 +1,56 @@
+/* StatsDisplay.module.css */
+.stats-display {
+  width: 100%;
+  margin: var(--spacing-md, 1rem) 0;
+}
+
+.stats-display__grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm, 0.5rem);
+}
+
+.stats-display__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-xs, 0.25rem);
+  transition: all 0.3s ease;
+}
+
+.stats-display__value {
+  font-family: var(--font-game, "Outfit", sans-serif);
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--text-primary, #411f07);
+  margin-bottom: var(--spacing-xs, 0.25rem);
+}
+
+.stats-display__label {
+  font-family: var(--font-game, "Outfit", sans-serif);
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #c19a6b);
+  text-transform: uppercase;
+}
+
+/* Responsive styles */
+@media (max-width: 576px) {
+  .stats-display__value {
+    font-size: 1.1rem;
+  }
+  
+  .stats-display__label {
+    font-size: 0.75rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .stats-display__value {
+    font-size: 1.3rem;
+  }
+  
+  .stats-display__label {
+    font-size: 0.9rem;
+  }
+}
