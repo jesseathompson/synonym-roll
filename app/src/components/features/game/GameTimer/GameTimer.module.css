@@ -1,0 +1,40 @@
+/* GameTimer.module.css */
+.game-timer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+  font-family: var(--font-game, "Outfit", sans-serif);
+  color: var(--text-primary, #411f07);
+}
+
+.game-timer__container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.game-timer__label {
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.game-timer__time {
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .game-timer__label, 
+  .game-timer__time {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .game-timer__label, 
+  .game-timer__time {
+    font-size: 1.4rem;
+  }
+}
