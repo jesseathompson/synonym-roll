@@ -22,7 +22,7 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {
-    synonyms: { control: 'array' },
+    synonyms: { control: 'object' },
     onSelect: { action: 'selected' },
     isLoading: { control: 'boolean' },
   },
