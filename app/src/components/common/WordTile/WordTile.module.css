@@ -1,0 +1,111 @@
+/* WordTile.module.css */
+:root {
+  /* Using the game's existing color scheme */
+  --word-tile-primary-color: var(--primary-color, #411f07);
+  --word-tile-secondary-color: var(--text-secondary, #c19a6b);
+  --word-tile-text-shadow: var(--text-shadow, #c19a6b);
+  --word-tile-bg-light: var(--bg-light, #fefdf8);
+  --word-tile-bg-dark: var(--bg-dark, #411f07);
+  --word-tile-font-family: var(--font-game, "Outfit", sans-serif);
+  
+  /* Additional styling variables */
+  --word-tile-font-size-sm: 0.875rem;
+  --word-tile-font-size-md: 1rem;
+  --word-tile-font-size-lg: 1.25rem;
+  --word-tile-padding-sm: 0.5rem 0.75rem;
+  --word-tile-padding-md: 0.75rem 1rem;
+  --word-tile-padding-lg: 1rem 1.5rem;
+  --word-tile-border-radius: 12px;
+  --word-tile-transition: all 0.2s ease-in-out;
+}
+
+.word-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--word-tile-padding-md);
+  margin: 0.25rem;
+  border-radius: var(--word-tile-border-radius);
+  font-family: var(--word-tile-font-family);
+  font-weight: 600;
+  font-size: var(--word-tile-font-size-md);
+  color: var(--word-tile-primary-color);
+  text-align: center;
+  transition: var(--word-tile-transition);
+  user-select: none;
+  background-color: var(--word-tile-bg-light);
+  border: 1px solid var(--word-tile-primary-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Variant-specific styles */
+.word-tile--start {
+  text-transform: uppercase;
+  text-shadow: 2px 2px 6px var(--word-tile-text-shadow);
+  font-size: var(--word-tile-font-size-lg);
+  font-weight: 600;
+}
+
+.word-tile--step {
+  text-shadow: 1px 1px 3px var(--word-tile-text-shadow);
+}
+
+.word-tile--end {
+  text-transform: uppercase;
+  text-shadow: 2px 2px 6px var(--word-tile-text-shadow);
+  font-size: var(--word-tile-font-size-lg);
+  font-weight: 600;
+}
+
+.word-tile--neutral {
+  /* Similar to the game buttons */
+  background-color: var(--word-tile-bg-light);
+  color: var(--word-tile-primary-color);
+  border-color: var(--word-tile-primary-color);
+}
+
+/* Interactive styles */
+.word-tile[role="button"] {
+  cursor: pointer;
+}
+
+.word-tile[role="button"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: var(--word-tile-bg-dark);
+  color: var(--word-tile-bg-light);
+}
+
+.word-tile[role="button"]:focus-visible {
+  outline: 2px solid var(--word-tile-secondary-color);
+  outline-offset: 2px;
+}
+
+.word-tile[role="button"]:active {
+  transform: translateY(0);
+}
+
+/* Responsive styles */
+@media (max-width: 576px) {
+  .word-tile {
+    padding: var(--word-tile-padding-sm);
+    font-size: var(--word-tile-font-size-sm);
+  }
+  
+  .word-tile--start,
+  .word-tile--end {
+    font-size: var(--word-tile-font-size-md);
+  }
+}
+
+@media (min-width: 992px) {
+  .word-tile {
+    padding: var(--word-tile-padding-lg);
+    font-size: var(--word-tile-font-size-lg);
+  }
+  
+  .word-tile--start,
+  .word-tile--end {
+    font-size: calc(var(--word-tile-font-size-lg) * 1.1);
+  }
+}

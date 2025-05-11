@@ -6,8 +6,8 @@ Create a reusable `WordTile` component that displays a word with different visua
 ## Component Details
 
 ### Location
-`src/components/common/WordTile/WordTile.tsx`
-`src/components/common/WordTile/WordTile.module.css`
+`app/src/components/common/WordTile/WordTile.tsx`
+`app/src/components/common/WordTile/WordTile.module.css`
 
 ### Props Interface
 ```tsx
