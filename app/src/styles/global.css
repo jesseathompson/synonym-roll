@@ -1,65 +1,52 @@
+/* Import design tokens */
+@import './variables.css';
+
 /* Global styles */
 :root {
-  --primary-color: #411f07; /* Warm brown for the cinnamon roll crust */
-  --text-primary: #411f07; /* Dark brown for text on the crust */
-  --text-secondary: #c19a6b; /* Lighter brown for secondary text */
-  --text-shadow: #c19a6b;
-  --bg-light: #fefdf8; /* Cream color for the background */
-  --bg-dark: #411f07; /* Dark brown for darker backgrounds */
-  --bs-body-color: #411f07;
-  --font-game: "Outfit", sans-serif;
-}
-
-[data-bs-theme="dark"] {
-  /* --text-primary: #ecf0f1;
-  --text-secondary: #bdc3c7; */
-  --primary-color: #fefdf8; /* Warm brown for the cinnamon roll crust */
-  --text-primary: #f1dfc9; /* Dark brown for text on the crust */
-  --text-secondary: #f1dfc9; /* Lighter brown for secondary text */
-  --text-shadow: #000000;
-  --bg-light: #411f07; /* Cream color for the background */
-  --bg-dark: #fefdf8; /* Dark brown for darker backgrounds */
-  --bs-body-color: #c19a6b;
-  --font-game: "Outfit", sans-serif;
+  /* Legacy variable mappings for backward compatibility */
+  --primary-color: var(--color-primary);
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --text-shadow: var(--color-text-shadow);
+  --bg-light: var(--color-background-light);
+  --bg-dark: var(--color-background-dark);
+  --bs-body-color: var(--color-text-primary);
+  --font-game: var(--font-family-base);
 }
 
 body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  font-family: var(--font-game);
-  background-color: var(--bg-light);
-  color: var(--text-primary);
+  font-family: var(--font-family-base);
+  background-color: var(--color-background-light);
+  color: var(--color-text-primary);
 }
 
 /* [data-bs-theme="dark"] body {
-  background-color: var(--bg-dark);
+  background-color: var(--color-background-dark);
 } */
 
 .start-end,
 .end-word {
-  padding: 1;
-  border-radius: 12px;
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius-lg);
   border: none;
-  font-size: 1.25rem;
-  font-family: var(--font-game);
-  font-weight: 600;
+  font-size: var(--font-size-lg);
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-semibold);
 }
 
 .start-word,
 .end-word {
   text-transform: uppercase;
-  text-shadow: 2px 2px 6px var(--text-shadow);
-  /* color: lime; */
-  font-size: larger;
-  font-weight: 600;
+  text-shadow: 2px 2px 6px var(--color-text-shadow);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
 }
 
 .step-word {
-  /* text-transform: uppercase; */
-  /* text-shadow: 2px 2px 6px var(--text-secondary); */
-  text-shadow: 1px 1px 3px var(--text-shadow);
-  /* color: aqua; */
+  text-shadow: 1px 1px 3px var(--color-text-shadow);
 }
 
 .ignore-start-word {
@@ -70,74 +57,72 @@ body {
 /* Navigation styles */
 .navbar {
   background-color: transparent;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  padding-top: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
 }
 
 .nav-icons {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
   align-items: center;
 }
 
 .nav-icons .nav-link {
-  color: var(--text-secondary);
-  font-size: 1.25rem;
-  padding: 0.5rem;
-  border-radius: 8px;
-  transition: all 0.2s ease;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-md);
+  transition: var(--transition-fast);
 }
 
 .nav-icons .nav-link:hover {
-  color: var(--text-secondary);
+  color: var(--color-text-secondary);
   transform: translateY(-2px);
 }
 
 /* Game title styles */
 
 @font-face {
-  font-family: "KissMe"; /* Name the font */
+  font-family: "KG Kiss Me Slowly"; /* Name the font */
   src: url("/KgKissMeSlowly-MEXx.ttf") format("truetype"); /* Path to the font in the public folder */
 }
 
 .game-title {
-  /* font-family: var(--font-game); */
-  font-family: "KissMe";
-  font-weight: 700;
+  font-family: var(--font-family-game);
+  font-weight: var(--font-weight-bold);
   font-size: 4.5rem;
-  color: var(--primary-color);
+  color: var(--color-primary);
   margin-bottom: 0;
   text-decoration: none;
   text-align: center;
 }
 
 .game-title:hover {
-  color: var(--primary-color);
+  color: var(--color-primary);
 }
 
 /* Game container styles */
 .game-container {
   min-height: 60vh;
-  border-radius: 12px;
-  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); */
-  background-color: var(--bg-light);
+  border-radius: var(--border-radius-lg);
+  background-color: var(--color-background-light);
   border-width: 0;
 }
 
 /* [data-bs-theme="dark"] .game-container {
-  background-color: var(--bg-dark);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background-color: var(--color-background-dark);
+  box-shadow: var(--shadow-md);
 } */
 
 .timer {
-  margin-bottom: 15px;
+  margin-bottom: var(--spacing-md);
 }
 
 /* Stats display */
 .stats-display {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--text-secondary);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
 }
 
 /* Button styles */
@@ -145,16 +130,16 @@ body {
 .btm-primary,
 .btn,
 .btn-lg {
-  font-family: var(--font-game);
-  font-weight: 600;
-  padding: 0.25rem 1rem;
-  border-radius: 8px;
-  transition: transform 0.2s;
-  background-color: var(--bg-light);
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-  margin: 0.1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-semibold);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  transition: var(--transition-fast);
+  background-color: var(--color-background-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  margin: calc(var(--spacing-xs) / 4);
+  box-shadow: var(--shadow-sm);
   text-decoration: none;
 }
 
@@ -164,15 +149,15 @@ body {
 
 .btn-game:hover {
   transform: translateY(-2px);
-  background-color: var(--bg-dark);
+  background-color: var(--color-background-dark);
 }
 
 /* Modal styles */
 .modal-game .modal-content {
-  border-radius: 12px;
+  border-radius: var(--border-radius-lg);
   border: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  background-color: var(--bg-light);
+  box-shadow: var(--shadow-lg);
+  background-color: var(--color-background-light);
 }
 
 .modal-game .modal-header {
@@ -188,22 +173,22 @@ body {
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .game-title {
-    font-size: 2.25rem;
+    font-size: var(--font-size-3xl);
   }
 
   .game-container {
     min-height: 70vh;
-    margin-bottom: 300px;
+    margin-bottom: var(--spacing-3xl);
   }
 
   .nav-icons .nav-link {
-    padding: 0.35rem;
+    padding: calc(var(--spacing-xs) * 0.7);
   }
 }
 
 /* Theme transitions */
 * {
-  transition: background-color 0.1s ease, color 0.1s ease;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 /* High contrast support */
@@ -223,8 +208,8 @@ body {
 .score-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  padding: 1rem;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
 }
 
 .stat-item,
@@ -234,28 +219,28 @@ body {
 
 .stat-value,
 .score-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary-color);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
 }
 
 .stat-label,
 .score-label {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  margin-top: 0.25rem;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-xs);
 }
 
 /* Home card styles */
 .home-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  background-color: var(--bg-light);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  background-color: var(--color-background-light);
 }
 
 /* [data-bs-theme="dark"] .home-card {
-  background-color: var(--bg-dark);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background-color: var(--color-background-dark);
+  box-shadow: var(--shadow-md);
 } */
 
 /* Game content */
@@ -269,7 +254,7 @@ body {
 
 /* Completed state */
 .completed-state {
-  padding: 2rem 1rem;
+  padding: var(--spacing-xl) var(--spacing-md);
   min-height: 50vh;
   display: flex;
   flex-direction: column;

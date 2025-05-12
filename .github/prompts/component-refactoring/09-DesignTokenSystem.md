@@ -6,7 +6,7 @@ Create a comprehensive design token system using CSS variables to ensure consist
 ## Component Details
 
 ### Location
-`src/styles/variables.css`
+`app/src/styles/variables.css`
 
 ### Implementation Details
 

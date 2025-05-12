@@ -1,0 +1,146 @@
+/* Design Token System for Synonym Roll */
+
+:root {
+  /* Colors - Main Palette */
+  --color-primary: #411f07; /* Warm brown for the cinnamon roll crust */
+  --color-primary-light: #723911; /* Lighter variant of primary */
+  --color-primary-dark: #2a1504; /* Darker variant of primary */
+  --color-secondary: #c19a6b; /* Lighter brown for secondary elements */
+  --color-secondary-light: #e6d7c3; /* Even lighter variant for subtle elements */
+  --color-secondary-dark: #9a7a53; /* Darker variant of secondary */
+  
+  /* Text Colors */
+  --color-text-primary: #411f07; /* Main text color - dark brown */
+  --color-text-secondary: #c19a6b; /* Secondary text - lighter brown */
+  --color-text-muted: #8c775d; /* Muted text for less emphasis */
+  --color-text-inverse: #fefdf8; /* Text on dark backgrounds */
+  --color-text-shadow: #c19a6b; /* For text shadows */
+  
+  /* Background Colors */
+  --color-background-light: #fefdf8; /* Main cream-colored background */
+  --color-background-medium: #f8f4ea; /* Slightly darker background for cards/sections */
+  --color-background-dark: #411f07; /* Dark background for contrast */
+  
+  /* Status Colors */
+  --color-success: #27ae60; /* Green for success states */
+  --color-error: #e74c3c; /* Red for error states */
+  --color-warning: #f39c12; /* Amber for warnings */
+  --color-info: #3498db; /* Blue for information */
+  
+  /* Border Colors */
+  --color-border-light: #e6d7c3; /* Light borders */
+  --color-border-medium: #c19a6b; /* Medium emphasis borders */
+  --color-border-dark: #9a7a53; /* Dark borders */
+  
+  /* Typography */
+  --font-family-base: "Outfit", sans-serif;
+  --font-family-game: "KG Kiss Me Slowly", cursive; /* Game-specific stylized font */
+  
+  /* Font Sizes */
+  --font-size-xs: 0.75rem;   /* 12px */
+  --font-size-sm: 0.875rem;  /* 14px */
+  --font-size-md: 1rem;      /* 16px - Base size */
+  --font-size-lg: 1.25rem;   /* 20px */
+  --font-size-xl: 1.5rem;    /* 24px */
+  --font-size-2xl: 2rem;     /* 32px */
+  --font-size-3xl: 2.5rem;   /* 40px */
+  
+  /* Font Weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  
+  /* Letter Spacing */
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;   /* 4px */
+  --spacing-sm: 0.5rem;    /* 8px */
+  --spacing-md: 1rem;      /* 16px */
+  --spacing-lg: 1.5rem;    /* 24px */
+  --spacing-xl: 2rem;      /* 32px */
+  --spacing-2xl: 3rem;     /* 48px */
+  --spacing-3xl: 4rem;     /* 64px */
+  
+  /* Layout */
+  --border-radius-xs: 0.125rem; /* 2px */
+  --border-radius-sm: 0.25rem;  /* 4px */
+  --border-radius-md: 0.5rem;   /* 8px */
+  --border-radius-lg: 1rem;     /* 16px */
+  --border-radius-xl: 1.5rem;   /* 24px */
+  --border-radius-full: 9999px; /* Fully rounded */
+  
+  /* Container Sizes */
+  --max-width-xs: 480px;
+  --max-width-sm: 640px;
+  --max-width-md: 768px;
+  --max-width-lg: 1024px;
+  --max-width-xl: 1280px;
+  
+  /* Z-index Scale */
+  --z-index-base: 1;
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1100;
+  --z-index-fixed: 1200;
+  --z-index-modal: 2000;
+  --z-index-popover: 2100;
+  --z-index-toast: 3000;
+  
+  /* Effects */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 15px 25px rgba(0, 0, 0, 0.1);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+  --transition-slow: 500ms ease;
+  
+  /* Game-specific Variables */
+  --game-tile-size: 3rem;
+  --game-grid-gap: 0.75rem;
+}
+
+/* Dark Theme Variables */
+[data-bs-theme="dark"] {
+  /* Colors - Main Palette (Inverted) */
+  --color-primary: #fefdf8; /* Inverted to light color */
+  --color-primary-light: #e6d7c3;
+  --color-primary-dark: #c19a6b;
+  --color-secondary: #f1dfc9;
+  --color-secondary-light: #f8f4ea;
+  --color-secondary-dark: #c19a6b;
+  
+  /* Text Colors */
+  --color-text-primary: #f1dfc9; /* Light text on dark background */
+  --color-text-secondary: #f1dfc9;
+  --color-text-muted: #d5c7b2;
+  --color-text-inverse: #411f07;
+  --color-text-shadow: #000000;
+  
+  /* Background Colors */
+  --color-background-light: #411f07; /* Dark background for dark mode */
+  --color-background-medium: #592b0a;
+  --color-background-dark: #2a1504;
+  
+  /* Border Colors */
+  --color-border-light: #59442b;
+  --color-border-medium: #8c775d;
+  --color-border-dark: #c19a6b;
+  
+  /* Effects (adjusted for dark mode) */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 15px 25px rgba(0, 0, 0, 0.3);
+}
