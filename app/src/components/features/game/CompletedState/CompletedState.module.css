@@ -1,0 +1,97 @@
+/* CompletedState.module.css */
+.completed-state {
+  width: 100%;
+  padding: var(--spacing-lg, 1.5rem) var(--spacing-md, 1rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-md, 1rem);
+}
+
+.completed-state__title {
+  font-family: var(--font-game, "Outfit", sans-serif);
+  font-weight: 600;
+  color: var(--text-primary, #411f07);
+  margin-bottom: var(--spacing-md, 1rem);
+}
+
+.completed-state__path {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs, 0.25rem);
+  margin: var(--spacing-md, 1rem) 0;
+  width: 100%;
+}
+
+.completed-state__arrow {
+  color: var(--text-secondary, #c19a6b);
+  font-weight: 700;
+  margin: 0 var(--spacing-xs, 0.25rem);
+  display: inline-flex;
+  align-items: center;
+}
+
+.completed-state__stats {
+  width: 100%;
+  margin: var(--spacing-md, 1rem) 0;
+}
+
+.completed-state__actions {
+  margin-top: var(--spacing-md, 1rem);
+}
+
+.completed-state__share-button {
+  font-family: var(--font-game, "Outfit", sans-serif);
+  font-weight: 600;
+  padding: 0.5rem 1.5rem;
+  border-radius: var(--border-radius-md, 8px);
+  background-color: var(--primary-color, #411f07);
+  border-color: var(--primary-color, #411f07);
+  color: var(--bg-light, #fefdf8);
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.1));
+  transition: all var(--transition-fast, 0.2s) ease;
+}
+
+.completed-state__share-button:hover,
+.completed-state__share-button:focus {
+  transform: translateY(-2px);
+  background-color: var(--bg-dark, #411f07);
+  box-shadow: var(--shadow-md, 0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.completed-state__share-icon {
+  margin-right: var(--spacing-xs, 0.25rem);
+}
+
+/* Responsive styles */
+@media (max-width: 576px) {
+  .completed-state__title {
+    font-size: 1.1rem;
+  }
+  
+  .completed-state__path {
+    gap: var(--spacing-xxs, 0.125rem);
+  }
+  
+  .completed-state__arrow {
+    margin: 0 0.125rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .completed-state {
+    padding: var(--spacing-xl, 2rem);
+  }
+  
+  .completed-state__title {
+    font-size: 1.5rem;
+  }
+  
+  .completed-state__path {
+    max-width: 80%;
+  }
+}

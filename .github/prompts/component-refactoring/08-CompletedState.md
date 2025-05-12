@@ -6,8 +6,8 @@ Create a reusable `CompletedState` component that displays the completed game st
 ## Component Details
 
 ### Location
-`src/components/features/game/CompletedState/CompletedState.tsx`
-`src/components/features/game/CompletedState/CompletedState.module.css`
+`app/src/components/features/game/CompletedState/CompletedState.tsx`
+`app/src/components/features/game/CompletedState/CompletedState.module.css`
 
 ### Props Interface
 ```tsx
