@@ -6,8 +6,8 @@ Refactor the existing `Navigation` component to follow component best practices,
 ## Component Details
 
 ### Location
-`src/components/layout/Navigation/Navigation.tsx`
-`src/components/layout/Navigation/Navigation.module.css`
+`app/src/components/layout/Navigation/Navigation.tsx`
+`app/src/components/layout/Navigation/Navigation.module.css`
 
 ### Props Interface
 ```tsx

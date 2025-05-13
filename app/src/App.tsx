@@ -3,7 +3,7 @@ import { Container } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/global.css';
 
-import { Navigation } from './components/Navigation';
+import { Navigation } from './components/layout/Navigation';
 import { Home } from './pages/Home';
 import { Play } from './pages/Play';
 import { GameStateProvider } from './context/GameStateContext';

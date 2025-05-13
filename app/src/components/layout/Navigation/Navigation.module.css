@@ -1,0 +1,95 @@
+/* Navigation component styles following BEM naming convention */
+
+.navigation {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: var(--color-background-light);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+/* Brand/title styles */
+.navigation__brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--color-primary);
+  font-family: var(--font-family-game);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  transition: color 0.2s ease;
+}
+
+.navigation__brand:hover,
+.navigation__brand:focus {
+  color: var(--color-primary-light);
+  text-decoration: none;
+}
+
+/* Navigation links container */
+.navigation__links {
+  display: flex;
+  align-items: center;
+}
+
+/* Navigation link/button styles */
+.navigation__button {
+  background: transparent;
+  color: var(--color-primary);
+  border: none;
+  padding: var(--spacing-sm);
+  margin-left: var(--spacing-sm);
+  font-size: var(--font-size-lg);
+  cursor: pointer;
+  border-radius: var(--border-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.navigation__button:hover,
+.navigation__button:focus {
+  color: var(--color-primary-light);
+  background-color: var(--color-background-medium);
+  outline: none;
+}
+
+.navigation__button:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+/* Dark theme overrides */
+:global([data-theme="dark"]) .navigation {
+  background-color: var(--color-background-dark);
+  border-bottom-color: var(--color-border-dark);
+}
+
+:global([data-theme="dark"]) .navigation__brand,
+:global([data-theme="dark"]) .navigation__button {
+  color: var(--color-text-inverse);
+}
+
+:global([data-theme="dark"]) .navigation__button:hover,
+:global([data-theme="dark"]) .navigation__button:focus {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .navigation {
+    padding: var(--spacing-sm);
+  }
+
+  .navigation__brand {
+    font-size: var(--font-size-lg);
+  }
+
+  .navigation__button {
+    padding: var(--spacing-xs);
+    margin-left: var(--spacing-xs);
+    font-size: var(--font-size-md);
+  }
+}
