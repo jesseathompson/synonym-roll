@@ -1,87 +1,47 @@
-import { Container, Row, Col, Card, Button, Stack, Alert } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import { useGameState } from "../context/GameStateContext";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faShare, faArrowLeft, faLightbulb } from "@fortawesome/free-solid-svg-icons";
 import { generateShareText, shareResults } from "../utils/shareUtils";
 import { getTodaysPuzzle, getTodaysSeed } from "../utils/gameUtils";
-import { WordGraph } from "../utils/wordGraph";
-import { useState, useEffect, useRef } from "react";
-const wordGraph = new WordGraph();
+import { useState, useEffect } from "react";
+
+// Import extracted components
+import { GameBoard } from "../components/features/game/GameBoard";
+import { GameTimer } from "../components/features/game/GameTimer";
+import { GameControls } from "../components/features/game/GameControls";
+import { SynonymList } from "../components/features/game/SynonymList";
+import { CompletedState } from "../components/features/game/CompletedState";
+import { useGamePlayState } from "../hooks/useGamePlayState";
 
 export const Play = () => {
   const { gameState, updateGameState } = useGameState();
-  const { todayCompleted, gamesPlayed, streak, maxStreak, winRate, wins } =
-    gameState;
-  const [puzzle, setPuzzle] = useState(getTodaysPuzzle());
-  const [currentSynonyms, setCurrentSynonyms] = useState(
-    wordGraph.getSynonyms(puzzle.start, puzzle.end) || []
-  );
-  const [steps, setSteps] = useState<string[]>([puzzle.start]);
-  const [minSteps, setMinSteps] = useState(
-    wordGraph.findShortestPathLengthBiDirectional(puzzle.start, puzzle.end)
-  );
-
-  const [elapsedTime, setElapsedTime] = useState(0); // Track elapsed time
-  const [hasGameStarted, setHasGameStarted] = useState(false); // Check if the game has started
-  const timerRef = useRef<NodeJS.Timeout | null>(null); // Store timer reference
-  const [noPathWarning, setNoPathWarning] = useState<string | null>(null); // Warning for invalid paths
-
-  useEffect(() => {
-    // Cleanup the timer when the component unmounts
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, []);
-
-  const startTimer = () => {
-    if (!hasGameStarted) {
-      setHasGameStarted(true);
-      timerRef.current = setInterval(() => {
-        setElapsedTime((prev) => prev + 1);
-      }, 1000);
-    }
-  };
-  const addStep = (event: React.MouseEvent<HTMLButtonElement>) => {
-    startTimer(); // Start the timer on the first synonym button click
-    const word = (event.target as HTMLInputElement).value;
-    const synonyms = wordGraph.getSynonyms(word, puzzle.end) || [];
-    if (word === puzzle.end) {
-      handleComplete();
-      // window.confirm("YOU WIN!!!");
-    } else {
-      setSteps((steps) => [...steps, word]);
-      setCurrentSynonyms(() => synonyms);
-      setMinSteps(() =>
-        wordGraph.findShortestPathLengthBiDirectional(word, puzzle.end)
-      );
-    }
-  };
-  const removeStep = () => {
-    if (steps.length > 1) {
-      const word = steps[steps.length - 2];
-      console.log(word);
-      setSteps((steps) => [...steps.slice(0, -1)]);
-      setCurrentSynonyms(wordGraph.getSynonyms(word, puzzle.end) || []);
-      setMinSteps(() =>
-        wordGraph.findShortestPathLengthBiDirectional(word, puzzle.end)
-      );
-    }
-  };
+  const { todayCompleted, gamesPlayed, streak, maxStreak, winRate, wins } = gameState;
+  
+  // Get today's puzzle
+  const [puzzle] = useState(getTodaysPuzzle());
+  
+  // Use the game play state hook
+  const { state, addStep, removeStep, completeGame, resetGame } = useGamePlayState({
+    startWord: puzzle.start,
+    endWord: puzzle.end,
+  });
+ 
   // Get today's puzzle number
   const puzzleNumber = Math.floor((getTodaysSeed() % 1000000) / 100);
 
-  const handleComplete = () => {
-    if (timerRef.current) clearInterval(timerRef.current); // Stop the timer
-    const newGamesPlayed = gamesPlayed + 1;
-    const newWins = wins + 1;
-    updateGameState({
-      todayCompleted: true,
-      gamesPlayed: newGamesPlayed,
-      wins: newWins,
-      winRate: newWins / newGamesPlayed,
-      maxStreak: Math.max(maxStreak, streak),
-    });
-  };
+  // Handle game completion
+  useEffect(() => {
+    if (state.isCompleted && !todayCompleted) {
+      const newGamesPlayed = gamesPlayed + 1;
+      const newWins = wins + 1;
+      updateGameState({
+        todayCompleted: true,
+        gamesPlayed: newGamesPlayed,
+        wins: newWins,
+        winRate: newWins / newGamesPlayed,
+        maxStreak: Math.max(maxStreak, streak),
+      });
+    }
+  }, [state.isCompleted, todayCompleted, gamesPlayed, wins, updateGameState, maxStreak, streak]);
 
   const handleShare = async () => {
     const shareText = generateShareText({
@@ -99,204 +59,108 @@ export const Play = () => {
     await shareResults(shareText);
   };
 
+  const handleSynonymSelect = (word: string) => {
+    addStep(word);
+    if (word === puzzle.end) {
+      completeGame();
+    }
+  };
+
+  // Debug function (can be removed in production)
+  const logSolution = () => {
+    console.log("Solution path would be logged here");
+  };
+
   return (
     <Container fluid className="py-3">
       <Row className="justify-content-center">
         <Col xs={12} md={10} lg={8}>
-          <Card className="game-container text-center">
-            {/* Card Body Start */}
+          <GameBoard 
+            isCompleted={state.isCompleted}
+            className="text-center"
+          >
+            {state.isCompleted || todayCompleted ? (
+              <CompletedState
+                startWord={puzzle.start}
+                endWord={puzzle.end}
+                steps={state.steps}
+                elapsedTime={state.elapsedTime}
+                onShare={handleShare}
+                stats={{
+                  winRate,
+                  gamesPlayed,
+                  streak,
+                  maxStreak,
+                }}
+              />
+            ) : (
+              <div className="game-content">
+                {/* Timer Display */}
+                <GameTimer 
+                  time={state.elapsedTime} 
+                  label="Time Elapsed" 
+                />
 
-            <Card.Body>
-              {/* <div className="stats-display mb-2">
-                <span>Daily Puzzle #{puzzleNumber}</span>
-              </div> */}
-
-              {todayCompleted ? (
-                <div className="game-content">
-                  <div className="completed-state">
-                    <h4>
-                      You completed the puzzle in {Math.floor(elapsedTime / 60)}
-                      :{(elapsedTime % 60).toString().padStart(2, "0")} and{" "}
-                      {steps.length - 1} steps:
-                    </h4>
-
+                {/* Game Path Display */}
+                <div className="game-path mb-3">
+                  <div className="start-end">
+                    Starting Word:
                     <div className="start-word">{puzzle.start}</div>
-                    {steps.map((word, index) => {
-                      if (index === 0) return null;
-                      return (
-                        <span key={index} className="step-word">
-                          {word}
-                          {index < steps.length - 1}
-                        </span>
-                      );
-                    })}
+                    
+                    {/* Steps taken so far */}
+                    <div className="steps-container">
+                      {state.steps.map((word, index) => {
+                        if (index === 0) return null;
+                        return (
+                          <span key={index} className="step-word">
+                            {word}
+                            {index < state.steps.length - 1 && " > "}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Synonym Selection */}
+                <SynonymList
+                  synonyms={state.synonyms}
+                  onSelect={handleSynonymSelect}
+                />
+
+                {/* Target Word Display */}
+                <div className="target-section mt-3">
+                  <div className="start-end">
+                    {state.minSteps} steps to Ending Word:
                     <div className="end-word">{puzzle.end}</div>
-
-                    <div className="score-grid">
-                      <div className="score-item">
-                        <div className="score-value">
-                          {Math.floor(elapsedTime / 60)}:
-                          {(elapsedTime % 60).toString().padStart(2, "0")}
-                        </div>
-                        <div className="score-label">Time</div>
-                      </div>
-
-                      <div className="score-item">
-                        <div className="score-value">{steps.length - 1}</div>
-                        <div className="score-label">Steps</div>
-                      </div>
-                      <div className="stat-item">
-                        <div className="stat-value">
-                          {Math.round(winRate * 100)}%
-                        </div>
-                        <div className="stat-label">Win Rate</div>
-                      </div>
-                      <div className="stat-item">
-                        <div className="stat-value">{gamesPlayed}</div>
-                        <div className="stat-label">Played</div>
-                      </div>
-                    </div>
-
-                    <div className="stats-grid mb-2">
-                      {/* <div className="stat-item">
-                        <div className="stat-value">
-                          {Math.round(winRate * 100)}%
-                        </div>
-                        <div className="stat-label">Win Rate</div>
-                      </div>
-                      <div className="stat-item">
-                        <div className="stat-value">{gamesPlayed}</div>
-                        <div className="stat-label">Played</div>
-                      </div> */}
-
-                      {/* <div className="stat-item">
-                        <div className="stat-value">{streak}</div>
-                        <div className="stat-label">Streak</div>
-                      </div> */}
-                      {/* <div className="stat-item">
-                        <div className="stat-value">{maxStreak}</div>
-                        <div className="stat-label">Best</div>
-                      </div> */}
-                    </div>
-                    <Button
-                      variant="primary"
-                      className="btn-game"
-                      onClick={handleShare}
-                    >
-                      <FontAwesomeIcon icon={faShare} className="me-2" />
-                      Share Result
-                    </Button>
                   </div>
                 </div>
-              ) : (
-                // Playing Game
 
-                <div className="game-content">
-                  {/* Display Timer */}
-                  <div className="timer">
-                    <h4>
-                      Time Elapsed: {Math.floor(elapsedTime / 60)}:
-                      {(elapsedTime % 60).toString().padStart(2, "0")}
-                    </h4>
-                  </div>
+                {/* Game Controls */}
+                <GameControls
+                  showBackButton={state.steps.length > 1}
+                  showResetButton={false}
+                  onGoBack={removeStep}
+                />
 
-                  <Stack gap={1}>
-                    <div className="start-end">
-                      Starting Word:
-                      <div className="start-word">{puzzle.start}</div>
-                      <div className="steps-container">
-                        {steps.map((word, index) => {
-                          if (index === 0) return null;
-                          return (
-                            <span key={index} className="step-word">
-                              {word}
-                              {index < steps.length - 1 && " > "}{" "}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    <div className="syn-words">
-                      {currentSynonyms?.sort().map((synonym, index) => (
-                        <Button
-                          key={index}
-                          // variant="secondary"
-                          className="btn-game"
-                          value={synonym}
-                          onClick={(
-                            e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-                          ) => addStep(e)}
-                        >
-                          {synonym}
-                        </Button>
-                      ))}
-                      
-                      {/* Display warning when no valid path exists */}
-                      {noPathWarning && (
-                        <Alert variant="warning" className="mt-3">
-                          <FontAwesomeIcon icon={faLightbulb} className="me-2" />
-                          {noPathWarning}
-                        </Alert>
-                      )}
-                    </div>
-                    <div className="start-end">
-                      {minSteps} steps to Ending Word:
-                      <div className="end-word">{puzzle.end}</div>
-                      <Button
-                        variant="primary"
-                        // size="md"
-                        className="btn-game"
-                        onClick={removeStep}
-                      >
-                        <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
-                        Go Back
-                      </Button>
-                    </div>
-                  </Stack>
-
-                  <span>
-                    {/* <div className="floating-steps">{minSteps} Steps Left</div> */}
-                    {/* <Button variant="primary" size="md" className="btn-game">
-                      {minSteps} Words To Go
-                    </Button> */}
-                    {/* <Button
-                      variant="primary"
-                      size="md"
-                      className="btn-game"
-                      onClick={removeStep}
-                    >
-                      <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
-                      Go Back
-                    </Button> */}
-                  </span>
-
-                  <div>
-                    <Button
-                      variant="primary"
-                      // size="md"
-                      className="btn-game"
-                      onClick={() =>
-                        console.log(
-                          wordGraph.findPath(puzzle.start, puzzle.end)
-                        )
-                      }
-                    >
-                      log solution
-                    </Button>
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      className="btn-game"
-                      onClick={handleComplete}
-                    >
-                      Don't Click
-                    </Button>
-                  </div>
+                {/* Debug Controls (can be removed in production) */}
+                <div className="debug-controls mt-3">
+                  <button 
+                    className="btn btn-secondary btn-sm me-2"
+                    onClick={logSolution}
+                  >
+                    Log Solution
+                  </button>
+                  <button 
+                    className="btn btn-warning btn-sm"
+                    onClick={completeGame}
+                  >
+                    Complete Game (Debug)
+                  </button>
                 </div>
-              )}
-            </Card.Body>
-          </Card>
+              </div>
+            )}
+          </GameBoard>
         </Col>
       </Row>
     </Container>
