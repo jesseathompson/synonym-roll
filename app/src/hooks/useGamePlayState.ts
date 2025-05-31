@@ -52,10 +52,10 @@ export function useGamePlayState({ startWord, endWord }: UseGamePlayStateProps):
 		if (!hasGameStartedRef.current && !state.isCompleted) {
 			hasGameStartedRef.current = true;
 			timerRef.current = setInterval(() => {
-				dispatch({ type: 'UPDATE_ELAPSED_TIME', payload: state.elapsedTime + 1 });
+				dispatch({ type: 'INCREMENT_ELAPSED_TIME' });
 			}, 1000);
 		}
-	}, [state.elapsedTime, state.isCompleted]);
+	}, [state.isCompleted]);
 
 	const stopTimer = useCallback(() => {
 		if (timerRef.current) {

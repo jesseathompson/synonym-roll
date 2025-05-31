@@ -9,6 +9,7 @@ export type GameAction =
 	| { type: 'REMOVE_STEP' }
 	| { type: 'COMPLETE_GAME' }
 	| { type: 'UPDATE_ELAPSED_TIME'; payload: number }
+	| { type: 'INCREMENT_ELAPSED_TIME' }
 	| { type: 'RESET_GAME'; payload: { start: string; end: string } };
 
 // Define state interface
@@ -85,6 +86,12 @@ export const gameReducer = (state: GamePlayState, action: GameAction): GamePlayS
 			return {
 				...state,
 				elapsedTime: action.payload,
+			};
+
+		case 'INCREMENT_ELAPSED_TIME':
+			return {
+				...state,
+				elapsedTime: state.elapsedTime + 1,
 			};
 
 		case 'RESET_GAME': {
