@@ -3,6 +3,7 @@ import { useGameState } from "../context/GameStateContext";
 import { generateShareText, shareResults } from "../utils/shareUtils";
 import { getTodaysPuzzle, getTodaysSeed } from "../utils/gameUtils";
 import { useState, useEffect } from "react";
+import { WordGraph } from "../utils/wordGraph";
 
 // Import components
 import { GameBoard } from "../components/features/game/GameBoard";
@@ -71,7 +72,23 @@ export const Play = () => {
 
   // Debug function (can be removed in production)
   const logSolution = () => {
-    console.log("Solution path would be logged here");
+    const wordGraph = new WordGraph();
+    const currentWord = state.currentWord;
+    const endWord = puzzle.end;
+    
+    console.log(`Finding path from "${currentWord}" to "${endWord}"`);
+    
+    const solutionPath = wordGraph.findPath(currentWord, endWord);
+    
+    if (solutionPath) {
+      console.log("✅ Valid solution path found:");
+      console.log("Path:", solutionPath.join(" → "));
+      console.log("Path length:", solutionPath.length);
+      console.log("Full path array:", solutionPath);
+    } else {
+      console.log("❌ No valid path found from current word to end word");
+      console.log("This might indicate a problem with the word graph or puzzle setup");
+    }
   };
 
   return (

@@ -102,54 +102,106 @@ export class WordGraph {
     return this.edgeScores.get(edgeKey) || 0;
   }
 
-  // Get synonyms and filter based on the min_edge_synonymy criteria
+  // Get synonyms with improved filtering that prioritizes shortest paths
   getSynonyms(word: string, endWord?: string): string[] | undefined {
     const allSynonyms = this.adjacencyList.get(word);
-
     if (!allSynonyms) return undefined;
 
-    // First filter by the minimum edge synonymy threshold
+    // Step 1: Filter by minimum edge synonymy threshold
     let filteredSynonyms = allSynonyms;
-
     if (this.minEdgeSynonymy > 0) {
       filteredSynonyms = allSynonyms.filter(synonym =>
         this.getEdgeSynonymyScore(word, synonym) >= this.minEdgeSynonymy
       );
     }
 
-    // If an end word is provided, also filter for synonyms that can lead to the target
-    if (endWord && endWord !== word) {
-      filteredSynonyms = filteredSynonyms.filter(synonym => {
-        // Avoid going back to words we've already visited
-        if (synonym === word) return false;
+    // Step 2: If no end word, return score-sorted synonyms
+    if (!endWord || endWord === word) {
+      return filteredSynonyms
+        .map(synonym => ({
+          word: synonym,
+          score: this.getEdgeSynonymyScore(word, synonym)
+        }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 12)
+        .map(item => item.word);
+    }
 
-        // Check if this synonym has a path to the end word
-        const pathExists = this.findShortestPathLengthBiDirectional(synonym, endWord) !== null;
-        return pathExists;
+    // Step 3: Create synonym data with path lengths and scores
+    const synonymData = filteredSynonyms
+      .filter(synonym => synonym !== word) // Avoid self-loops
+      .map(synonym => {
+        const pathLength = this.findShortestPathLengthBiDirectional(synonym, endWord);
+        return {
+          word: synonym,
+          pathLength: pathLength,
+          score: this.getEdgeSynonymyScore(word, synonym)
+        };
+      })
+      .filter(item => item.pathLength !== null) // Only keep synonyms with paths
+      .sort((a, b) => {
+        // Primary sort: shortest path first
+        if (a.pathLength !== b.pathLength) {
+          return a.pathLength! - b.pathLength!;
+        }
+        // Secondary sort: highest score within same path length
+        return b.score - a.score;
       });
-    }
 
-    // Additional filtering for UI optimization
-    // Sort by synonymy score and take only the best ones
-    const scoredSynonyms = filteredSynonyms.map(synonym => ({
-      word: synonym,
-      score: this.getEdgeSynonymyScore(word, synonym)
-    })).sort((a, b) => b.score - a.score);
+    if (synonymData.length === 0) return [];
 
-    // Limit to top 12 synonyms for better UI performance
-    const topSynonyms = scoredSynonyms.slice(0, 12);
+    // Step 4: Group by path length and apply smart filtering
+    const shortestPath = synonymData[0].pathLength!;
+    const pathGroups = new Map<number, typeof synonymData>();
 
-    // If we have too many synonyms, be more aggressive with filtering
-    if (filteredSynonyms.length > 8) {
-      // Take only synonyms with above-average scores
-      const avgScore = scoredSynonyms.reduce((sum, item) => sum + item.score, 0) / scoredSynonyms.length;
-      return topSynonyms
+    synonymData.forEach(item => {
+      const pathLen = item.pathLength!;
+      if (!pathGroups.has(pathLen)) {
+        pathGroups.set(pathLen, []);
+      }
+      pathGroups.get(pathLen)!.push(item);
+    });
+
+    // Step 5: Select synonyms with preference for shorter paths
+    const selectedSynonyms: typeof synonymData = [];
+
+    // Always include ALL synonyms with the shortest path
+    const shortestPathSynonyms = pathGroups.get(shortestPath) || [];
+    selectedSynonyms.push(...shortestPathSynonyms);
+
+    // Add synonyms from longer paths if we have space and they're high quality
+    let remainingSlots = 12 - selectedSynonyms.length;
+    const sortedPathLengths = Array.from(pathGroups.keys()).sort((a, b) => a - b);
+
+    for (const pathLength of sortedPathLengths) {
+      if (pathLength === shortestPath || remainingSlots <= 0) continue;
+
+      const groupSynonyms = pathGroups.get(pathLength) || [];
+      const avgScore = groupSynonyms.reduce((sum, item) => sum + item.score, 0) / groupSynonyms.length;
+
+      // Only add high-scoring synonyms from longer paths
+      const highQualitySynonyms = groupSynonyms
         .filter(item => item.score >= avgScore)
-        .map(item => item.word)
-        .slice(0, 8);
+        .slice(0, Math.min(remainingSlots, 4)); // Limit longer paths
+
+      selectedSynonyms.push(...highQualitySynonyms);
+      remainingSlots -= highQualitySynonyms.length;
     }
 
-    return topSynonyms.map(item => item.word);
+    // Step 6: Final filtering if we still have too many
+    if (selectedSynonyms.length > 8) {
+      // Keep all shortest path synonyms + best from others
+      const shortestPathCount = shortestPathSynonyms.length;
+      const otherSynonyms = selectedSynonyms.slice(shortestPathCount);
+      const remainingSlots = Math.max(0, 8 - shortestPathCount);
+
+      return [
+        ...shortestPathSynonyms.map(item => item.word),
+        ...otherSynonyms.slice(0, remainingSlots).map(item => item.word)
+      ];
+    }
+
+    return selectedSynonyms.map(item => item.word);
   }
 
   addWord(word: string, synonyms: string[]) {

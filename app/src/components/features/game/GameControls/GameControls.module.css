@@ -24,43 +24,73 @@
   min-width: 120px;
 }
 
-.game-controls__button--back {
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
-  color: var(--color-text-inverse);
+/* High specificity to override Bootstrap styles */
+.game-controls .game-controls__button--back,
+.game-controls .game-controls__button--back.btn,
+.game-controls .game-controls__button--back.btn-primary {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--color-text-inverse) !important;
 }
 
-.game-controls__button--back:hover,
-.game-controls__button--back:focus {
-  background-color: var(--color-primary-dark);
-  border-color: var(--color-primary-dark);
-  color: var(--color-text-inverse);
+.game-controls .game-controls__button--back:hover,
+.game-controls .game-controls__button--back:focus,
+.game-controls .game-controls__button--back:active,
+.game-controls .game-controls__button--back.btn:hover,
+.game-controls .game-controls__button--back.btn:focus,
+.game-controls .game-controls__button--back.btn:active,
+.game-controls .game-controls__button--back.btn-primary:hover,
+.game-controls .game-controls__button--back.btn-primary:focus,
+.game-controls .game-controls__button--back.btn-primary:active {
+  background-color: var(--color-primary-dark) !important;
+  border-color: var(--color-primary-dark) !important;
+  color: var(--color-text-inverse) !important;
 }
 
-.game-controls__button--share {
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
-  color: var(--color-text-inverse);
+/* High specificity to override Bootstrap styles */
+.game-controls .game-controls__button--share,
+.game-controls .game-controls__button--share.btn,
+.game-controls .game-controls__button--share.btn-primary {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--color-text-inverse) !important;
 }
 
-.game-controls__button--share:hover,
-.game-controls__button--share:focus {
-  background-color: var(--color-primary-dark);
-  border-color: var(--color-primary-dark);
-  color: var(--color-text-inverse);
+.game-controls .game-controls__button--share:hover,
+.game-controls .game-controls__button--share:focus,
+.game-controls .game-controls__button--share:active,
+.game-controls .game-controls__button--share.btn:hover,
+.game-controls .game-controls__button--share.btn:focus,
+.game-controls .game-controls__button--share.btn:active,
+.game-controls .game-controls__button--share.btn-primary:hover,
+.game-controls .game-controls__button--share.btn-primary:focus,
+.game-controls .game-controls__button--share.btn-primary:active {
+  background-color: var(--color-primary-dark) !important;
+  border-color: var(--color-primary-dark) !important;
+  color: var(--color-text-inverse) !important;
 }
 
-.game-controls__button--reset {
-  background-color: transparent;
-  border-color: var(--color-text-primary);
-  color: var(--color-text-primary);
+/* High specificity to override Bootstrap styles */
+.game-controls .game-controls__button--reset,
+.game-controls .game-controls__button--reset.btn,
+.game-controls .game-controls__button--reset.btn-secondary {
+  background-color: transparent !important;
+  border-color: var(--color-text-primary) !important;
+  color: var(--color-text-primary) !important;
 }
 
-.game-controls__button--reset:hover,
-.game-controls__button--reset:focus {
-  background-color: var(--color-background-light);
-  border-color: var(--color-text-primary);
-  color: var(--color-text-primary);
+.game-controls .game-controls__button--reset:hover,
+.game-controls .game-controls__button--reset:focus,
+.game-controls .game-controls__button--reset:active,
+.game-controls .game-controls__button--reset.btn:hover,
+.game-controls .game-controls__button--reset.btn:focus,
+.game-controls .game-controls__button--reset.btn:active,
+.game-controls .game-controls__button--reset.btn-secondary:hover,
+.game-controls .game-controls__button--reset.btn-secondary:focus,
+.game-controls .game-controls__button--reset.btn-secondary:active {
+  background-color: var(--color-background-light) !important;
+  border-color: var(--color-text-primary) !important;
+  color: var(--color-text-primary) !important;
 }
 
 .game-controls__icon {

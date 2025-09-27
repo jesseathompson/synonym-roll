@@ -1,0 +1,641 @@
+---
+description:
+globs:
+alwaysApply: true
+
+---
+
+# Synonym Roll Design Rules & UI/UX Guidelines
+
+## 🎯 **Core Design Philosophy**
+
+### **Wordle-Inspired Aesthetics**
+- Clean, minimalist interface that prioritizes content over decoration
+- High contrast text and backgrounds for optimal readability
+- Consistent spacing and typography throughout the application
+- Focus on the word tiles as the primary interactive elements
+
+### **Daily Word Game Principles**
+- **Accessibility First**: Ensure all users can play regardless of ability
+- **Progressive Disclosure**: Show information when needed, hide complexity
+- **Immediate Feedback**: Clear visual responses to user actions
+- **Consistent Patterns**: Predictable interactions across all game elements
+
+## 🎨 **Visual Design System**
+
+### **Color Palette & Theming**
+
+#### **Light Mode (Default)**
+```css
+/* Primary Colors */
+--color-primary: #5c62d6;           /* Main brand color */
+--color-primary-light: #8287e0;    /* Lighter variant */
+--color-primary-dark: #4a4fc7;     /* Darker variant */
+
+/* Text Colors */
+--color-text-primary: #333333;     /* Main text */
+--color-text-secondary: #666666;   /* Secondary text */
+--color-text-inverse: #ffffff;     /* Text on dark backgrounds */
+
+/* Background Colors */
+--color-background-light: #ffffff;     /* Main background */
+--color-background-medium: #f8f9fa;    /* Card backgrounds */
+--color-background-dark: #e9ecef;      /* Subtle backgrounds */
+```
+
+#### **Dark Mode**
+```css
+/* Primary Colors (Inverted) */
+--color-primary: #fefdf8;          /* Light primary */
+--color-primary-light: #f8f4ea;    /* Lighter variant */
+--color-primary-dark: #c19a6b;      /* Darker variant */
+
+/* Text Colors */
+--color-text-primary: #f1dfc9;     /* Light text */
+--color-text-secondary: #d5c7b2;  /* Muted text */
+--color-text-inverse: #411f07;    /* Dark text on light backgrounds */
+
+/* Background Colors */
+--color-background-light: #411f07;     /* Dark background */
+--color-background-medium: #592b0a;   /* Card backgrounds */
+--color-background-dark: #2a1504;     /* Subtle backgrounds */
+```
+
+### **Typography Hierarchy**
+
+#### **Font Families**
+- **Primary**: System fonts (San Francisco, Segoe UI, Roboto)
+- **Game Title**: Custom font "KG Kiss Me Slowly" for branding
+- **UI Elements**: System fonts for consistency
+
+#### **Font Sizes**
+```css
+--font-size-xs: 0.75rem;    /* 12px - Small labels */
+--font-size-sm: 0.875rem;   /* 14px - Body text */
+--font-size-md: 1rem;      /* 16px - Default text */
+--font-size-lg: 1.125rem;  /* 18px - Large text */
+--font-size-xl: 1.25rem;   /* 20px - Headings */
+--font-size-2xl: 1.5rem;   /* 24px - Large headings */
+```
+
+#### **Font Weights**
+```css
+--font-weight-normal: 400;     /* Regular text */
+--font-weight-medium: 500;     /* Medium emphasis */
+--font-weight-semibold: 600;   /* Strong emphasis */
+--font-weight-bold: 700;        /* Maximum emphasis */
+```
+
+## 🧩 **Component Design Rules**
+
+### **Word Tiles**
+
+#### **Visual States**
+- **Start Word**: Distinct styling to indicate beginning
+- **Step Words**: Clear progression indicators
+- **End Word**: Final destination styling
+- **Selected**: Highlighted when chosen
+- **Correct**: Success state with animation
+- **Incorrect**: Error state with feedback
+
+#### **Sizing & Responsiveness**
+```css
+/* Base tile dimensions */
+min-width: 2rem;
+height: 2.5rem;
+padding: var(--spacing-sm);
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  min-width: 1.5rem;
+  height: 2rem;
+}
+
+@media (max-width: 480px) {
+  min-width: 1.25rem;
+  height: 1.75rem;
+}
+```
+
+#### **Interactive States**
+- **Hover**: Subtle elevation and scale
+- **Active**: Pressed state feedback
+- **Focus**: Clear outline for accessibility
+- **Disabled**: Reduced opacity and no interaction
+
+### **Game Path Display**
+
+#### **Layout Principles**
+- **Horizontal Flow**: Left-to-right progression
+- **Arrow Indicators**: Clear visual connections between words
+- **Consistent Spacing**: Even gaps between elements
+- **Responsive Wrapping**: Adapts to screen size
+
+#### **Visual Hierarchy**
+- **Start Word**: Prominent but separate from path
+- **Path Steps**: Sequential with arrows
+- **End Word**: Clear destination indicator
+- **Placeholders**: Subtle indicators for remaining steps
+
+### **Synonym List**
+
+#### **Grid Layout**
+- **Flexible Wrapping**: Words flow naturally
+- **Consistent Spacing**: Even gaps between tiles
+- **Centered Alignment**: Balanced appearance
+- **Overflow Handling**: Scrollable when needed
+
+#### **Content Filtering**
+- **Quality Over Quantity**: Show best synonyms first
+- **Score-Based Sorting**: Higher synonymy scores prioritized
+- **Path Validation**: Only show words that lead somewhere
+- **Dead-End Filtering**: Remove words with no connections
+
+## 📱 **Responsive Design Rules**
+
+### **Breakpoint Strategy**
+```css
+/* Mobile First Approach */
+/* Base styles: 320px+ */
+/* Small mobile: 480px+ */
+/* Tablet: 768px+ */
+/* Desktop: 1024px+ */
+```
+
+### **Layout Adaptations**
+
+#### **Mobile (320px - 767px)**
+- **Single Column**: Stack all elements vertically
+- **Compact Spacing**: Reduced margins and padding
+- **Touch-Friendly**: Larger touch targets (44px minimum)
+- **Readable Text**: Minimum 16px font size
+
+#### **Tablet (768px - 1023px)**
+- **Optimized Spacing**: Balanced margins and padding
+- **Two-Column Potential**: Side-by-side layouts where appropriate
+- **Medium Touch Targets**: 40px minimum
+- **Enhanced Typography**: Larger font sizes
+
+#### **Desktop (1024px+)**
+- **Full Layout**: Maximum use of available space
+- **Hover States**: Rich interactive feedback
+- **Keyboard Navigation**: Full accessibility support
+- **Optimal Typography**: Best readability
+
+### **Container Rules**
+
+#### **Game Container**
+- **Full Height**: `height: 100vh` with no scrolling
+- **Flexible Layout**: Adapts to content and screen size
+- **Consistent Margins**: Uniform spacing around edges
+- **Overflow Control**: Hidden to prevent scrolling
+
+#### **Unified Sections**
+- **Single Background**: Consistent color throughout
+- **Subtle Borders**: Light separations between sections
+- **Rounded Corners**: Modern, friendly appearance
+- **Proper Spacing**: Balanced internal padding
+
+## ♿ **Accessibility Guidelines**
+
+### **Color & Contrast**
+- **WCAG AA Compliance**: Minimum 4.5:1 contrast ratio
+- **Color Independence**: Information not conveyed by color alone
+- **High Contrast Mode**: Support for system preferences
+- **Focus Indicators**: Clear visual focus states
+
+### **Keyboard Navigation**
+- **Tab Order**: Logical sequence through interactive elements
+- **Skip Links**: Quick access to main content
+- **Escape Key**: Close modals and return to game
+- **Arrow Keys**: Navigate word tiles when appropriate
+
+### **Screen Reader Support**
+- **Semantic HTML**: Proper heading structure and landmarks
+- **ARIA Labels**: Descriptive labels for interactive elements
+- **Live Regions**: Announce dynamic content changes
+- **Alternative Text**: Meaningful descriptions for visual elements
+
+### **Motor Accessibility**
+- **Touch Targets**: Minimum 44px for mobile, 40px for desktop
+- **Gesture Alternatives**: Button alternatives for swipe actions
+- **Timing Controls**: No time-based interactions without alternatives
+- **Error Prevention**: Clear confirmation for destructive actions
+
+## 🎮 **Game-Specific UX Rules**
+
+### **Word Selection Flow**
+1. **Clear Affordance**: Obvious that words are clickable
+2. **Immediate Feedback**: Visual response on selection
+3. **Progress Indication**: Show current position in path
+4. **Error Recovery**: Easy way to undo selections
+
+### **Synonym Display**
+1. **Quality Filtering**: Show only high-quality synonyms
+2. **Score-Based Order**: Best options appear first
+3. **Path Validation**: Only show words that lead somewhere
+4. **Dead-End Prevention**: Filter out words with no connections
+
+### **Game Completion**
+1. **Celebration**: Clear success indication
+2. **Statistics**: Meaningful performance metrics
+3. **Sharing**: Easy way to share results
+4. **Next Game**: Clear path to continue playing
+
+## 🚀 **Performance Guidelines**
+
+### **Loading States**
+- **Skeleton Screens**: Show structure while loading
+- **Progressive Enhancement**: Core functionality works without JS
+- **Lazy Loading**: Load non-critical content as needed
+- **Optimistic Updates**: Show changes before server confirmation
+
+### **Animation Principles**
+- **Purposeful Motion**: Animations should have meaning
+- **Performance First**: 60fps animations only
+- **Reduced Motion**: Respect user preferences
+- **Quick Transitions**: 200-300ms for most animations
+
+### **Content Strategy**
+- **Progressive Disclosure**: Show complexity gradually
+- **Contextual Help**: Help when needed, hidden otherwise
+- **Error Prevention**: Prevent mistakes before they happen
+- **Recovery Paths**: Clear ways to fix problems
+
+## 🎨 **Brand & Personality**
+
+### **Tone of Voice**
+- **Friendly**: Welcoming and approachable
+- **Encouraging**: Positive reinforcement for progress
+- **Clear**: Simple, understandable language
+- **Inclusive**: Accessible to all skill levels
+
+### **Visual Personality**
+- **Clean**: Uncluttered, focused design
+- **Modern**: Contemporary styling and interactions
+- **Playful**: Subtle animations and micro-interactions
+- **Professional**: Reliable and trustworthy appearance
+
+### **Consistency Rules**
+- **Design System**: Use established patterns throughout
+- **Component Reuse**: Leverage existing components
+- **Spacing Scale**: Consistent spacing values
+- **Color Harmony**: Cohesive color relationships
+
+## 📊 **Quality Assurance**
+
+### **Testing Checklist**
+- [ ] **Cross-Browser**: Chrome, Firefox, Safari, Edge
+- [ ] **Responsive**: All breakpoints tested
+- [ ] **Accessibility**: Screen reader and keyboard navigation
+- [ ] **Performance**: Fast loading and smooth interactions
+- [ ] **Dark Mode**: Proper contrast and visibility
+- [ ] **Touch Devices**: Mobile and tablet interactions
+
+### **Design Review Process**
+1. **Component Review**: Individual component testing
+2. **Integration Review**: Full page layout testing
+3. **User Testing**: Real user feedback collection
+4. **Accessibility Audit**: Comprehensive a11y testing
+5. **Performance Audit**: Speed and efficiency testing
+
+---
+
+## 📝 **Implementation Notes**
+
+### **CSS Architecture**
+- Use CSS custom properties for theming
+- Implement mobile-first responsive design
+- Leverage CSS Grid and Flexbox for layouts
+- Maintain consistent naming conventions (BEM methodology)
+
+### **Component Structure**
+- Create reusable, composable components
+- Implement proper TypeScript interfaces
+- Use React.memo for performance optimization
+- Follow single responsibility principle
+
+### **State Management**
+- Keep state as local as possible
+- Use context for shared state
+- Implement proper error boundaries
+- Handle loading and error states gracefully
+
+This design system ensures Synonym Roll provides an excellent user experience that's accessible, performant, and enjoyable for all players! 🎉
+# Synonym Roll Design Rules & UI/UX Guidelines
+
+## 🎯 **Core Design Philosophy**
+
+### **Wordle-Inspired Aesthetics**
+- Clean, minimalist interface that prioritizes content over decoration
+- High contrast text and backgrounds for optimal readability
+- Consistent spacing and typography throughout the application
+- Focus on the word tiles as the primary interactive elements
+
+### **Daily Word Game Principles**
+- **Accessibility First**: Ensure all users can play regardless of ability
+- **Progressive Disclosure**: Show information when needed, hide complexity
+- **Immediate Feedback**: Clear visual responses to user actions
+- **Consistent Patterns**: Predictable interactions across all game elements
+
+## 🎨 **Visual Design System**
+
+### **Color Palette & Theming**
+
+#### **Light Mode (Default)**
+```css
+/* Primary Colors */
+--color-primary: #5c62d6;           /* Main brand color */
+--color-primary-light: #8287e0;    /* Lighter variant */
+--color-primary-dark: #4a4fc7;     /* Darker variant */
+
+/* Text Colors */
+--color-text-primary: #333333;     /* Main text */
+--color-text-secondary: #666666;   /* Secondary text */
+--color-text-inverse: #ffffff;     /* Text on dark backgrounds */
+
+/* Background Colors */
+--color-background-light: #ffffff;     /* Main background */
+--color-background-medium: #f8f9fa;    /* Card backgrounds */
+--color-background-dark: #e9ecef;      /* Subtle backgrounds */
+```
+
+#### **Dark Mode**
+```css
+/* Primary Colors (Inverted) */
+--color-primary: #fefdf8;          /* Light primary */
+--color-primary-light: #f8f4ea;    /* Lighter variant */
+--color-primary-dark: #c19a6b;      /* Darker variant */
+
+/* Text Colors */
+--color-text-primary: #f1dfc9;     /* Light text */
+--color-text-secondary: #d5c7b2;  /* Muted text */
+--color-text-inverse: #411f07;    /* Dark text on light backgrounds */
+
+/* Background Colors */
+--color-background-light: #411f07;     /* Dark background */
+--color-background-medium: #592b0a;   /* Card backgrounds */
+--color-background-dark: #2a1504;     /* Subtle backgrounds */
+```
+
+### **Typography Hierarchy**
+
+#### **Font Families**
+- **Primary**: System fonts (San Francisco, Segoe UI, Roboto)
+- **Game Title**: Custom font "KG Kiss Me Slowly" for branding
+- **UI Elements**: System fonts for consistency
+
+#### **Font Sizes**
+```css
+--font-size-xs: 0.75rem;    /* 12px - Small labels */
+--font-size-sm: 0.875rem;   /* 14px - Body text */
+--font-size-md: 1rem;      /* 16px - Default text */
+--font-size-lg: 1.125rem;  /* 18px - Large text */
+--font-size-xl: 1.25rem;   /* 20px - Headings */
+--font-size-2xl: 1.5rem;   /* 24px - Large headings */
+```
+
+#### **Font Weights**
+```css
+--font-weight-normal: 400;     /* Regular text */
+--font-weight-medium: 500;     /* Medium emphasis */
+--font-weight-semibold: 600;   /* Strong emphasis */
+--font-weight-bold: 700;        /* Maximum emphasis */
+```
+
+## 🧩 **Component Design Rules**
+
+### **Word Tiles**
+
+#### **Visual States**
+- **Start Word**: Distinct styling to indicate beginning
+- **Step Words**: Clear progression indicators
+- **End Word**: Final destination styling
+- **Selected**: Highlighted when chosen
+- **Correct**: Success state with animation
+- **Incorrect**: Error state with feedback
+
+#### **Sizing & Responsiveness**
+```css
+/* Base tile dimensions */
+min-width: 2rem;
+height: 2.5rem;
+padding: var(--spacing-sm);
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  min-width: 1.5rem;
+  height: 2rem;
+}
+
+@media (max-width: 480px) {
+  min-width: 1.25rem;
+  height: 1.75rem;
+}
+```
+
+#### **Interactive States**
+- **Hover**: Subtle elevation and scale
+- **Active**: Pressed state feedback
+- **Focus**: Clear outline for accessibility
+- **Disabled**: Reduced opacity and no interaction
+
+### **Game Path Display**
+
+#### **Layout Principles**
+- **Horizontal Flow**: Left-to-right progression
+- **Arrow Indicators**: Clear visual connections between words
+- **Consistent Spacing**: Even gaps between elements
+- **Responsive Wrapping**: Adapts to screen size
+
+#### **Visual Hierarchy**
+- **Start Word**: Prominent but separate from path
+- **Path Steps**: Sequential with arrows
+- **End Word**: Clear destination indicator
+- **Placeholders**: Subtle indicators for remaining steps
+
+### **Synonym List**
+
+#### **Grid Layout**
+- **Flexible Wrapping**: Words flow naturally
+- **Consistent Spacing**: Even gaps between tiles
+- **Centered Alignment**: Balanced appearance
+- **Overflow Handling**: Scrollable when needed
+
+#### **Content Filtering**
+- **Quality Over Quantity**: Show best synonyms first
+- **Score-Based Sorting**: Higher synonymy scores prioritized
+- **Path Validation**: Only show words that lead somewhere
+- **Dead-End Filtering**: Remove words with no connections
+
+## 📱 **Responsive Design Rules**
+
+### **Breakpoint Strategy**
+```css
+/* Mobile First Approach */
+/* Base styles: 320px+ */
+/* Small mobile: 480px+ */
+/* Tablet: 768px+ */
+/* Desktop: 1024px+ */
+```
+
+### **Layout Adaptations**
+
+#### **Mobile (320px - 767px)**
+- **Single Column**: Stack all elements vertically
+- **Compact Spacing**: Reduced margins and padding
+- **Touch-Friendly**: Larger touch targets (44px minimum)
+- **Readable Text**: Minimum 16px font size
+
+#### **Tablet (768px - 1023px)**
+- **Optimized Spacing**: Balanced margins and padding
+- **Two-Column Potential**: Side-by-side layouts where appropriate
+- **Medium Touch Targets**: 40px minimum
+- **Enhanced Typography**: Larger font sizes
+
+#### **Desktop (1024px+)**
+- **Full Layout**: Maximum use of available space
+- **Hover States**: Rich interactive feedback
+- **Keyboard Navigation**: Full accessibility support
+- **Optimal Typography**: Best readability
+
+### **Container Rules**
+
+#### **Game Container**
+- **Full Height**: `height: 100vh` with no scrolling
+- **Flexible Layout**: Adapts to content and screen size
+- **Consistent Margins**: Uniform spacing around edges
+- **Overflow Control**: Hidden to prevent scrolling
+
+#### **Unified Sections**
+- **Single Background**: Consistent color throughout
+- **Subtle Borders**: Light separations between sections
+- **Rounded Corners**: Modern, friendly appearance
+- **Proper Spacing**: Balanced internal padding
+
+## ♿ **Accessibility Guidelines**
+
+### **Color & Contrast**
+- **WCAG AA Compliance**: Minimum 4.5:1 contrast ratio
+- **Color Independence**: Information not conveyed by color alone
+- **High Contrast Mode**: Support for system preferences
+- **Focus Indicators**: Clear visual focus states
+
+### **Keyboard Navigation**
+- **Tab Order**: Logical sequence through interactive elements
+- **Skip Links**: Quick access to main content
+- **Escape Key**: Close modals and return to game
+- **Arrow Keys**: Navigate word tiles when appropriate
+
+### **Screen Reader Support**
+- **Semantic HTML**: Proper heading structure and landmarks
+- **ARIA Labels**: Descriptive labels for interactive elements
+- **Live Regions**: Announce dynamic content changes
+- **Alternative Text**: Meaningful descriptions for visual elements
+
+### **Motor Accessibility**
+- **Touch Targets**: Minimum 44px for mobile, 40px for desktop
+- **Gesture Alternatives**: Button alternatives for swipe actions
+- **Timing Controls**: No time-based interactions without alternatives
+- **Error Prevention**: Clear confirmation for destructive actions
+
+## 🎮 **Game-Specific UX Rules**
+
+### **Word Selection Flow**
+1. **Clear Affordance**: Obvious that words are clickable
+2. **Immediate Feedback**: Visual response on selection
+3. **Progress Indication**: Show current position in path
+4. **Error Recovery**: Easy way to undo selections
+
+### **Synonym Display**
+1. **Quality Filtering**: Show only high-quality synonyms
+2. **Score-Based Order**: Best options appear first
+3. **Path Validation**: Only show words that lead somewhere
+4. **Dead-End Prevention**: Filter out words with no connections
+
+### **Game Completion**
+1. **Celebration**: Clear success indication
+2. **Statistics**: Meaningful performance metrics
+3. **Sharing**: Easy way to share results
+4. **Next Game**: Clear path to continue playing
+
+## 🚀 **Performance Guidelines**
+
+### **Loading States**
+- **Skeleton Screens**: Show structure while loading
+- **Progressive Enhancement**: Core functionality works without JS
+- **Lazy Loading**: Load non-critical content as needed
+- **Optimistic Updates**: Show changes before server confirmation
+
+### **Animation Principles**
+- **Purposeful Motion**: Animations should have meaning
+- **Performance First**: 60fps animations only
+- **Reduced Motion**: Respect user preferences
+- **Quick Transitions**: 200-300ms for most animations
+
+### **Content Strategy**
+- **Progressive Disclosure**: Show complexity gradually
+- **Contextual Help**: Help when needed, hidden otherwise
+- **Error Prevention**: Prevent mistakes before they happen
+- **Recovery Paths**: Clear ways to fix problems
+
+## 🎨 **Brand & Personality**
+
+### **Tone of Voice**
+- **Friendly**: Welcoming and approachable
+- **Encouraging**: Positive reinforcement for progress
+- **Clear**: Simple, understandable language
+- **Inclusive**: Accessible to all skill levels
+
+### **Visual Personality**
+- **Clean**: Uncluttered, focused design
+- **Modern**: Contemporary styling and interactions
+- **Playful**: Subtle animations and micro-interactions
+- **Professional**: Reliable and trustworthy appearance
+
+### **Consistency Rules**
+- **Design System**: Use established patterns throughout
+- **Component Reuse**: Leverage existing components
+- **Spacing Scale**: Consistent spacing values
+- **Color Harmony**: Cohesive color relationships
+
+## 📊 **Quality Assurance**
+
+### **Testing Checklist**
+- [ ] **Cross-Browser**: Chrome, Firefox, Safari, Edge
+- [ ] **Responsive**: All breakpoints tested
+- [ ] **Accessibility**: Screen reader and keyboard navigation
+- [ ] **Performance**: Fast loading and smooth interactions
+- [ ] **Dark Mode**: Proper contrast and visibility
+- [ ] **Touch Devices**: Mobile and tablet interactions
+
+### **Design Review Process**
+1. **Component Review**: Individual component testing
+2. **Integration Review**: Full page layout testing
+3. **User Testing**: Real user feedback collection
+4. **Accessibility Audit**: Comprehensive a11y testing
+5. **Performance Audit**: Speed and efficiency testing
+
+---
+
+## 📝 **Implementation Notes**
+
+### **CSS Architecture**
+- Use CSS custom properties for theming
+- Implement mobile-first responsive design
+- Leverage CSS Grid and Flexbox for layouts
+- Maintain consistent naming conventions (BEM methodology)
+
+### **Component Structure**
+- Create reusable, composable components
+- Implement proper TypeScript interfaces
+- Use React.memo for performance optimization
+- Follow single responsibility principle
+
+### **State Management**
+- Keep state as local as possible
+- Use context for shared state
+- Implement proper error boundaries
+- Handle loading and error states gracefully
+
+This design system ensures Synonym Roll provides an excellent user experience that's accessible, performant, and enjoyable for all players! 🎉
