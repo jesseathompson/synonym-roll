@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShare } from '@fortawesome/free-solid-svg-icons';
 import { WordTile } from '../../../common/WordTile';
 import { ShareModal } from '../../../ShareModal';
+import { WordGraph } from '../../../../utils/wordGraph';
 import styles from './CompletedState.module.css';
 
 export interface CompletedStateProps {
@@ -39,8 +40,15 @@ export const CompletedState: React.FC<CompletedStateProps> = memo(({
   stats
 }) => {
   const [showShareModal, setShowShareModal] = useState(false);
+  const wordGraph = new WordGraph();
+  
   // Filter out any duplicated words in the path
   const uniqueSteps = steps.filter((word, index) => steps.indexOf(word) === index);
+  
+  // Get temperature variant for a word
+  const getTemperatureVariant = (word: string): 'hot' | 'warm' | 'cool' | 'cold' => {
+    return wordGraph.getTemperatureCategory(word, endWord);
+  };
   
   // Format the time as MM:SS
   const formatTime = (seconds: number): string => {
@@ -61,7 +69,7 @@ export const CompletedState: React.FC<CompletedStateProps> = memo(({
         {uniqueSteps.map((word, index) => {
           const isFirst = index === 0;
           const isLast = index === uniqueSteps.length - 1;
-          const variant = isFirst ? 'start' : isLast ? 'end' : 'step';
+          const variant = isFirst ? getTemperatureVariant(word) : isLast ? getTemperatureVariant(word) : getTemperatureVariant(word);
           
           return (
             <React.Fragment key={`${word}-${index}`}>

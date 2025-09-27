@@ -439,4 +439,47 @@ export class WordGraph {
       console.log(`No path found from ${start} to ${end}`);
     }
   }
+
+  /**
+   * Calculate the "temperature" (hot/cold) of a word relative to the target word
+   * Returns a value between 0 (coldest) and 1 (hottest)
+   * @param currentWord The current word to evaluate
+   * @param targetWord The target word to compare against
+   * @returns Temperature value between 0 and 1
+   */
+  getTemperature(currentWord: string, targetWord: string): number {
+    if (currentWord === targetWord) {
+      return 1; // Hottest - exact match
+    }
+
+    // Get the shortest path length
+    const pathLength = this.findShortestPathLengthBiDirectional(currentWord, targetWord);
+
+    if (pathLength === null) {
+      return 0; // Coldest - no path exists
+    }
+
+    // Convert path length to temperature (shorter path = hotter)
+    // Use exponential decay: temperature = e^(-pathLength/2)
+    // This gives us: 1 step = ~0.61, 2 steps = ~0.37, 3 steps = ~0.22, etc.
+    const temperature = Math.exp(-pathLength / 2);
+
+    // Ensure temperature is between 0 and 1
+    return Math.max(0, Math.min(1, temperature));
+  }
+
+  /**
+   * Get the temperature category (hot, warm, cool, cold) for a word
+   * @param currentWord The current word to evaluate
+   * @param targetWord The target word to compare against
+   * @returns Temperature category string
+   */
+  getTemperatureCategory(currentWord: string, targetWord: string): 'hot' | 'warm' | 'cool' | 'cold' {
+    const temperature = this.getTemperature(currentWord, targetWord);
+
+    if (temperature >= 0.7) return 'hot';
+    if (temperature >= 0.4) return 'warm';
+    if (temperature >= 0.1) return 'cool';
+    return 'cold';
+  }
 }

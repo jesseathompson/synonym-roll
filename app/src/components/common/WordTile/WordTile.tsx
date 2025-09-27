@@ -3,7 +3,7 @@ import styles from './WordTile.module.css'
 
 export interface WordTileProps {
 	word: string
-	variant: 'start' | 'step' | 'end' | 'neutral' | 'selected' | 'correct' | 'incorrect'
+	variant: 'start' | 'step' | 'end' | 'neutral' | 'selected' | 'correct' | 'incorrect' | 'hot' | 'warm' | 'cool' | 'cold'
 	onClick?: () => void
 	size?: 'sm' | 'md' | 'lg'
 	disabled?: boolean

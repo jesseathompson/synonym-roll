@@ -193,3 +193,10 @@
 .game-path__step:nth-child(9) { animation-delay: 800ms; }
 .game-path__step:nth-child(10) { animation-delay: 900ms; }
 .game-path__step:nth-child(n+11) { animation-delay: 1000ms; }
+
+/* Thermometer styles */
+.game-path__thermometer {
+	width: 100%;
+	max-width: 200px;
+	margin-top: var(--spacing-sm);
+}

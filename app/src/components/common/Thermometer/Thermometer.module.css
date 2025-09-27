@@ -1,0 +1,196 @@
+/* Thermometer component styles */
+.thermometer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: 100%;
+}
+
+.thermometer__labels {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.thermometer__label {
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+}
+
+.thermometer__track {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(90deg, 
+    #90caf9 0%, 
+    #64b5f6 25%, 
+    #42a5f5 50%, 
+    #ffa726 75%, 
+    #ff6b35 100%
+  );
+  border-radius: 4px;
+  overflow: visible;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Arrow container */
+.thermometer__arrow-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Arrow indicator */
+.thermometer__arrow {
+  position: absolute;
+  top: -8px;
+  left: 0;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 12px solid;
+  transition: left 0.3s ease-in-out;
+  z-index: 3;
+}
+
+/* Temperature category arrow colors */
+.thermometer__arrow--cold {
+  border-top-color: #90caf9;
+  filter: drop-shadow(0 2px 4px rgba(144, 202, 249, 0.3));
+}
+
+.thermometer__arrow--cool {
+  border-top-color: #42a5f5;
+  filter: drop-shadow(0 2px 4px rgba(66, 165, 245, 0.4));
+}
+
+.thermometer__arrow--warm {
+  border-top-color: #ffa726;
+  filter: drop-shadow(0 2px 4px rgba(255, 167, 38, 0.5));
+}
+
+.thermometer__arrow--hot {
+  border-top-color: #ff6b35;
+  filter: drop-shadow(0 2px 4px rgba(255, 107, 53, 0.6));
+  animation: hotPulse 2s ease-in-out infinite alternate;
+}
+
+.thermometer__current-temp {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  text-align: center;
+  margin-top: var(--spacing-xs);
+}
+
+/* Size variants */
+.thermometer--sm {
+  gap: 2px;
+}
+
+.thermometer--sm .thermometer__track {
+  height: 6px;
+}
+
+.thermometer--sm .thermometer__arrow {
+  top: -6px;
+  border-left-width: 4px;
+  border-right-width: 4px;
+  border-top-width: 8px;
+}
+
+.thermometer--sm .thermometer__labels {
+  font-size: 0.625rem;
+}
+
+.thermometer--sm .thermometer__current-temp {
+  font-size: var(--font-size-xs);
+}
+
+.thermometer--md {
+  gap: var(--spacing-xs);
+}
+
+.thermometer--lg {
+  gap: var(--spacing-sm);
+}
+
+.thermometer--lg .thermometer__track {
+  height: 10px;
+}
+
+.thermometer--lg .thermometer__arrow {
+  top: -10px;
+  border-left-width: 8px;
+  border-right-width: 8px;
+  border-top-width: 16px;
+}
+
+.thermometer--lg .thermometer__labels {
+  font-size: var(--font-size-sm);
+}
+
+.thermometer--lg .thermometer__current-temp {
+  font-size: var(--font-size-md);
+}
+
+/* Animations */
+@keyframes hotPulse {
+  0% {
+    box-shadow: 0 0 15px rgba(255, 107, 53, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 25px rgba(255, 107, 53, 0.8);
+  }
+}
+
+@keyframes hotGlow {
+  0% {
+    box-shadow: 0 0 8px rgba(255, 107, 53, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(255, 107, 53, 0.7);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .thermometer--lg .thermometer__track {
+    height: 8px;
+  }
+  
+  .thermometer--lg .thermometer__arrow {
+    top: -8px;
+    border-left-width: 6px;
+    border-right-width: 6px;
+    border-top-width: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .thermometer__track {
+    height: 6px;
+  }
+  
+  .thermometer__arrow {
+    top: -6px;
+    border-left-width: 4px;
+    border-right-width: 4px;
+    border-top-width: 8px;
+  }
+  
+  .thermometer__labels {
+    font-size: 0.625rem;
+  }
+  
+  .thermometer__current-temp {
+    font-size: var(--font-size-xs);
+  }
+}

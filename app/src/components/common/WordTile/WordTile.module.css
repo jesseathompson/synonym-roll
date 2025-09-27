@@ -96,6 +96,44 @@
 	animation: incorrectShake 0.6s ease-in-out;
 }
 
+/* Hot/Cold temperature variants */
+.word-tile--hot {
+	background: linear-gradient(135deg, #ff6b35, #f7931e);
+	color: var(--color-text-inverse);
+	border-color: #ff6b35;
+	text-transform: uppercase;
+	font-weight: var(--font-weight-bold);
+	box-shadow: 0 0 20px rgba(255, 107, 53, 0.4);
+	animation: hotGlow 2s ease-in-out infinite alternate;
+}
+
+.word-tile--warm {
+	background: linear-gradient(135deg, #ffa726, #ff9800);
+	color: var(--color-text-inverse);
+	border-color: #ffa726;
+	text-transform: uppercase;
+	font-weight: var(--font-weight-semibold);
+	box-shadow: 0 0 15px rgba(255, 167, 38, 0.3);
+}
+
+.word-tile--cool {
+	background: linear-gradient(135deg, #42a5f5, #2196f3);
+	color: var(--color-text-inverse);
+	border-color: #42a5f5;
+	text-transform: uppercase;
+	font-weight: var(--font-weight-semibold);
+	box-shadow: 0 0 10px rgba(66, 165, 245, 0.2);
+}
+
+.word-tile--cold {
+	background: linear-gradient(135deg, #90caf9, #64b5f6);
+	color: var(--color-text-inverse);
+	border-color: #90caf9;
+	text-transform: uppercase;
+	font-weight: var(--font-weight-medium);
+	box-shadow: 0 0 5px rgba(144, 202, 249, 0.1);
+}
+
 .word-tile--disabled {
 	opacity: 0.5;
 	cursor: not-allowed;
@@ -151,6 +189,15 @@
 	}
 	75% {
 		transform: translateX(4px);
+	}
+}
+
+@keyframes hotGlow {
+	0% {
+		box-shadow: 0 0 20px rgba(255, 107, 53, 0.4);
+	}
+	100% {
+		box-shadow: 0 0 30px rgba(255, 107, 53, 0.8);
 	}
 }
 

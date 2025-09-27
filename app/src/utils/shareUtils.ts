@@ -1,4 +1,5 @@
 import { getTodaysSeed } from "./gameUtils";
+import { WordGraph } from "./wordGraph";
 
 type ResultEmoji = "⬛" | "🟨" | "🟩" | "🟦" | "🟥" | "⬜"; // Add more as needed
 
@@ -138,21 +139,23 @@ export const generateEnhancedShareText = ({
   lines.push(`🧩 ${title} #${dayNumber}`);
   lines.push("");
 
-  // Word path visualization with circles (spoiler-free)
+  // Word path visualization with hot/cold colors (spoiler-free)
   lines.push("🎯 Word Path:");
   const pathLength = steps.length - 1; // Exclude start word from count
   const circles = [];
 
-  // Start circle (green)
-  circles.push('🟢');
+  // Start circle with temperature color
+  const startTemp = getTemperatureEmoji(getTemperatureCategory(steps[0], endWord));
+  circles.push(startTemp);
 
-  // Intermediate circles (yellow)
+  // Intermediate circles with temperature colors
   for (let i = 1; i < pathLength; i++) {
-    circles.push('🟡');
+    const stepTemp = getTemperatureEmoji(getTemperatureCategory(steps[i - 1], endWord));
+    circles.push(stepTemp);
   }
 
-  // End circle (red)
-  circles.push('🔴');
+  // End circle (always hot since it's the target)
+  circles.push('🔥');
 
   lines.push(circles.join(' '));
   lines.push(`${steps[0]} → ${steps[steps.length - 1]} (${pathLength} steps)`);
@@ -269,3 +272,20 @@ export const shareResults = async (
 
 //   return lines.join("\n");
 // };
+
+// Helper function to get temperature category
+const getTemperatureCategory = (word: string, targetWord: string): 'hot' | 'warm' | 'cool' | 'cold' => {
+  const wordGraph = new WordGraph();
+  return wordGraph.getTemperatureCategory(word, targetWord);
+};
+
+// Helper function to get emoji for temperature category
+const getTemperatureEmoji = (temperature: 'hot' | 'warm' | 'cool' | 'cold'): string => {
+  switch (temperature) {
+    case 'hot': return '🔥';
+    case 'warm': return '🟠';
+    case 'cool': return '🔵';
+    case 'cold': return '🔵';
+    default: return '⚪';
+  }
+};

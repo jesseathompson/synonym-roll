@@ -1,5 +1,7 @@
 import React from 'react'
 import { WordTile } from '../../../common/WordTile'
+import { Thermometer } from '../../../common/Thermometer'
+import { WordGraph } from '../../../../utils/wordGraph'
 import styles from './GamePath.module.css'
 
 export interface GamePathProps {
@@ -17,8 +19,20 @@ export const GamePath: React.FC<GamePathProps> = ({
 	minSteps,
 	className = ''
 }) => {
-	const allWords = [startWord, ...steps, endWord]
-	const maxWords = Math.max(allWords.length, minSteps + 2) // Ensure we show at least minSteps + start + end
+	const wordGraph = new WordGraph()
+	
+	// Calculate temperature for each word in the path
+	const getTemperatureVariant = (word: string): 'hot' | 'warm' | 'cool' | 'cold' => {
+		return wordGraph.getTemperatureCategory(word, endWord)
+	}
+	
+	// Get temperature for the current word (last step or start word if no steps)
+	const currentWord = steps.length > 0 ? steps[steps.length - 1] : startWord
+	const currentTemperatureValue = wordGraph.getTemperature(currentWord, endWord)
+	const currentTemperature = getTemperatureVariant(currentWord)
+	
+	// Get temperature for the target word (should always be 'hot' since it's the target)
+	const targetTemperature = getTemperatureVariant(endWord)
 
 	return (
 		<div className={`${styles['game-path']} ${className}`}>
@@ -30,7 +44,7 @@ export const GamePath: React.FC<GamePathProps> = ({
 				<div className={styles['game-path__word-container']}>
 					<WordTile
 						word={startWord}
-						variant="start"
+						variant={getTemperatureVariant(startWord)}
 						size="lg"
 					/>
 				</div>
@@ -47,7 +61,7 @@ export const GamePath: React.FC<GamePathProps> = ({
 							<div className={styles['game-path__step']}>
 								<WordTile
 									word={word}
-									variant="step"
+									variant={getTemperatureVariant(word)}
 									size="md"
 								/>
 							</div>
@@ -84,13 +98,20 @@ export const GamePath: React.FC<GamePathProps> = ({
 			{/* End Word */}
 			<div className={styles['game-path__section']}>
 				<div className={styles['game-path__label']}>
-					Target Word ({minSteps} steps needed)
+					Target Word
 				</div>
 				<div className={styles['game-path__word-container']}>
 					<WordTile
 						word={endWord}
-						variant="end"
+						variant={targetTemperature}
 						size="lg"
+					/>
+				</div>
+				<div className={styles['game-path__thermometer']}>
+					<Thermometer
+						temperature={currentTemperatureValue}
+						size="md"
+						showLabels={true}
 					/>
 				</div>
 			</div>

@@ -3,6 +3,7 @@ import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy, faCheck, faShare } from '@fortawesome/free-solid-svg-icons';
 import { generateEnhancedShareText } from '../utils/shareUtils';
+import { WordGraph } from '../utils/wordGraph';
 import styles from './ShareModal.module.css';
 
 export interface ShareModalProps {
@@ -75,23 +76,37 @@ export const ShareModal: React.FC<ShareModalProps> = ({
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  // Generate path visualization with circles
+  // Generate path visualization with hot/cold colors
   const generatePathVisualization = () => {
+    const wordGraph = new WordGraph();
     const pathLength = steps.length - 1;
     const circles = [];
     
-    // Start circle (green)
-    circles.push('🟢');
+    // Start circle with temperature color
+    const startTemp = wordGraph.getTemperatureCategory(startWord, endWord);
+    circles.push(getTemperatureEmoji(startTemp));
     
-    // Intermediate circles (yellow)
+    // Intermediate circles with temperature colors
     for (let i = 1; i < pathLength; i++) {
-      circles.push('🟡');
+      const stepTemp = wordGraph.getTemperatureCategory(steps[i - 1], endWord);
+      circles.push(getTemperatureEmoji(stepTemp));
     }
     
-    // End circle (red)
-    circles.push('🔴');
+    // End circle (always hot since it's the target)
+    circles.push('🔥');
     
     return circles.join(' ');
+  };
+
+  // Get emoji for temperature category
+  const getTemperatureEmoji = (temperature: 'hot' | 'warm' | 'cool' | 'cold'): string => {
+    switch (temperature) {
+      case 'hot': return '🔥';
+      case 'warm': return '🟠';
+      case 'cool': return '🔵';
+      case 'cold': return '🔵';
+      default: return '⚪';
+    }
   };
 
   return (
