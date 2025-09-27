@@ -25,39 +25,42 @@
 }
 
 .game-controls__button--back {
-  background-color: var(--primary-color, #5c62d6);
-  border-color: var(--primary-color, #5c62d6);
-  color: white;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-inverse);
 }
 
 .game-controls__button--back:hover,
 .game-controls__button--back:focus {
-  background-color: var(--secondary-color, #8287e0);
-  border-color: var(--secondary-color, #8287e0);
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  color: var(--color-text-inverse);
 }
 
 .game-controls__button--share {
-  background-color: var(--primary-color, #5c62d6);
-  border-color: var(--primary-color, #5c62d6);
-  color: white;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-inverse);
 }
 
 .game-controls__button--share:hover,
 .game-controls__button--share:focus {
-  background-color: var(--secondary-color, #8287e0);
-  border-color: var(--secondary-color, #8287e0);
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  color: var(--color-text-inverse);
 }
 
 .game-controls__button--reset {
   background-color: transparent;
-  border-color: var(--text-color, #333333);
-  color: var(--text-color, #333333);
+  border-color: var(--color-text-primary);
+  color: var(--color-text-primary);
 }
 
 .game-controls__button--reset:hover,
 .game-controls__button--reset:focus {
-  background-color: #f0f0f0;
-  border-color: var(--text-color, #333333);
+  background-color: var(--color-background-light);
+  border-color: var(--color-text-primary);
+  color: var(--color-text-primary);
 }
 
 .game-controls__icon {
