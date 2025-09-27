@@ -36,6 +36,7 @@ export function useGamePlayState({ startWord, endWord }: UseGamePlayStateProps):
 		targetWord: endWord,
 		isCompleted: false,
 		elapsedTime: 0,
+		totalMoves: 0, // Initialize total moves
 		synonyms: initialSynonyms,
 		minSteps: initialMinSteps,
 	};

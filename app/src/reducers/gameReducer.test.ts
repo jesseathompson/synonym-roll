@@ -23,6 +23,7 @@ describe('gameReducer', () => {
 			targetWord: 'end',
 			isCompleted: false,
 			elapsedTime: 0,
+			totalMoves: 0,
 			synonyms: ['word1', 'word2', 'word3'],
 			minSteps: 2
 		};
@@ -95,6 +96,7 @@ describe('gameReducer', () => {
 			targetWord: 'end',
 			isCompleted: false,
 			elapsedTime: 45,
+			totalMoves: 2,
 			synonyms: ['word1', 'word2'],
 			minSteps: 1
 		};

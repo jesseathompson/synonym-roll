@@ -31,7 +31,8 @@ describe('CompletedState Component', () => {
         startWord="happy" 
         endWord="glad" 
         steps={["happy", "joyful", "glad"]} 
-        elapsedTime={65} 
+        elapsedTime={65}
+        totalMoves={2}
       />
     );
     
@@ -51,7 +52,8 @@ describe('CompletedState Component', () => {
         startWord="happy" 
         endWord="glad" 
         steps={["happy", "glad"]} 
-        elapsedTime={65} 
+        elapsedTime={65}
+        totalMoves={1}
       />
     );
     
@@ -65,7 +67,8 @@ describe('CompletedState Component', () => {
         startWord="happy" 
         endWord="glad" 
         steps={["happy", "glad"]} 
-        elapsedTime={65} 
+        elapsedTime={65}
+        totalMoves={1}
         onShare={mockOnShare}
       />
     );
@@ -83,7 +86,8 @@ describe('CompletedState Component', () => {
         startWord="happy" 
         endWord="glad" 
         steps={["happy", "glad"]} 
-        elapsedTime={65} 
+        elapsedTime={65}
+        totalMoves={1}
       />
     );
     
@@ -96,7 +100,8 @@ describe('CompletedState Component', () => {
         startWord="happy" 
         endWord="glad" 
         steps={["happy", "glad"]} 
-        elapsedTime={65} 
+        elapsedTime={65}
+        totalMoves={1}
         stats={{
           winRate: 0.75,
           gamesPlayed: 10,
@@ -118,7 +123,8 @@ describe('CompletedState Component', () => {
         startWord="happy" 
         endWord="glad" 
         steps={["happy", "joyful", "happy", "glad"]} 
-        elapsedTime={65} 
+        elapsedTime={65}
+        totalMoves={3}
       />
     );
     
@@ -132,7 +138,8 @@ describe('CompletedState Component', () => {
         startWord="happy" 
         endWord="glad" 
         steps={["happy", "glad"]} 
-        elapsedTime={65} 
+        elapsedTime={65}
+        totalMoves={1}
         onShare={() => {}}
       />
     );

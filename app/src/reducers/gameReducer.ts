@@ -19,6 +19,7 @@ export interface GamePlayState {
 	targetWord: string;
 	isCompleted: boolean;
 	elapsedTime: number;
+	totalMoves: number; // Track total moves including go back actions
 	minSteps?: number; // Optional minimum steps to complete
 	synonyms: string[]; // Current available synonyms
 }
@@ -48,6 +49,7 @@ export const gameReducer = (state: GamePlayState, action: GameAction): GamePlayS
 				steps: newSteps,
 				currentWord: action.payload,
 				isCompleted: isComplete,
+				totalMoves: state.totalMoves + 1, // Increment total moves
 				synonyms,
 				minSteps,
 			};
@@ -71,6 +73,7 @@ export const gameReducer = (state: GamePlayState, action: GameAction): GamePlayS
 				...state,
 				steps: newSteps,
 				currentWord,
+				totalMoves: state.totalMoves + 1, // Increment total moves for go back action
 				synonyms,
 				minSteps,
 			};
@@ -105,6 +108,7 @@ export const gameReducer = (state: GamePlayState, action: GameAction): GamePlayS
 				targetWord: end,
 				isCompleted: false,
 				elapsedTime: 0,
+				totalMoves: 0, // Reset total moves
 				synonyms,
 				minSteps,
 			};

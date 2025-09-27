@@ -10,6 +10,7 @@ export interface CompletedStateProps {
   endWord: string;
   steps: string[];
   elapsedTime: number;
+  totalMoves: number; // Add total moves prop
   onShare?: () => void;
   stats?: {
     winRate?: number;
@@ -28,6 +29,7 @@ export const CompletedState: React.FC<CompletedStateProps> = memo(({
   endWord,
   steps,
   elapsedTime,
+  totalMoves,
   onShare,
   stats
 }) => {
@@ -89,6 +91,12 @@ export const CompletedState: React.FC<CompletedStateProps> = memo(({
               {uniqueSteps.length - 1}
             </span>
             <span className={styles['completed-state__stat-label']}>Steps</span>
+          </div>
+          <div className={styles['completed-state__stat-item']}>
+            <span className={styles['completed-state__stat-value']}>
+              {totalMoves}
+            </span>
+            <span className={styles['completed-state__stat-label']}>Total Moves</span>
           </div>
           {stats && (
             <>

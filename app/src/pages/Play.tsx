@@ -105,6 +105,7 @@ export const Play = () => {
                 endWord={puzzle.end}
                 steps={state.steps}
                 elapsedTime={state.elapsedTime}
+                totalMoves={state.totalMoves}
                 onShare={handleShare}
                 stats={{
                   winRate,

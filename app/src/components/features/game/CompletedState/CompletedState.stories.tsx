@@ -41,6 +41,7 @@ export const ShortPath: Story = {
     endWord: 'Glad',
     steps: ['Happy', 'Glad'],
     elapsedTime: 45,
+    totalMoves: 1,
     onShare: action('share button clicked'),
   },
 };
@@ -52,6 +53,7 @@ export const MediumPath: Story = {
     endWord: 'Sad',
     steps: ['Happy', 'Joyful', 'Cheerful', 'Content', 'Sad'],
     elapsedTime: 120,
+    totalMoves: 4,
     onShare: action('share button clicked'),
   },
 };
@@ -66,6 +68,7 @@ export const LongPath: Story = {
       'Heavy', 'Solid', 'Firm', 'Soft', 'Delicate', 'Weak'
     ],
     elapsedTime: 240,
+    totalMoves: 9,
     onShare: action('share button clicked'),
   },
 };
@@ -77,6 +80,7 @@ export const WithoutSharing: Story = {
     endWord: 'Sad',
     steps: ['Happy', 'Joyful', 'Cheerful', 'Content', 'Sad'],
     elapsedTime: 120,
+    totalMoves: 4,
   },
 };
 
@@ -87,6 +91,7 @@ export const WithDetailedStats: Story = {
     endWord: 'Glad',
     steps: ['Happy', 'Joyful', 'Glad'],
     elapsedTime: 87,
+    totalMoves: 2,
     onShare: action('share button clicked'),
     stats: {
       winRate: 0.75,
@@ -104,6 +109,7 @@ export const Responsive: Story = {
     endWord: 'Sad',
     steps: ['Happy', 'Joyful', 'Cheerful', 'Content', 'Sad'],
     elapsedTime: 180,
+    totalMoves: 4,
     onShare: action('share button clicked'),
     stats: {
       winRate: 0.8,
@@ -154,6 +160,7 @@ export const InGameContext: Story = {
     endWord: 'Glad',
     steps: ['Happy', 'Joyful', 'Cheerful', 'Glad'],
     elapsedTime: 130,
+    totalMoves: 3,
     onShare: action('share button clicked'),
     stats: {
       winRate: 0.67,
