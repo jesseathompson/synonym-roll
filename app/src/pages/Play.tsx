@@ -4,13 +4,16 @@ import { generateShareText, shareResults } from "../utils/shareUtils";
 import { getTodaysPuzzle, getTodaysSeed } from "../utils/gameUtils";
 import { useState, useEffect } from "react";
 
-// Import extracted components
+// Import components
 import { GameBoard } from "../components/features/game/GameBoard";
 import { GameTimer } from "../components/features/game/GameTimer";
 import { GameControls } from "../components/features/game/GameControls";
-import { SynonymList } from "../components/features/game/SynonymList";
 import { CompletedState } from "../components/features/game/CompletedState";
 import { useGamePlayState } from "../hooks/useGamePlayState";
+
+// Import components
+import { SynonymList } from "../components/features/game/SynonymList";
+import { GamePath } from "../components/features/game/GamePath";
 
 export const Play = () => {
   const { gameState, updateGameState } = useGameState();
@@ -50,7 +53,7 @@ export const Play = () => {
       streak,
       stats: {
         gamesPlayed,
-        winRate,
+        winRate, 
         currentStreak: streak,
         maxStreak,
       },
@@ -102,39 +105,18 @@ export const Play = () => {
                 />
 
                 {/* Game Path Display */}
-                <div className="game-path mb-3">
-                  <div className="start-end">
-                    Starting Word:
-                    <div className="start-word">{puzzle.start}</div>
-                    
-                    {/* Steps taken so far */}
-                    <div className="steps-container">
-                      {state.steps.map((word, index) => {
-                        if (index === 0) return null;
-                        return (
-                          <span key={index} className="step-word">
-                            {word}
-                            {index < state.steps.length - 1 && " > "}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
+                <GamePath
+                  startWord={puzzle.start}
+                  endWord={puzzle.end}
+                  steps={state.steps}
+                  minSteps={state.minSteps || 3}
+                />
 
                 {/* Synonym Selection */}
                 <SynonymList
                   synonyms={state.synonyms}
                   onSelect={handleSynonymSelect}
                 />
-
-                {/* Target Word Display */}
-                <div className="target-section mt-3">
-                  <div className="start-end">
-                    {state.minSteps} steps to Ending Word:
-                    <div className="end-word">{puzzle.end}</div>
-                  </div>
-                </div>
 
                 {/* Game Controls */}
                 <GameControls

@@ -40,6 +40,36 @@
   margin: var(--spacing-md, 1rem) 0;
 }
 
+.completed-state__basic-stats {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-lg, 1.5rem);
+  flex-wrap: wrap;
+}
+
+.completed-state__stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs, 0.25rem);
+}
+
+.completed-state__stat-value {
+  font-size: var(--font-size-xl, 1.5rem);
+  font-weight: var(--font-weight-bold, 700);
+  color: var(--color-primary, #411f07);
+  font-family: var(--font-family-base, "Outfit", sans-serif);
+}
+
+.completed-state__stat-label {
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--color-text-secondary, #c19a6b);
+  font-weight: var(--font-weight-medium, 500);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide, 0.025em);
+}
+
 .completed-state__actions {
   margin-top: var(--spacing-md, 1rem);
 }

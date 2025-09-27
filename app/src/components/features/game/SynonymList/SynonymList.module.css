@@ -1,81 +1,136 @@
-/* SynonymList.module.css */
+/* Enhanced SynonymList with Wordle-style grid layout */
 .synonym-list__container {
-  width: 100%;
-  margin: 10px 0;
+	width: 100%;
+	margin: var(--spacing-lg) 0;
+	padding: var(--spacing-md);
 }
 
 .synonym-list__grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	gap: var(--spacing-sm);
+	max-width: 100%;
+	margin: 0 auto;
 }
 
 .synonym-list__item {
-  margin: 5px;
-  display: inline-block;
-  /* The WordTile component already handles the styling of individual tiles */
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 /* Empty state */
 .synonym-list__empty {
-  text-align: center;
-  padding: 2rem;
-  font-family: var(--font-game, "Outfit", sans-serif);
-  color: var(--text-secondary, #c19a6b);
-  font-weight: 500;
-  font-size: 1.25rem;
+	text-align: center;
+	padding: var(--spacing-2xl);
+	font-family: var(--font-family-base);
+	color: var(--color-text-secondary);
+	font-weight: var(--font-weight-medium);
+	font-size: var(--font-size-lg);
+	background-color: var(--color-background-medium);
+	border-radius: var(--border-radius-lg);
+	border: 2px dashed var(--color-border-light);
 }
 
 /* Loading state */
 .synonym-list__loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  padding: 2rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: var(--spacing-md);
+	padding: var(--spacing-2xl);
+	background-color: var(--color-background-medium);
+	border-radius: var(--border-radius-lg);
+	border: 2px solid var(--color-border-light);
 }
 
 .synonym-list__loading-text {
-  font-family: var(--font-game, "Outfit", sans-serif);
-  color: var(--text-secondary, #c19a6b);
-  font-weight: 500;
-  font-size: 1.25rem;
+	font-family: var(--font-family-base);
+	color: var(--color-text-secondary);
+	font-weight: var(--font-weight-medium);
+	font-size: var(--font-size-lg);
 }
 
 .synonym-list__loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid rgba(193, 154, 107, 0.3);
-  border-radius: 50%;
-  border-top-color: var(--primary-color, #411f07);
-  animation: spin 1s linear infinite;
+	width: 2rem;
+	height: 2rem;
+	border: 3px solid var(--color-border-light);
+	border-radius: 50%;
+	border-top-color: var(--color-primary);
+	animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+	to {
+		transform: rotate(360deg);
+	}
 }
 
-/* Responsive adjustments */
-@media (max-width: 576px) {
-  .synonym-list__grid {
-    margin: 0 -3px; /* Smaller negative margin for mobile */
-  }
-  
-  .synonym-list__item {
-    margin: 3px;
-  }
+/* Responsive flex adjustments */
+@media (max-width: 480px) {
+	.synonym-list__grid {
+		gap: var(--spacing-xs);
+	}
+	
+	.synonym-list__container {
+		padding: var(--spacing-sm);
+	}
 }
 
-@media (min-width: 992px) {
-  .synonym-list__grid {
-    margin: 0 -7px; /* Larger negative margin for desktop */
-  }
-  
-  .synonym-list__item {
-    margin: 7px;
-  }
+@media (min-width: 481px) and (max-width: 768px) {
+	.synonym-list__grid {
+		gap: var(--spacing-sm);
+	}
 }
+
+@media (min-width: 769px) and (max-width: 1024px) {
+	.synonym-list__grid {
+		gap: var(--spacing-md);
+	}
+}
+
+@media (min-width: 1025px) {
+	.synonym-list__grid {
+		gap: var(--spacing-md);
+		max-width: 90%;
+	}
+}
+
+/* Focus management for accessibility */
+.synonym-list__container:focus-within {
+	outline: 2px solid var(--color-info);
+	outline-offset: 2px;
+	border-radius: var(--border-radius-md);
+}
+
+/* Animation for grid items */
+.synonym-list__item {
+	animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* Staggered animation for grid items */
+.synonym-list__item:nth-child(1) { animation-delay: 0ms; }
+.synonym-list__item:nth-child(2) { animation-delay: 50ms; }
+.synonym-list__item:nth-child(3) { animation-delay: 100ms; }
+.synonym-list__item:nth-child(4) { animation-delay: 150ms; }
+.synonym-list__item:nth-child(5) { animation-delay: 200ms; }
+.synonym-list__item:nth-child(6) { animation-delay: 250ms; }
+.synonym-list__item:nth-child(7) { animation-delay: 300ms; }
+.synonym-list__item:nth-child(8) { animation-delay: 350ms; }
+.synonym-list__item:nth-child(9) { animation-delay: 400ms; }
+.synonym-list__item:nth-child(10) { animation-delay: 450ms; }
+.synonym-list__item:nth-child(n+11) { animation-delay: 500ms; }

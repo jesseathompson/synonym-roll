@@ -3,7 +3,6 @@ import { Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShare } from '@fortawesome/free-solid-svg-icons';
 import { WordTile } from '../../../common/WordTile';
-import { StatsDisplay } from '../../stats/StatsDisplay';
 import styles from './CompletedState.module.css';
 
 export interface CompletedStateProps {
@@ -60,7 +59,8 @@ export const CompletedState: React.FC<CompletedStateProps> = memo(({
             <React.Fragment key={`${word}-${index}`}>
               <WordTile 
                 word={word} 
-                variant={variant} 
+                variant={variant}
+                size="md"
               />
               {!isLast && (
                 <span 
@@ -77,19 +77,36 @@ export const CompletedState: React.FC<CompletedStateProps> = memo(({
 
       {/* Stats display */}
       <div className={styles['completed-state__stats']}>
-        <StatsDisplay 
-          stats={{
-            elapsedTime,
-            steps: uniqueSteps.length - 1,
-            ...(stats ? {
-              winRate: stats.winRate,
-              gamesPlayed: stats.gamesPlayed,
-              currentStreak: stats.streak,
-              maxStreak: stats.maxStreak
-            } : {})
-          }}
-          showDetailedStats={!!stats}
-        />
+        <div className={styles['completed-state__basic-stats']}>
+          <div className={styles['completed-state__stat-item']}>
+            <span className={styles['completed-state__stat-value']}>
+              {formatTime(elapsedTime)}
+            </span>
+            <span className={styles['completed-state__stat-label']}>Time</span>
+          </div>
+          <div className={styles['completed-state__stat-item']}>
+            <span className={styles['completed-state__stat-value']}>
+              {uniqueSteps.length - 1}
+            </span>
+            <span className={styles['completed-state__stat-label']}>Steps</span>
+          </div>
+          {stats && (
+            <>
+              <div className={styles['completed-state__stat-item']}>
+                <span className={styles['completed-state__stat-value']}>
+                  {Math.round((stats.winRate || 0) * 100)}%
+                </span>
+                <span className={styles['completed-state__stat-label']}>Win Rate</span>
+              </div>
+              <div className={styles['completed-state__stat-item']}>
+                <span className={styles['completed-state__stat-value']}>
+                  {stats.streak || 0}
+                </span>
+                <span className={styles['completed-state__stat-label']}>Streak</span>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Share button (only displayed if onShare is provided) */}

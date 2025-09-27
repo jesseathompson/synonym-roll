@@ -1,111 +1,202 @@
-/* WordTile.module.css */
-:root {
-  /* Using the game's design token system */
-  --word-tile-primary-color: var(--color-primary);
-  --word-tile-secondary-color: var(--color-text-secondary);
-  --word-tile-text-shadow: var(--color-text-shadow);
-  --word-tile-bg-light: var(--color-background-light);
-  --word-tile-bg-dark: var(--color-background-dark);
-  --word-tile-font-family: var(--font-family-base);
-  
-  /* Additional styling variables mapped to design tokens */
-  --word-tile-font-size-sm: var(--font-size-sm);
-  --word-tile-font-size-md: var(--font-size-md);
-  --word-tile-font-size-lg: var(--font-size-lg);
-  --word-tile-padding-sm: var(--spacing-sm) var(--spacing-sm);
-  --word-tile-padding-md: var(--spacing-sm) var(--spacing-md);
-  --word-tile-padding-lg: var(--spacing-md) var(--spacing-lg);
-  --word-tile-border-radius: var(--border-radius-lg);
-  --word-tile-transition: var(--transition-normal);
-}
-
+/* WordTile with Wordle-style design */
 .word-tile {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--word-tile-padding-md);
-  margin: var(--spacing-xs);
-  border-radius: var(--word-tile-border-radius);
-  font-family: var(--word-tile-font-family);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--word-tile-font-size-md);
-  color: var(--word-tile-primary-color);
-  text-align: center;
-  transition: var(--word-tile-transition);
-  user-select: none;
-  background-color: var(--word-tile-bg-light);
-  border: 1px solid var(--word-tile-primary-color);
-  box-shadow: var(--shadow-sm);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: var(--border-radius-md);
+	font-family: var(--font-family-base);
+	font-weight: var(--font-weight-semibold);
+	text-align: center;
+	transition: all var(--transition-fast);
+	user-select: none;
+	border: 2px solid var(--color-border-medium);
+	position: relative;
+	overflow: hidden;
 }
 
-/* Variant-specific styles */
+/* Size variants - now rectangular and responsive */
+.word-tile--sm {
+	min-width: 2.5rem;
+	height: 2.5rem;
+	font-size: var(--font-size-sm);
+	padding: var(--spacing-xs) var(--spacing-sm);
+	width: auto;
+}
+
+.word-tile--md {
+	min-width: 3.5rem;
+	height: 3.5rem;
+	font-size: var(--font-size-md);
+	padding: var(--spacing-sm) var(--spacing-md);
+	width: auto;
+}
+
+.word-tile--lg {
+	min-width: 4.5rem;
+	height: 4.5rem;
+	font-size: var(--font-size-lg);
+	padding: var(--spacing-md) var(--spacing-lg);
+	width: auto;
+}
+
+/* Variant styles */
 .word-tile--start {
-  text-transform: uppercase;
-  text-shadow: 2px 2px 6px var(--word-tile-text-shadow);
-  font-size: var(--word-tile-font-size-lg);
-  font-weight: 600;
-}
-
-.word-tile--step {
-  text-shadow: 1px 1px 3px var(--word-tile-text-shadow);
+	background-color: var(--color-success);
+	color: var(--color-text-inverse);
+	border-color: var(--color-success);
+	text-transform: uppercase;
+	font-weight: var(--font-weight-bold);
+	box-shadow: var(--shadow-md);
 }
 
 .word-tile--end {
-  text-transform: uppercase;
-  text-shadow: 2px 2px 6px var(--word-tile-text-shadow);
-  font-size: var(--word-tile-font-size-lg);
-  font-weight: 600;
+	background-color: var(--color-error);
+	color: var(--color-text-inverse);
+	border-color: var(--color-error);
+	text-transform: uppercase;
+	font-weight: var(--font-weight-bold);
+	box-shadow: var(--shadow-md);
+}
+
+.word-tile--step {
+	background-color: var(--color-info);
+	color: var(--color-text-inverse);
+	border-color: var(--color-info);
+	text-transform: uppercase;
+	font-weight: var(--font-weight-semibold);
+	box-shadow: var(--shadow-sm);
 }
 
 .word-tile--neutral {
-  /* Similar to the game buttons */
-  background-color: var(--word-tile-bg-light);
-  color: var(--word-tile-primary-color);
-  border-color: var(--word-tile-primary-color);
+	background-color: var(--color-background-light);
+	color: var(--color-text-primary);
+	border-color: var(--color-border-medium);
+	box-shadow: var(--shadow-sm);
 }
 
-/* Interactive styles */
-.word-tile[role="button"] {
-  cursor: pointer;
+.word-tile--selected {
+	background-color: var(--color-warning);
+	color: var(--color-text-inverse);
+	border-color: var(--color-warning);
+	transform: scale(1.05);
+	box-shadow: var(--shadow-lg);
 }
 
-.word-tile[role="button"]:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  background-color: var(--word-tile-bg-dark);
-  color: var(--word-tile-bg-light);
+.word-tile--correct {
+	background-color: var(--color-success);
+	color: var(--color-text-inverse);
+	border-color: var(--color-success);
+	animation: correctPulse 0.6s ease-in-out;
+}
+
+.word-tile--incorrect {
+	background-color: var(--color-error);
+	color: var(--color-text-inverse);
+	border-color: var(--color-error);
+	animation: incorrectShake 0.6s ease-in-out;
+}
+
+.word-tile--disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+/* Interactive states */
+.word-tile[role="button"]:not(.word-tile--disabled) {
+	cursor: pointer;
+}
+
+.word-tile[role="button"]:not(.word-tile--disabled):hover {
+	transform: translateY(-2px);
+	box-shadow: var(--shadow-lg);
+}
+
+.word-tile[role="button"]:not(.word-tile--disabled):active {
+	transform: translateY(0);
+	box-shadow: var(--shadow-sm);
 }
 
 .word-tile[role="button"]:focus-visible {
-  outline: 2px solid var(--word-tile-secondary-color);
-  outline-offset: 2px;
+	outline: 3px solid var(--color-info);
+	outline-offset: 2px;
 }
 
-.word-tile[role="button"]:active {
-  transform: translateY(0);
+/* Text styling */
+.word-tile__text {
+	display: block;
+	line-height: 1;
+	letter-spacing: var(--letter-spacing-wide);
 }
 
-/* Responsive styles */
+/* Animations */
+@keyframes correctPulse {
+	0% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.1);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+@keyframes incorrectShake {
+	0%, 100% {
+		transform: translateX(0);
+	}
+	25% {
+		transform: translateX(-4px);
+	}
+	75% {
+		transform: translateX(4px);
+	}
+}
+
+/* Responsive adjustments */
 @media (max-width: 576px) {
-  .word-tile {
-    padding: var(--word-tile-padding-sm);
-    font-size: var(--word-tile-font-size-sm);
-  }
-  
-  .word-tile--start,
-  .word-tile--end {
-    font-size: var(--word-tile-font-size-md);
-  }
+	.word-tile--sm {
+		min-width: 2rem;
+		height: 2rem;
+		font-size: var(--font-size-xs);
+		padding: var(--spacing-xs) var(--spacing-sm);
+	}
+	
+	.word-tile--md {
+		min-width: 2.75rem;
+		height: 2.75rem;
+		font-size: var(--font-size-sm);
+		padding: var(--spacing-sm) var(--spacing-md);
+	}
+	
+	.word-tile--lg {
+		min-width: 3.5rem;
+		height: 3.5rem;
+		font-size: var(--font-size-md);
+		padding: var(--spacing-md) var(--spacing-lg);
+	}
 }
 
 @media (min-width: 992px) {
-  .word-tile {
-    padding: var(--word-tile-padding-lg);
-    font-size: var(--word-tile-font-size-lg);
-  }
-  
-  .word-tile--start,
-  .word-tile--end {
-    font-size: calc(var(--word-tile-font-size-lg) * 1.1);
-  }
+	.word-tile--sm {
+		min-width: 3rem;
+		height: 3rem;
+		font-size: var(--font-size-md);
+		padding: var(--spacing-sm) var(--spacing-md);
+	}
+	
+	.word-tile--md {
+		min-width: 4rem;
+		height: 4rem;
+		font-size: var(--font-size-lg);
+		padding: var(--spacing-md) var(--spacing-lg);
+	}
+	
+	.word-tile--lg {
+		min-width: 5rem;
+		height: 5rem;
+		font-size: var(--font-size-xl);
+		padding: var(--spacing-lg) var(--spacing-xl);
+	}
 }

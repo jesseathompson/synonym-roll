@@ -1,279 +1,113 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { SynonymList } from './SynonymList';
-import { expect, userEvent, within } from '@storybook/test';
+import type { Meta, StoryObj } from '@storybook/react'
+import { SynonymList } from './SynonymList'
 
-const meta = {
-  title: 'Game/SynonymList',
-  component: SynonymList,
-  parameters: {
-    layout: 'fullscreen',
-    backgrounds: {
-      default: 'synonym-roll-light',
-      values: [
-        { name: 'synonym-roll-light', value: '#fefdf8' }, // bg-light
-        { name: 'synonym-roll-dark', value: '#411f07' }, // bg-dark
-      ],
-    },
-    docs: {
-      description: {
-        component: 'SynonymList component displays a grid of synonym words that users can select during gameplay.',
-      },
-    },
-  },
-  tags: ['autodocs'],
-  argTypes: {
-    synonyms: { control: 'object' },
-    onSelect: { action: 'selected' },
-    isLoading: { control: 'boolean' },
-  },
-} satisfies Meta<typeof SynonymList>;
+const meta: Meta<typeof SynonymList> = {
+	title: 'Features/Game/SynonymList',
+	component: SynonymList,
+	parameters: {
+		layout: 'padded',
+	},
+	tags: ['autodocs'],
+	argTypes: {
+		synonyms: {
+			control: 'object',
+			description: 'Array of synonym words to display',
+		},
+		onSelect: {
+			action: 'synonym-selected',
+			description: 'Function called when a synonym is selected',
+		},
+		isLoading: {
+			control: 'boolean',
+			description: 'Whether the component is in loading state',
+		},
+		selectedWord: {
+			control: 'text',
+			description: 'Currently selected word',
+		},
+		disabled: {
+			control: 'boolean',
+			description: 'Whether the component is disabled',
+		},
+	},
+}
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
-// Sample synonym lists for different scenarios
-const fewSynonyms = ['happy', 'joyful', 'cheerful', 'merry', 'glad'];
+const sampleSynonyms = [
+	'word', 'term', 'phrase', 'expression', 'vocabulary',
+	'language', 'speech', 'communication', 'dialect', 'tongue'
+]
+
 const manySynonyms = [
-  'happy', 'joyful', 'cheerful', 'merry', 'glad', 'delighted', 'pleased', 
-  'content', 'thrilled', 'ecstatic', 'blissful', 'upbeat', 'elated', 
-  'jubilant', 'gleeful', 'sunny', 'chipper', 'jolly'
-];
+	'word', 'term', 'phrase', 'expression', 'vocabulary', 'language', 'speech',
+	'communication', 'dialect', 'tongue', 'jargon', 'slang', 'vernacular',
+	'terminology', 'lexicon', 'dictionary', 'thesaurus', 'glossary'
+]
 
-// Base story - Few synonyms
-export const FewSynonyms: Story = {
-  args: {
-    synonyms: fewSynonyms,
-    onSelect: (word) => console.log(`Selected: ${word}`),
-    isLoading: false,
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ 
-        padding: '1.5rem', 
-        maxWidth: '800px', 
-        margin: '0 auto',
-        backgroundColor: '#fefdf8',
-        borderRadius: '12px',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-      }}>
-        <Story />
-      </div>
-    ),
-  ],
-};
+const longWordSynonyms = [
+	'extraordinary', 'phenomenal', 'magnificent', 'tremendous', 'outstanding',
+	'remarkable', 'exceptional', 'incredible', 'fantastic', 'wonderful',
+	'brilliant', 'spectacular', 'marvelous', 'amazing', 'fabulous'
+]
 
-// Story with many synonyms
+export const Default: Story = {
+	args: {
+		synonyms: sampleSynonyms,
+		onSelect: (word: string) => console.log('Selected:', word),
+	},
+}
+
+export const WithSelectedWord: Story = {
+	args: {
+		synonyms: sampleSynonyms,
+		selectedWord: 'word',
+		onSelect: (word: string) => console.log('Selected:', word),
+	},
+}
+
 export const ManySynonyms: Story = {
-  args: {
-    synonyms: manySynonyms,
-    onSelect: (word) => console.log(`Selected: ${word}`),
-    isLoading: false,
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ 
-        padding: '1.5rem', 
-        maxWidth: '800px', 
-        margin: '0 auto',
-        backgroundColor: '#fefdf8',
-        borderRadius: '12px',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-      }}>
-        <Story />
-      </div>
-    ),
-  ],
-};
+	args: {
+		synonyms: manySynonyms,
+		onSelect: (word: string) => console.log('Selected:', word),
+	},
+}
 
-// Interactive story
-export const Interactive: Story = {
-  args: {
-    synonyms: fewSynonyms,
-    onSelect: (word) => {},
-    isLoading: false,
-  },
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    
-    // Wait for component to render
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    // Find and click on the second synonym
-    const secondSynonym = canvas.getByText('joyful'); // 'joyful' should be the second after sorting
-    await userEvent.click(secondSynonym);
-    
-    // Verify the selection handler was called
-    await expect(args.onSelect).toHaveBeenCalledWith('joyful');
-  },
-};
-
-// Empty state story
-export const EmptyState: Story = {
-  args: {
-    synonyms: [],
-    onSelect: (word) => console.log(`Selected: ${word}`),
-    isLoading: false,
-  },
-};
-
-// Loading state story
 export const Loading: Story = {
-  args: {
-    synonyms: fewSynonyms,
-    onSelect: (word) => console.log(`Selected: ${word}`),
-    isLoading: true,
-  },
-};
+	args: {
+		synonyms: [],
+		isLoading: true,
+	},
+}
 
-// Responsive behavior demonstration
-export const ResponsiveExample: Story = {
-  args: {
-    synonyms: manySynonyms,
-    onSelect: (word) => console.log(`Selected: ${word}`),
-    isLoading: false,
-  },
-  parameters: {
-    viewport: {
-      defaultViewport: 'responsive',
-      viewports: {
-        small: {
-          name: 'Mobile',
-          styles: {
-            width: '375px',
-            height: '667px',
-          },
-        },
-        medium: {
-          name: 'Tablet',
-          styles: {
-            width: '768px',
-            height: '1024px',
-          },
-        },
-        large: {
-          name: 'Desktop',
-          styles: {
-            width: '1440px',
-            height: '900px',
-          },
-        },
-      },
-    },
-    docs: {
-      description: {
-        story: 'This example demonstrates the responsive behavior of the SynonymList component at different viewport sizes.',
-      },
-    },
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ 
-        padding: '1.5rem', 
-        maxWidth: '800px', 
-        margin: '0 auto',
-        backgroundColor: '#fefdf8',
-        borderRadius: '12px',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-      }}>
-        <Story />
-      </div>
-    ),
-  ],
-};
+export const Empty: Story = {
+	args: {
+		synonyms: [],
+		isLoading: false,
+	},
+}
 
-// Game-like context story
-export const GameContext: Story = {
-  args: {
-    synonyms: ['joyful', 'cheerful', 'merry', 'pleased', 'delighted', 'content'],
-    onSelect: (word) => console.log(`Selected: ${word}`),
-    isLoading: false,
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ 
-        padding: '1.5rem', 
-        maxWidth: '800px', 
-        margin: '0 auto',
-        backgroundColor: '#fefdf8',
-        borderRadius: '12px',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-      }}>
-        <div style={{
-          textAlign: 'center',
-          marginBottom: '1.5rem',
-        }}>
-          <h4 style={{
-            fontFamily: 'var(--font-game, "Outfit", sans-serif)',
-            color: '#411f07',
-            marginBottom: '0.5rem'
-          }}>
-            Time Elapsed: 0:42
-          </h4>
-          
-          <div style={{
-            fontFamily: 'var(--font-game, "Outfit", sans-serif)',
-            color: '#411f07',
-            marginBottom: '1rem'
-          }}>
-            Starting Word:
-          </div>
-          
-          <div style={{
-            fontWeight: '600',
-            textTransform: 'uppercase',
-            textShadow: '2px 2px 6px #c19a6b',
-            fontSize: 'larger',
-            color: '#411f07',
-            marginBottom: '1rem'
-          }}>
-            HAPPY
-          </div>
-          
-          <div style={{
-            marginBottom: '1rem', 
-            textShadow: '1px 1px 3px #c19a6b',
-            color: '#411f07',
-          }}>
-            3 steps to Ending Word:
-          </div>
-          
-          <div style={{
-            fontWeight: '600',
-            textTransform: 'uppercase',
-            textShadow: '2px 2px 6px #c19a6b',
-            fontSize: 'larger',
-            color: '#411f07',
-            marginBottom: '1.5rem'
-          }}>
-            GLAD
-          </div>
-        </div>
-        
-        <div style={{ marginBottom: '0.5rem', color: '#411f07' }}>
-          Choose a synonym:
-        </div>
-        
-        <Story />
-        
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          marginTop: '1.5rem',
-        }}>
-          <button style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: '#fefdf8',
-            border: '1px solid #411f07',
-            color: '#411f07',
-            borderRadius: '8px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-            fontWeight: '600',
-            fontFamily: 'var(--font-game, "Outfit", sans-serif)',
-          }}>
-            Go Back
-          </button>
-        </div>
-      </div>
-    ),
-  ],
-};
+export const Disabled: Story = {
+	args: {
+		synonyms: sampleSynonyms,
+		disabled: true,
+		onSelect: (word: string) => console.log('Selected:', word),
+	},
+}
+
+export const Interactive: Story = {
+	args: {
+		synonyms: sampleSynonyms,
+		onSelect: (word: string) => {
+			alert(`You selected: ${word}`)
+		},
+	},
+}
+
+export const LongWords: Story = {
+	args: {
+		synonyms: longWordSynonyms,
+		onSelect: (word: string) => console.log('Selected:', word),
+	},
+}
