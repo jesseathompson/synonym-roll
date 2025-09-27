@@ -42,31 +42,42 @@ export const GamePath: React.FC<GamePathProps> = ({
 					Your Path ({steps.length} steps)
 				</div>
 				<div className={styles['game-path__path']}>
-					{Array.from({ length: maxWords - 2 }, (_, index) => {
-						const word = steps[index]
-						const isEmpty = !word
-						
-						return (
-							<div 
-								key={index} 
-								className={`${styles['game-path__step']} ${
-									isEmpty ? styles['game-path__step--empty'] : ''
-								}`}
-							>
-								{word ? (
-									<WordTile
-										word={word}
-										variant="step"
-										size="md"
-									/>
-								) : (
-									<div className={styles['game-path__placeholder']}>
-										?
-									</div>
-								)}
+					{steps.map((word, index) => (
+						<React.Fragment key={index}>
+							<div className={styles['game-path__step']}>
+								<WordTile
+									word={word}
+									variant="step"
+									size="md"
+								/>
 							</div>
-						)
-					})}
+							{index < steps.length - 1 && (
+								<span className={styles['game-path__arrow']}>
+									→
+								</span>
+							)}
+						</React.Fragment>
+					))}
+					{/* Show placeholder steps for remaining slots */}
+					{Array.from({ length: Math.max(0, minSteps - steps.length) }, (_, index) => (
+						<React.Fragment key={`placeholder-${index}`}>
+							{steps.length > 0 && index === 0 && (
+								<span className={styles['game-path__arrow']}>
+									→
+								</span>
+							)}
+							<div className={styles['game-path__step']}>
+								<div className={styles['game-path__placeholder']}>
+									?
+								</div>
+							</div>
+							{index < Math.max(0, minSteps - steps.length) - 1 && (
+								<span className={styles['game-path__arrow']}>
+									→
+								</span>
+							)}
+						</React.Fragment>
+					))}
 				</div>
 			</div>
 

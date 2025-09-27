@@ -74,6 +74,23 @@
 	transform: scale(1.05);
 }
 
+.game-path__arrow {
+	color: var(--color-text-secondary);
+	font-size: var(--font-size-xl);
+	font-weight: var(--font-weight-bold);
+	margin: 0 var(--spacing-sm);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	transition: all var(--transition-fast);
+	user-select: none;
+}
+
+.game-path__arrow:hover {
+	color: var(--color-primary);
+	transform: scale(1.1);
+}
+
 /* Responsive adjustments */
 @media (max-width: 576px) {
 	.game-path {
@@ -94,6 +111,11 @@
 		height: 2.75rem;
 		font-size: var(--font-size-md);
 		padding: var(--spacing-xs) var(--spacing-sm);
+	}
+	
+	.game-path__arrow {
+		font-size: var(--font-size-lg);
+		margin: 0 var(--spacing-xs);
 	}
 }
 

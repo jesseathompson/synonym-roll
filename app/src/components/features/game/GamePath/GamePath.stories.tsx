@@ -49,6 +49,15 @@ export const WithSteps: Story = {
 	},
 }
 
+export const WithMultipleSteps: Story = {
+	args: {
+		startWord: 'HAPPY',
+		endWord: 'SAD',
+		steps: ['JOYFUL', 'CHEERFUL', 'GLAD'],
+		minSteps: 4,
+	},
+}
+
 export const MoreSteps: Story = {
 	args: {
 		startWord: 'CAT',
