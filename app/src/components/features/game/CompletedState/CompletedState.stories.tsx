@@ -42,6 +42,8 @@ export const ShortPath: Story = {
     steps: ['Happy', 'Glad'],
     elapsedTime: 45,
     totalMoves: 1,
+    minSteps: 1,
+    dayNumber: 42,
     onShare: action('share button clicked'),
   },
 };
@@ -54,6 +56,8 @@ export const MediumPath: Story = {
     steps: ['Happy', 'Joyful', 'Cheerful', 'Content', 'Sad'],
     elapsedTime: 120,
     totalMoves: 4,
+    minSteps: 4,
+    dayNumber: 42,
     onShare: action('share button clicked'),
   },
 };
@@ -69,6 +73,8 @@ export const LongPath: Story = {
     ],
     elapsedTime: 240,
     totalMoves: 9,
+    minSteps: 9,
+    dayNumber: 42,
     onShare: action('share button clicked'),
   },
 };
@@ -81,6 +87,8 @@ export const WithoutSharing: Story = {
     steps: ['Happy', 'Joyful', 'Cheerful', 'Content', 'Sad'],
     elapsedTime: 120,
     totalMoves: 4,
+    minSteps: 4,
+    dayNumber: 42,
   },
 };
 
@@ -92,6 +100,8 @@ export const WithDetailedStats: Story = {
     steps: ['Happy', 'Joyful', 'Glad'],
     elapsedTime: 87,
     totalMoves: 2,
+    minSteps: 2,
+    dayNumber: 42,
     onShare: action('share button clicked'),
     stats: {
       winRate: 0.75,
@@ -110,6 +120,8 @@ export const Responsive: Story = {
     steps: ['Happy', 'Joyful', 'Cheerful', 'Content', 'Sad'],
     elapsedTime: 180,
     totalMoves: 4,
+    minSteps: 4,
+    dayNumber: 42,
     onShare: action('share button clicked'),
     stats: {
       winRate: 0.8,
@@ -161,6 +173,8 @@ export const InGameContext: Story = {
     steps: ['Happy', 'Joyful', 'Cheerful', 'Glad'],
     elapsedTime: 130,
     totalMoves: 3,
+    minSteps: 3,
+    dayNumber: 42,
     onShare: action('share button clicked'),
     stats: {
       winRate: 0.67,

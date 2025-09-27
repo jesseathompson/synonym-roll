@@ -1,8 +1,9 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShare } from '@fortawesome/free-solid-svg-icons';
 import { WordTile } from '../../../common/WordTile';
+import { ShareModal } from '../../../ShareModal';
 import styles from './CompletedState.module.css';
 
 export interface CompletedStateProps {
@@ -10,7 +11,9 @@ export interface CompletedStateProps {
   endWord: string;
   steps: string[];
   elapsedTime: number;
-  totalMoves: number; // Add total moves prop
+  totalMoves: number;
+  minSteps: number;
+  dayNumber: number;
   onShare?: () => void;
   stats?: {
     winRate?: number;
@@ -30,9 +33,12 @@ export const CompletedState: React.FC<CompletedStateProps> = memo(({
   steps,
   elapsedTime,
   totalMoves,
+  minSteps,
+  dayNumber,
   onShare,
   stats
 }) => {
+  const [showShareModal, setShowShareModal] = useState(false);
   // Filter out any duplicated words in the path
   const uniqueSteps = steps.filter((word, index) => steps.indexOf(word) === index);
   
@@ -117,20 +123,35 @@ export const CompletedState: React.FC<CompletedStateProps> = memo(({
         </div>
       </div>
 
-      {/* Share button (only displayed if onShare is provided) */}
-      {onShare && (
-        <div className={styles['completed-state__actions']}>
-          <Button
-            variant="primary"
-            className={styles['completed-state__share-button']}
-            onClick={onShare}
-            aria-label="Share your game result"
-          >
-            <FontAwesomeIcon icon={faShare} className={styles['completed-state__share-icon']} />
-            Share Result
-          </Button>
-        </div>
-      )}
+      {/* Share button */}
+      <div className={styles['completed-state__actions']}>
+        <Button
+          variant="primary"
+          className={styles['completed-state__share-button']}
+          onClick={() => setShowShareModal(true)}
+          aria-label="Share your game result"
+        >
+          <FontAwesomeIcon icon={faShare} className={styles['completed-state__share-icon']} />
+          Share Result
+        </Button>
+      </div>
+
+      {/* Share Modal */}
+      <ShareModal
+        show={showShareModal}
+        onHide={() => setShowShareModal(false)}
+        dayNumber={dayNumber}
+        startWord={startWord}
+        endWord={endWord}
+        steps={steps}
+        elapsedTime={elapsedTime}
+        totalMoves={totalMoves}
+        minSteps={minSteps}
+        streak={stats?.streak || 0}
+        winRate={stats?.winRate || 0}
+        gamesPlayed={stats?.gamesPlayed || 0}
+        maxStreak={stats?.maxStreak || 0}
+      />
     </div>
   );
 });

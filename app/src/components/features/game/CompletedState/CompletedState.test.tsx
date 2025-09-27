@@ -33,6 +33,8 @@ describe('CompletedState Component', () => {
         steps={["happy", "joyful", "glad"]} 
         elapsedTime={65}
         totalMoves={2}
+        minSteps={2}
+        dayNumber={42}
       />
     );
     
@@ -54,6 +56,8 @@ describe('CompletedState Component', () => {
         steps={["happy", "glad"]} 
         elapsedTime={65}
         totalMoves={1}
+        minSteps={1}
+        dayNumber={42}
       />
     );
     
@@ -69,6 +73,8 @@ describe('CompletedState Component', () => {
         steps={["happy", "glad"]} 
         elapsedTime={65}
         totalMoves={1}
+        minSteps={1}
+        dayNumber={42}
         onShare={mockOnShare}
       />
     );
@@ -88,6 +94,8 @@ describe('CompletedState Component', () => {
         steps={["happy", "glad"]} 
         elapsedTime={65}
         totalMoves={1}
+        minSteps={1}
+        dayNumber={42}
       />
     );
     
@@ -102,6 +110,8 @@ describe('CompletedState Component', () => {
         steps={["happy", "glad"]} 
         elapsedTime={65}
         totalMoves={1}
+        minSteps={1}
+        dayNumber={42}
         stats={{
           winRate: 0.75,
           gamesPlayed: 10,
@@ -125,6 +135,8 @@ describe('CompletedState Component', () => {
         steps={["happy", "joyful", "happy", "glad"]} 
         elapsedTime={65}
         totalMoves={3}
+        minSteps={2}
+        dayNumber={42}
       />
     );
     
@@ -140,6 +152,8 @@ describe('CompletedState Component', () => {
         steps={["happy", "glad"]} 
         elapsedTime={65}
         totalMoves={1}
+        minSteps={1}
+        dayNumber={42}
         onShare={() => {}}
       />
     );

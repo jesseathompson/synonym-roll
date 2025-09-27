@@ -1,6 +1,5 @@
 import { Container, Row, Col } from "react-bootstrap";
 import { useGameState } from "../context/GameStateContext";
-import { generateShareText, shareResults } from "../utils/shareUtils";
 import { getTodaysPuzzle, getTodaysSeed } from "../utils/gameUtils";
 import { useState, useEffect } from "react";
 import { WordGraph } from "../utils/wordGraph";
@@ -47,21 +46,6 @@ export const Play = () => {
     }
   }, [state.isCompleted, todayCompleted, gamesPlayed, wins, updateGameState, maxStreak, streak]);
 
-  const handleShare = async () => {
-    const shareText = generateShareText({
-      title: "Synonym Roll",
-      dayNumber: puzzleNumber,
-      streak,
-      stats: {
-        gamesPlayed,
-        winRate, 
-        currentStreak: streak,
-        maxStreak,
-      },
-    });
-
-    await shareResults(shareText);
-  };
 
   const handleSynonymSelect = (word: string) => {
     addStep(word);
@@ -106,7 +90,8 @@ export const Play = () => {
                 steps={state.steps}
                 elapsedTime={state.elapsedTime}
                 totalMoves={state.totalMoves}
-                onShare={handleShare}
+                minSteps={state.minSteps || 3}
+                dayNumber={puzzleNumber}
                 stats={{
                   winRate,
                   gamesPlayed,

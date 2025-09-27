@@ -43,9 +43,9 @@ const formatTime = (ms: number): string => {
 };
 
 /**
- * Generate a shareable text for the game results
- * @param options Share options including grid, stats, etc.
- * @returns Formatted share text
+ * Generate a visually interesting share text for Synonym Roll
+ * @param options Share options including path, stats, etc.
+ * @returns Formatted share text with emojis and visual elements
  */
 export const generateShareText = ({
   title,
@@ -96,6 +96,90 @@ export const generateShareText = ({
       lines.push(`Best Time: ${formatTime(stats.bestTime)}`);
     }
   }
+
+  return lines.join("\n");
+};
+
+/**
+ * Generate a visually interesting share text for Synonym Roll with word path
+ * @param options Enhanced share options including word path and comprehensive stats
+ * @returns Formatted share text with emojis and visual elements
+ */
+export const generateEnhancedShareText = ({
+  title = "Synonym Roll",
+  dayNumber,
+  startWord,
+  endWord,
+  steps,
+  elapsedTime,
+  totalMoves,
+  minSteps,
+  streak,
+  winRate,
+  gamesPlayed,
+  maxStreak,
+}: {
+  title?: string;
+  dayNumber: number;
+  startWord: string;
+  endWord: string;
+  steps: string[];
+  elapsedTime: number;
+  totalMoves: number;
+  minSteps: number;
+  streak: number;
+  winRate: number;
+  gamesPlayed: number;
+  maxStreak: number;
+}): string => {
+  const lines: string[] = [];
+
+  // Header with puzzle number
+  lines.push(`🧩 ${title} #${dayNumber}`);
+  lines.push("");
+
+  // Word path visualization with circles (spoiler-free)
+  lines.push("🎯 Word Path:");
+  const pathLength = steps.length - 1; // Exclude start word from count
+  const circles = [];
+
+  // Start circle (green)
+  circles.push('🟢');
+
+  // Intermediate circles (yellow)
+  for (let i = 1; i < pathLength; i++) {
+    circles.push('🟡');
+  }
+
+  // End circle (red)
+  circles.push('🔴');
+
+  lines.push(circles.join(' '));
+  lines.push(`${steps[0]} → ${steps[steps.length - 1]} (${pathLength} steps)`);
+  lines.push("");
+
+  // Performance metrics
+  const efficiency = totalMoves > 0 ? ((steps.length - 1) / totalMoves * 100).toFixed(0) : "100";
+  const isOptimal = steps.length - 1 === minSteps;
+
+  lines.push("📊 Performance:");
+  lines.push(`⏱️  Time: ${formatTime(elapsedTime * 1000)}`);
+  lines.push(`👣 Steps: ${steps.length - 1}${isOptimal ? " ⭐" : ""}`);
+  lines.push(`🎮 Total Moves: ${totalMoves}`);
+  lines.push(`📈 Efficiency: ${efficiency}%`);
+  lines.push("");
+
+  // Game stats
+  lines.push("🏆 Overall Stats:");
+  lines.push(`🔥 Streak: ${streak}`);
+  lines.push(`📈 Win Rate: ${Math.round(winRate * 100)}%`);
+  lines.push(`🎯 Games Played: ${gamesPlayed}`);
+  lines.push(`🏅 Best Streak: ${maxStreak}`);
+  lines.push("");
+
+  // Footer
+  lines.push("🎲 Play at: [Your Game URL]");
+  lines.push("#SynonymRoll #WordGame #Puzzle");
 
   return lines.join("\n");
 };
