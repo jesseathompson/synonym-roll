@@ -48,30 +48,30 @@ export class WordGraph {
     this.edgeScores = new Map();
     this.minEdgeSynonymy = 0; // Default to 0 if no game is loaded
     this.currentGame = null;
-    
+
     // Process graph thesaurus data
     const thesaurusData = graphThesaurusData as GraphThesaurus;
-    
+
     // Load the current game data to get metadata criteria
     this.loadCurrentGame();
-    
+
     // Create the adjacency list from the edges
     for (const edge of thesaurusData.edges) {
       this.addWordPair(edge.source, edge.target, edge.synonymy_score);
     }
   }
-  
+
   private loadCurrentGame() {
     try {
       const todaysPuzzle = getTodaysPuzzle();
       const games = playableGamesData.games as PlayableGame[];
-      
+
       // Find the game that matches today's puzzle
-      this.currentGame = games.find(game => 
-        game.start_word === todaysPuzzle.start && 
+      this.currentGame = games.find(game =>
+        game.start_word === todaysPuzzle.start &&
         game.end_word === todaysPuzzle.end
       ) || null;
-      
+
       // Set the minimum edge synonymy score from the game data
       if (this.currentGame) {
         this.minEdgeSynonymy = this.currentGame.min_edge_synonymy;
@@ -81,16 +81,16 @@ export class WordGraph {
       this.minEdgeSynonymy = 0; // Default fallback
     }
   }
-  
+
   private addWordPair(word1: string, word2: string, synonymyScore: number) {
     // Create a unique key for the edge in both directions
     const edgeKey1 = `${word1}:${word2}`;
     const edgeKey2 = `${word2}:${word1}`;
-    
+
     // Store the synonymy score for this edge
     this.edgeScores.set(edgeKey1, synonymyScore);
     this.edgeScores.set(edgeKey2, synonymyScore);
-    
+
     // Add word2 as a synonym of word1
     this.addWord(word1, [word2]);
     // Add word1 as a synonym of word2 (for bidirectional relationship)
@@ -105,31 +105,51 @@ export class WordGraph {
   // Get synonyms and filter based on the min_edge_synonymy criteria
   getSynonyms(word: string, endWord?: string): string[] | undefined {
     const allSynonyms = this.adjacencyList.get(word);
-    
+
     if (!allSynonyms) return undefined;
-    
+
     // First filter by the minimum edge synonymy threshold
     let filteredSynonyms = allSynonyms;
-    
+
     if (this.minEdgeSynonymy > 0) {
-      filteredSynonyms = allSynonyms.filter(synonym => 
+      filteredSynonyms = allSynonyms.filter(synonym =>
         this.getEdgeSynonymyScore(word, synonym) >= this.minEdgeSynonymy
       );
     }
-    
+
     // If an end word is provided, also filter for synonyms that can lead to the target
     if (endWord && endWord !== word) {
       filteredSynonyms = filteredSynonyms.filter(synonym => {
         // Avoid going back to words we've already visited
         if (synonym === word) return false;
-        
+
         // Check if this synonym has a path to the end word
         const pathExists = this.findShortestPathLengthBiDirectional(synonym, endWord) !== null;
         return pathExists;
       });
     }
-    
-    return filteredSynonyms;
+
+    // Additional filtering for UI optimization
+    // Sort by synonymy score and take only the best ones
+    const scoredSynonyms = filteredSynonyms.map(synonym => ({
+      word: synonym,
+      score: this.getEdgeSynonymyScore(word, synonym)
+    })).sort((a, b) => b.score - a.score);
+
+    // Limit to top 12 synonyms for better UI performance
+    const topSynonyms = scoredSynonyms.slice(0, 12);
+
+    // If we have too many synonyms, be more aggressive with filtering
+    if (filteredSynonyms.length > 8) {
+      // Take only synonyms with above-average scores
+      const avgScore = scoredSynonyms.reduce((sum, item) => sum + item.score, 0) / scoredSynonyms.length;
+      return topSynonyms
+        .filter(item => item.score >= avgScore)
+        .map(item => item.word)
+        .slice(0, 8);
+    }
+
+    return topSynonyms.map(item => item.word);
   }
 
   addWord(word: string, synonyms: string[]) {
@@ -187,7 +207,7 @@ export class WordGraph {
     }
 
     if (start === end) {
-        return 0; // Start and end are the same
+      return 0; // Start and end are the same
     }
 
     const queue: { word: string; length: number }[] = [{ word: start, length: 0 }];
@@ -216,11 +236,11 @@ export class WordGraph {
   }
   findShortestPathLengthBiDirectional(start: string, end: string): number | null {
     if (!this.adjacencyList.has(start) || !this.adjacencyList.has(end)) {
-        return null;
+      return null;
     }
 
     if (start === end) {
-        return 0;
+      return 0;
     }
 
     const queueStart: { word: string; length: number }[] = [{ word: start, length: 0 }];
@@ -232,40 +252,40 @@ export class WordGraph {
     visitedEnd.set(end, 0);
 
     while (queueStart.length > 0 && queueEnd.length > 0) {
-        const currentStart = queueStart.shift()!;
+      const currentStart = queueStart.shift()!;
 
-        if (visitedEnd.has(currentStart.word)) {
-            return currentStart.length + visitedEnd.get(currentStart.word)!;
-        }
+      if (visitedEnd.has(currentStart.word)) {
+        return currentStart.length + visitedEnd.get(currentStart.word)!;
+      }
 
-        const synonymsStart = this.adjacencyList.get(currentStart.word);
-        if (synonymsStart) {
-            for (const synonym of synonymsStart) {
-                if (!visitedStart.has(synonym)) {
-                    visitedStart.set(synonym, currentStart.length + 1);
-                    queueStart.push({ word: synonym, length: currentStart.length + 1 });
-                }
-            }
+      const synonymsStart = this.adjacencyList.get(currentStart.word);
+      if (synonymsStart) {
+        for (const synonym of synonymsStart) {
+          if (!visitedStart.has(synonym)) {
+            visitedStart.set(synonym, currentStart.length + 1);
+            queueStart.push({ word: synonym, length: currentStart.length + 1 });
+          }
         }
+      }
 
-        const currentEnd = queueEnd.shift()!;
-        if (visitedStart.has(currentEnd.word)) {
-            return currentEnd.length + visitedStart.get(currentEnd.word)!;
-        }
+      const currentEnd = queueEnd.shift()!;
+      if (visitedStart.has(currentEnd.word)) {
+        return currentEnd.length + visitedStart.get(currentEnd.word)!;
+      }
 
-        const synonymsEnd = this.adjacencyList.get(currentEnd.word);
-        if (synonymsEnd) {
-            for (const synonym of synonymsEnd) {
-                if (!visitedEnd.has(synonym)) {
-                    visitedEnd.set(synonym, currentEnd.length + 1);
-                    queueEnd.push({ word: synonym, length: currentEnd.length + 1 });
-                }
-            }
+      const synonymsEnd = this.adjacencyList.get(currentEnd.word);
+      if (synonymsEnd) {
+        for (const synonym of synonymsEnd) {
+          if (!visitedEnd.has(synonym)) {
+            visitedEnd.set(synonym, currentEnd.length + 1);
+            queueEnd.push({ word: synonym, length: currentEnd.length + 1 });
+          }
         }
+      }
     }
 
     return null;
-}
+  }
 
   findLongestPath(startNode: string): number {
     const memo: Memo = new Map();

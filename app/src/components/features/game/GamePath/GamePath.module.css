@@ -1,28 +1,32 @@
-/* Enhanced Game Path with clean Wordle-style layout */
+/* Game Path within unified container */
 .game-path {
 	display: flex;
 	flex-direction: column;
-	gap: var(--spacing-xl);
-	padding: var(--spacing-lg);
-	background-color: var(--color-background-medium);
-	border-radius: var(--border-radius-lg);
-	border: 2px solid var(--color-border-light);
-	margin: var(--spacing-lg) 0;
+	gap: var(--spacing-sm);
+	padding: var(--spacing-md);
+	background-color: transparent;
+	border: none;
+	margin: 0;
+	flex-shrink: 0;
+	overflow: visible;
 }
 
 .game-path__section {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: var(--spacing-md);
+	gap: var(--spacing-sm);
+	flex-shrink: 0;
+	min-height: fit-content;
 }
 
 .game-path__label {
 	font-family: var(--font-family-base);
-	font-size: var(--font-size-lg);
+	font-size: var(--font-size-sm);
 	font-weight: var(--font-weight-semibold);
 	color: var(--color-text-primary);
 	text-align: center;
+	margin-bottom: var(--spacing-xs);
 }
 
 .game-path__word-container {
@@ -94,12 +98,13 @@
 /* Responsive adjustments */
 @media (max-width: 576px) {
 	.game-path {
-		padding: var(--spacing-md);
-		gap: var(--spacing-lg);
+		padding: var(--spacing-sm);
+		gap: var(--spacing-sm);
 	}
 	
 	.game-path__label {
-		font-size: var(--font-size-md);
+		font-size: var(--font-size-sm);
+		margin-bottom: var(--spacing-xs);
 	}
 	
 	.game-path__path {
@@ -107,14 +112,38 @@
 	}
 	
 	.game-path__placeholder {
-		min-width: 2.75rem;
-		height: 2.75rem;
+		min-width: 2.5rem;
+		height: 2.5rem;
 		font-size: var(--font-size-md);
 		padding: var(--spacing-xs) var(--spacing-sm);
 	}
 	
 	.game-path__arrow {
 		font-size: var(--font-size-lg);
+		margin: 0 var(--spacing-xs);
+	}
+}
+
+@media (max-width: 480px) {
+	.game-path {
+		padding: var(--spacing-xs);
+		gap: var(--spacing-xs);
+	}
+	
+	.game-path__label {
+		font-size: var(--font-size-xs);
+		margin-bottom: var(--spacing-xs);
+	}
+	
+	.game-path__placeholder {
+		min-width: 2rem;
+		height: 2rem;
+		font-size: var(--font-size-sm);
+		padding: var(--spacing-xs);
+	}
+	
+	.game-path__arrow {
+		font-size: var(--font-size-md);
 		margin: 0 var(--spacing-xs);
 	}
 }

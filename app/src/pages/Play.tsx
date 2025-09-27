@@ -75,12 +75,12 @@ export const Play = () => {
   };
 
   return (
-    <Container fluid className="py-3">
-      <Row className="justify-content-center">
-        <Col xs={12} md={10} lg={8}>
+    <Container fluid className="game-container">
+      <Row className="justify-content-center h-100">
+        <Col xs={12} md={10} lg={8} className="d-flex flex-column">
           <GameBoard 
             isCompleted={state.isCompleted}
-            className="text-center"
+            className="text-center flex-grow-1 d-flex flex-column"
           >
             {state.isCompleted || todayCompleted ? (
               <CompletedState
@@ -97,36 +97,38 @@ export const Play = () => {
                 }}
               />
             ) : (
-              <div className="game-content">
-                {/* Timer Display */}
-                <GameTimer 
-                  time={state.elapsedTime} 
-                  label="Time Elapsed" 
-                />
+              <div className="game-content-compact">
+                {/* Header with Timer */}
+                <div className="game-header">
+                  <GameTimer 
+                    time={state.elapsedTime} 
+                    label="Time" 
+                  />
+                </div>
 
-                {/* Game Path Display */}
-                <GamePath
-                  startWord={puzzle.start}
-                  endWord={puzzle.end}
-                  steps={state.steps}
-                  minSteps={state.minSteps || 3}
-                />
-
-                {/* Synonym Selection */}
-                <SynonymList
-                  synonyms={state.synonyms}
-                  onSelect={handleSynonymSelect}
-                />
-
-                {/* Game Controls */}
-                <GameControls
-                  showBackButton={state.steps.length > 1}
-                  showResetButton={false}
-                  onGoBack={removeStep}
-                />
+                {/* Game Path, Synonyms, and Controls - Unified Container */}
+                <div className="game-main-section">
+                  <GamePath
+                    startWord={puzzle.start}
+                    endWord={puzzle.end}
+                    steps={state.steps}
+                    minSteps={state.minSteps || 3}
+                  />
+                  <SynonymList
+                    synonyms={state.synonyms}
+                    onSelect={handleSynonymSelect}
+                  />
+                  <div className="game-controls-inline">
+                    <GameControls
+                      showBackButton={state.steps.length > 1}
+                      showResetButton={false}
+                      onGoBack={removeStep}
+                    />
+                  </div>
+                </div>
 
                 {/* Debug Controls (can be removed in production) */}
-                <div className="debug-controls mt-3">
+                <div className="debug-controls">
                   <button 
                     className="btn btn-secondary btn-sm me-2"
                     onClick={logSolution}
