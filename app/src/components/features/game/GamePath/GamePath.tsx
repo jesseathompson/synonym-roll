@@ -56,42 +56,100 @@ export const GamePath: React.FC<GamePathProps> = ({
 					Your Path ({steps.length} steps)
 				</div>
 				<div className={styles['game-path__path']}>
-					{steps.map((word, index) => (
-						<React.Fragment key={index}>
+					{steps.length <= 5 ? (
+						// Show all steps if 5 or fewer
+						<>
+							{steps.map((word, index) => (
+								<React.Fragment key={index}>
+									<div className={styles['game-path__step']}>
+										<WordTile
+											word={word}
+											variant={getTemperatureVariant(word)}
+											size="md"
+										/>
+									</div>
+									{index < steps.length - 1 && (
+										<span className={styles['game-path__arrow']}>
+											→
+										</span>
+									)}
+								</React.Fragment>
+							))}
+							{/* Show placeholder steps for remaining slots */}
+							{Array.from({ length: Math.max(0, minSteps - steps.length) }, (_, index) => (
+								<React.Fragment key={`placeholder-${index}`}>
+									{steps.length > 0 && index === 0 && (
+										<span className={styles['game-path__arrow']}>
+											→
+										</span>
+									)}
+									<div className={styles['game-path__step']}>
+										<div className={styles['game-path__placeholder']}>
+											?
+										</div>
+									</div>
+									{index < Math.max(0, minSteps - steps.length) - 1 && (
+										<span className={styles['game-path__arrow']}>
+											→
+										</span>
+									)}
+								</React.Fragment>
+							))}
+						</>
+					) : (
+						// Show condensed view for more than 5 steps
+						<>
+							{/* First word */}
 							<div className={styles['game-path__step']}>
 								<WordTile
-									word={word}
-									variant={getTemperatureVariant(word)}
+									word={steps[0]}
+									variant={getTemperatureVariant(steps[0])}
 									size="md"
 								/>
 							</div>
-							{index < steps.length - 1 && (
-								<span className={styles['game-path__arrow']}>
-									→
-								</span>
-							)}
-						</React.Fragment>
-					))}
-					{/* Show placeholder steps for remaining slots */}
-					{Array.from({ length: Math.max(0, minSteps - steps.length) }, (_, index) => (
-						<React.Fragment key={`placeholder-${index}`}>
-							{steps.length > 0 && index === 0 && (
-								<span className={styles['game-path__arrow']}>
-									→
-								</span>
-							)}
+							<span className={styles['game-path__arrow']}>→</span>
+							
+							{/* Hidden count */}
 							<div className={styles['game-path__step']}>
-								<div className={styles['game-path__placeholder']}>
-									?
+								<div className={styles['game-path__hidden-count']}>
+									+{steps.length - 2}
 								</div>
 							</div>
-							{index < Math.max(0, minSteps - steps.length) - 1 && (
-								<span className={styles['game-path__arrow']}>
-									→
-								</span>
-							)}
-						</React.Fragment>
-					))}
+							<span className={styles['game-path__arrow']}>→</span>
+							
+							{/* Last two words */}
+							{steps.slice(-2).map((word, index) => (
+								<React.Fragment key={`last-${index}`}>
+									<div className={styles['game-path__step']}>
+										<WordTile
+											word={word}
+											variant={getTemperatureVariant(word)}
+											size="md"
+										/>
+									</div>
+									{index < 1 && (
+										<span className={styles['game-path__arrow']}>
+											→
+										</span>
+									)}
+								</React.Fragment>
+							))}
+							
+							{/* Show placeholder steps for remaining slots */}
+							{Array.from({ length: Math.max(0, minSteps - steps.length) }, (_, index) => (
+								<React.Fragment key={`placeholder-${index}`}>
+									<span className={styles['game-path__arrow']}>
+										→
+									</span>
+									<div className={styles['game-path__step']}>
+										<div className={styles['game-path__placeholder']}>
+											?
+										</div>
+									</div>
+								</React.Fragment>
+							))}
+						</>
+					)}
 				</div>
 			</div>
 

@@ -66,29 +66,78 @@ export const CompletedState: React.FC<CompletedStateProps> = memo(({
 
       <div className={styles['completed-state__path']}>
         {/* Display the path of words from start to end */}
-        {uniqueSteps.map((word, index) => {
-          const isFirst = index === 0;
-          const isLast = index === uniqueSteps.length - 1;
-          const variant = isFirst ? getTemperatureVariant(word) : isLast ? getTemperatureVariant(word) : getTemperatureVariant(word);
-          
-          return (
-            <React.Fragment key={`${word}-${index}`}>
-              <WordTile 
-                word={word} 
-                variant={variant}
-                size="md"
-              />
-              {!isLast && (
-                <span 
-                  className={styles['completed-state__arrow']}
-                  aria-hidden="true"
-                >
-                  →
-                </span>
-              )}
-            </React.Fragment>
-          );
-        })}
+        {uniqueSteps.length <= 5 ? (
+          // Show all steps if 5 or fewer
+          uniqueSteps.map((word, index) => {
+            const isFirst = index === 0;
+            const isLast = index === uniqueSteps.length - 1;
+            const variant = isFirst ? getTemperatureVariant(word) : isLast ? getTemperatureVariant(word) : getTemperatureVariant(word);
+            
+            return (
+              <React.Fragment key={`${word}-${index}`}>
+                <WordTile 
+                  word={word} 
+                  variant={variant}
+                  size="md"
+                />
+                {!isLast && (
+                  <span 
+                    className={styles['completed-state__arrow']}
+                    aria-hidden="true"
+                  >
+                    →
+                  </span>
+                )}
+              </React.Fragment>
+            );
+          })
+        ) : (
+          // Show condensed view for more than 5 steps
+          <>
+            {/* First word */}
+            <WordTile 
+              word={uniqueSteps[0]} 
+              variant={getTemperatureVariant(uniqueSteps[0])}
+              size="md"
+            />
+            <span 
+              className={styles['completed-state__arrow']}
+              aria-hidden="true"
+            >
+              →
+            </span>
+            
+            {/* Hidden count */}
+            <div className={styles['completed-state__hidden-count']}>
+              +{uniqueSteps.length - 2}
+            </div>
+            <span 
+              className={styles['completed-state__arrow']}
+              aria-hidden="true"
+            >
+              →
+            </span>
+            
+            {/* Last two words */}
+            {uniqueSteps.slice(-2).map((word, index) => (
+              <React.Fragment key={`last-${index}`}>
+                <WordTile 
+                  word={word} 
+                  variant={getTemperatureVariant(word)}
+                  size="md"
+                />
+                {index < 1 && (
+                  <span 
+                    className={styles['completed-state__arrow']}
+                    aria-hidden="true"
+                  >
+                    →
+                  </span>
+                )}
+              </React.Fragment>
+            ))}
+          </>
+        )}
       </div>
 
       {/* Stats display */}
