@@ -183,6 +183,18 @@ const handleShare = async () => {
 };
 ```
 
+## Scripts
+
+### Social Media Image Generation
+
+Generate a social media preview image for Open Graph and Twitter Card sharing:
+
+```bash
+npm run generate-social-image
+```
+
+This creates `public/og-image.png` (1200x630) with the app's branding and color theme. See `scripts/README.md` for more details.
+
 ## Common Issues
 
 1. **GitHub Pages 404**: Make sure GitHub Pages is enabled and set to deploy from GitHub Actions
