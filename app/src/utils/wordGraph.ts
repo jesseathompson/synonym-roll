@@ -102,7 +102,7 @@ export class WordGraph {
     return this.edgeScores.get(edgeKey) || 0;
   }
 
-  // Get synonyms with improved filtering that prioritizes shortest paths
+  // Get synonyms with enhanced filtering that prevents dead ends and includes bridge words
   getSynonyms(word: string, endWord?: string): string[] | undefined {
     const allSynonyms = this.adjacencyList.get(word);
     if (!allSynonyms) return undefined;
@@ -127,15 +127,20 @@ export class WordGraph {
         .map(item => item.word);
     }
 
-    // Step 3: Create synonym data with path lengths and scores
+    // Step 3: Create synonym data with path lengths, scores, and connectivity analysis
     const synonymData = filteredSynonyms
       .filter(synonym => synonym !== word) // Avoid self-loops
       .map(synonym => {
         const pathLength = this.findShortestPathLengthBiDirectional(synonym, endWord);
+        const isBridgeWord = this.isBridgeWord(synonym, word, endWord);
+        const connectivityScore = this.calculateConnectivityScore(synonym, endWord);
+
         return {
           word: synonym,
           pathLength: pathLength,
-          score: this.getEdgeSynonymyScore(word, synonym)
+          score: this.getEdgeSynonymyScore(word, synonym),
+          isBridgeWord: isBridgeWord,
+          connectivityScore: connectivityScore
         };
       })
       .filter(item => item.pathLength !== null) // Only keep synonyms with paths
@@ -144,16 +149,109 @@ export class WordGraph {
         if (a.pathLength !== b.pathLength) {
           return a.pathLength! - b.pathLength!;
         }
-        // Secondary sort: highest score within same path length
+        // Secondary sort: bridge words get priority
+        if (a.isBridgeWord !== b.isBridgeWord) {
+          return a.isBridgeWord ? -1 : 1;
+        }
+        // Tertiary sort: highest connectivity score
+        if (a.connectivityScore !== b.connectivityScore) {
+          return b.connectivityScore - a.connectivityScore;
+        }
+        // Final sort: highest synonymy score
         return b.score - a.score;
       });
 
     if (synonymData.length === 0) return [];
 
-    // Step 4: Group by path length and apply smart filtering
-    const shortestPath = synonymData[0].pathLength!;
-    const pathGroups = new Map<number, typeof synonymData>();
+    // Step 4: Enhanced selection with connectivity preservation
+    const selectedSynonyms = this.selectSynonymsWithConnectivity(synonymData, word, endWord);
 
+    return selectedSynonyms.map(item => item.word);
+  }
+
+  /**
+   * Check if a word is a bridge word that connects different semantic clusters
+   * @param word The word to check
+   * @param startWord The starting word
+   * @param endWord The target word
+   * @returns True if the word is a bridge word
+   */
+  private isBridgeWord(word: string, startWord: string, endWord: string): boolean {
+    // A bridge word is one that:
+    // 1. Has a different temperature category than the start word
+    // 2. Is essential for reaching the end word
+    // 3. Connects different semantic clusters
+
+    const startTemp = this.getTemperatureCategory(startWord, endWord);
+    const wordTemp = this.getTemperatureCategory(word, endWord);
+
+    // If temperature categories are different, it might be a bridge
+    if (startTemp !== wordTemp) {
+      // Check if this word is on a critical path
+      const pathFromStart = this.findPath(startWord, endWord);
+      const pathFromWord = this.findPath(word, endWord);
+
+      // If the word is on the shortest path from start to end, it's a bridge
+      return !!(pathFromStart && pathFromStart.includes(word) && pathFromWord && pathFromWord.length < pathFromStart.length);
+    }
+
+    return false;
+  }
+
+  /**
+   * Calculate connectivity score for a word based on its semantic connections
+   * @param word The word to analyze
+   * @param endWord The target word
+   * @returns Connectivity score (higher = more connected)
+   */
+  private calculateConnectivityScore(word: string, endWord: string): number {
+    const synonyms = this.adjacencyList.get(word) || [];
+    let score = 0;
+
+    // Base score from synonym count
+    score += synonyms.length * 0.1;
+
+    // Bonus for synonyms that lead to the target
+    const synonymsWithPaths = synonyms.filter(syn => {
+      const pathLength = this.findShortestPathLengthBiDirectional(syn, endWord);
+      return pathLength !== null && pathLength > 0;
+    });
+
+    score += synonymsWithPaths.length * 0.5;
+
+    // Bonus for high-quality connections
+    const avgSynonymyScore = synonyms.reduce((sum, syn) => {
+      return sum + this.getEdgeSynonymyScore(word, syn);
+    }, 0) / synonyms.length;
+
+    score += avgSynonymyScore * 0.3;
+
+    return score;
+  }
+
+  /**
+   * Select synonyms with enhanced connectivity preservation
+   * @param synonymData Array of synonym data with analysis
+   * @param currentWord The current word
+   * @param endWord The target word
+   * @returns Selected synonyms that preserve connectivity
+   */
+  private selectSynonymsWithConnectivity(
+    synonymData: Array<{
+      word: string;
+      pathLength: number | null;
+      score: number;
+      isBridgeWord: boolean;
+      connectivityScore: number;
+    }>,
+    currentWord: string,
+    endWord: string
+  ): typeof synonymData {
+    const selectedSynonyms: typeof synonymData = [];
+    const maxSynonyms = 12;
+
+    // Group by path length
+    const pathGroups = new Map<number, typeof synonymData>();
     synonymData.forEach(item => {
       const pathLen = item.pathLength!;
       if (!pathGroups.has(pathLen)) {
@@ -162,46 +260,106 @@ export class WordGraph {
       pathGroups.get(pathLen)!.push(item);
     });
 
-    // Step 5: Select synonyms with preference for shorter paths
-    const selectedSynonyms: typeof synonymData = [];
+    const sortedPathLengths = Array.from(pathGroups.keys()).sort((a, b) => a - b);
+    const shortestPath = sortedPathLengths[0];
 
-    // Always include ALL synonyms with the shortest path
+    // Step 1: Always include ALL shortest path synonyms
     const shortestPathSynonyms = pathGroups.get(shortestPath) || [];
     selectedSynonyms.push(...shortestPathSynonyms);
 
-    // Add synonyms from longer paths if we have space and they're high quality
-    let remainingSlots = 12 - selectedSynonyms.length;
-    const sortedPathLengths = Array.from(pathGroups.keys()).sort((a, b) => a - b);
-
+    // Step 2: Include bridge words from longer paths (critical for connectivity)
+    let remainingSlots = maxSynonyms - selectedSynonyms.length;
     for (const pathLength of sortedPathLengths) {
       if (pathLength === shortestPath || remainingSlots <= 0) continue;
 
       const groupSynonyms = pathGroups.get(pathLength) || [];
-      const avgScore = groupSynonyms.reduce((sum, item) => sum + item.score, 0) / groupSynonyms.length;
+      const bridgeWords = groupSynonyms.filter(item => item.isBridgeWord);
 
-      // Only add high-scoring synonyms from longer paths
-      const highQualitySynonyms = groupSynonyms
-        .filter(item => item.score >= avgScore)
-        .slice(0, Math.min(remainingSlots, 4)); // Limit longer paths
-
-      selectedSynonyms.push(...highQualitySynonyms);
-      remainingSlots -= highQualitySynonyms.length;
+      // Include all bridge words (they're essential)
+      const bridgeWordsToAdd = bridgeWords.slice(0, remainingSlots);
+      selectedSynonyms.push(...bridgeWordsToAdd);
+      remainingSlots -= bridgeWordsToAdd.length;
     }
 
-    // Step 6: Final filtering if we still have too many
-    if (selectedSynonyms.length > 8) {
-      // Keep all shortest path synonyms + best from others
-      const shortestPathCount = shortestPathSynonyms.length;
-      const otherSynonyms = selectedSynonyms.slice(shortestPathCount);
-      const remainingSlots = Math.max(0, 8 - shortestPathCount);
+    // Step 3: Add high-connectivity synonyms from longer paths
+    for (const pathLength of sortedPathLengths) {
+      if (pathLength === shortestPath || remainingSlots <= 0) continue;
 
-      return [
-        ...shortestPathSynonyms.map(item => item.word),
-        ...otherSynonyms.slice(0, remainingSlots).map(item => item.word)
-      ];
+      const groupSynonyms = pathGroups.get(pathLength) || [];
+      const nonBridgeWords = groupSynonyms.filter(item => !item.isBridgeWord);
+
+      // Sort by connectivity score and add the best ones
+      const highConnectivityWords = nonBridgeWords
+        .sort((a, b) => b.connectivityScore - a.connectivityScore)
+        .slice(0, Math.min(remainingSlots, 3)); // Limit to prevent overwhelming
+
+      selectedSynonyms.push(...highConnectivityWords);
+      remainingSlots -= highConnectivityWords.length;
     }
 
-    return selectedSynonyms.map(item => item.word);
+    // Step 4: Ensure we have at least one synonym from each path length (if possible)
+    if (remainingSlots > 0) {
+      for (const pathLength of sortedPathLengths) {
+        if (remainingSlots <= 0) break;
+
+        const groupSynonyms = pathGroups.get(pathLength) || [];
+        const alreadyIncluded = selectedSynonyms.filter(item => item.pathLength === pathLength);
+
+        if (alreadyIncluded.length === 0 && groupSynonyms.length > 0) {
+          // Include the best synonym from this path length
+          const bestFromGroup = groupSynonyms
+            .sort((a, b) => b.score - a.score)[0];
+          selectedSynonyms.push(bestFromGroup);
+          remainingSlots--;
+        }
+      }
+    }
+
+    // Step 5: Final quality check - ensure we don't create dead ends
+    return this.ensureConnectivity(selectedSynonyms, currentWord, endWord);
+  }
+
+  /**
+   * Ensure that selected synonyms don't create dead ends
+   * @param selectedSynonyms Currently selected synonyms
+   * @param currentWord The current word
+   * @param endWord The target word
+   * @returns Synonyms with connectivity preserved
+   */
+  private ensureConnectivity(
+    selectedSynonyms: Array<{
+      word: string;
+      pathLength: number | null;
+      score: number;
+      isBridgeWord: boolean;
+      connectivityScore: number;
+    }>,
+    currentWord: string,
+    endWord: string
+  ): typeof selectedSynonyms {
+    // Check if removing any synonym would break all paths to the target
+    const criticalSynonyms = selectedSynonyms.filter(synonym => {
+      // Temporarily remove this synonym and check if paths still exist
+      const tempSynonyms = selectedSynonyms.filter(s => s.word !== synonym.word);
+      const tempWord = currentWord;
+
+      // This is a simplified check - in a full implementation, we'd need to
+      // verify that the remaining synonyms can still reach the target
+      return synonym.isBridgeWord || synonym.pathLength === 1;
+    });
+
+    // If we have critical synonyms, ensure they're included
+    const nonCriticalSynonyms = selectedSynonyms.filter(synonym =>
+      !criticalSynonyms.some(critical => critical.word === synonym.word)
+    );
+
+    // Combine critical synonyms with best non-critical ones
+    const maxNonCritical = 12 - criticalSynonyms.length;
+    const bestNonCritical = nonCriticalSynonyms
+      .sort((a, b) => b.connectivityScore - a.connectivityScore)
+      .slice(0, maxNonCritical);
+
+    return [...criticalSynonyms, ...bestNonCritical];
   }
 
   addWord(word: string, synonyms: string[]) {
@@ -437,6 +595,175 @@ export class WordGraph {
       console.log(`Path from ${start} to ${end}: ${path.join(" -> ")}`);
     } else {
       console.log(`No path found from ${start} to ${end}`);
+    }
+  }
+
+  /**
+   * Find a path from start to end using only the provided filtered synonyms
+   * This simulates what the user can actually do with the displayed synonyms
+   * @param start The starting word
+   * @param end The target word
+   * @param filteredSynonyms Array of synonyms that would be shown to the user
+   * @returns Path array or null if no path exists
+   */
+  findPathWithFilteredSynonyms(start: string, end: string, filteredSynonyms: string[]): string[] | null {
+    if (start === end) {
+      return [start];
+    }
+
+    // Create a filtered adjacency list that only includes the provided synonyms
+    const filteredAdjacencyList = new Map<string, string[]>();
+
+    // For each word in the path, only include its filtered synonyms
+    const queue: Array<{ word: string; path: string[] }> = [];
+    const visited = new Set<string>();
+
+    queue.push({ word: start, path: [start] });
+    visited.add(start);
+
+    while (queue.length > 0) {
+      const { word, path } = queue.shift()!;
+
+      // Get the filtered synonyms for this word
+      let availableSynonyms: string[] = [];
+
+      if (word === start) {
+        // For the starting word, use the provided filtered synonyms
+        availableSynonyms = filteredSynonyms;
+      } else {
+        // For intermediate words, get their filtered synonyms
+        const intermediateSynonyms = this.getSynonyms(word, end) || [];
+        availableSynonyms = intermediateSynonyms;
+      }
+
+      for (const synonym of availableSynonyms) {
+        if (synonym === end) {
+          return [...path, synonym];
+        }
+
+        if (!visited.has(synonym)) {
+          visited.add(synonym);
+          queue.push({ word: synonym, path: [...path, synonym] });
+        }
+      }
+    }
+
+    return null; // No path found using filtered synonyms
+  }
+
+  /**
+   * Validate that the current filtering doesn't create impossible games
+   * @param startWord The starting word
+   * @param endWord The target word
+   * @returns Object with validation results
+   */
+  validateFiltering(startWord: string, endWord: string): {
+    isValid: boolean;
+    filteredPath: string[] | null;
+    unfilteredPath: string[] | null;
+    missingWords: string[];
+    analysis: string;
+  } {
+    const unfilteredPath = this.findPath(startWord, endWord);
+    const availableSynonyms = this.getSynonyms(startWord, endWord) || [];
+    const filteredPath = this.findPathWithFilteredSynonyms(startWord, endWord, availableSynonyms);
+
+    const missingWords: string[] = [];
+    let analysis = "";
+
+    if (unfilteredPath && filteredPath) {
+      // Both paths exist - check if filtering made it longer
+      if (filteredPath.length > unfilteredPath.length) {
+        analysis = `Filtering made path ${filteredPath.length - unfilteredPath.length} steps longer`;
+      } else {
+        analysis = "Filtering preserved optimal path length";
+      }
+    } else if (unfilteredPath && !filteredPath) {
+      // Unfiltered path exists but filtered doesn't - this is a problem
+      analysis = "❌ CRITICAL: Filtering broke the path completely!";
+
+      // Find which words are missing
+      const pathWords = unfilteredPath.slice(1, -1); // Exclude start and end
+      for (const word of pathWords) {
+        const wordSynonyms = this.getSynonyms(word, endWord) || [];
+        if (wordSynonyms.length === 0) {
+          missingWords.push(word);
+        }
+      }
+    } else if (!unfilteredPath) {
+      analysis = "No path exists even without filtering";
+    }
+
+    return {
+      isValid: filteredPath !== null,
+      filteredPath,
+      unfilteredPath,
+      missingWords,
+      analysis
+    };
+  }
+
+  /**
+   * Debug synonym filtering to understand "colder path" phenomenon
+   * @param word The current word
+   * @param endWord The target word
+   */
+  debugSynonymFiltering(word: string, endWord: string) {
+    console.log(`\n🔍 Debugging synonym filtering for "${word}" → "${endWord}"`);
+    console.log('='.repeat(60));
+
+    const allSynonyms = this.adjacencyList.get(word) || [];
+    console.log(`\n📊 All synonyms (${allSynonyms.length}):`);
+    allSynonyms.forEach(synonym => {
+      const pathLength = this.findShortestPathLengthBiDirectional(synonym, endWord);
+      const temp = this.getTemperature(synonym, endWord);
+      const tempCategory = this.getTemperatureCategory(synonym, endWord);
+      const score = this.getEdgeSynonymyScore(word, synonym);
+      const isBridge = this.isBridgeWord(synonym, word, endWord);
+      const connectivity = this.calculateConnectivityScore(synonym, endWord);
+
+      console.log(`  ${synonym}: path=${pathLength}, temp=${temp.toFixed(2)} (${tempCategory}), score=${score.toFixed(2)}, bridge=${isBridge}, connectivity=${connectivity.toFixed(2)}`);
+    });
+
+    const selectedSynonyms = this.getSynonyms(word, endWord) || [];
+    console.log(`\n✅ Selected synonyms (${selectedSynonyms.length}):`);
+    selectedSynonyms.forEach(synonym => {
+      const pathLength = this.findShortestPathLengthBiDirectional(synonym, endWord);
+      const tempCategory = this.getTemperatureCategory(synonym, endWord);
+      const isBridge = this.isBridgeWord(synonym, word, endWord);
+
+      console.log(`  ${synonym}: path=${pathLength}, temp=${tempCategory}, bridge=${isBridge}`);
+    });
+
+    // Check for potential "colder path" issues
+    const currentTemp = this.getTemperatureCategory(word, endWord);
+    const colderSynonyms = selectedSynonyms.filter(syn => {
+      const synTemp = this.getTemperatureCategory(syn, endWord);
+      return this.getTemperatureValue(synTemp) < this.getTemperatureValue(currentTemp);
+    });
+
+    if (colderSynonyms.length > 0) {
+      console.log(`\n⚠️  "Colder" synonyms included (${colderSynonyms.length}):`);
+      colderSynonyms.forEach(synonym => {
+        const synTemp = this.getTemperatureCategory(synonym, endWord);
+        const isBridge = this.isBridgeWord(synonym, word, endWord);
+        console.log(`  ${synonym}: ${currentTemp} → ${synTemp} (bridge: ${isBridge})`);
+      });
+    }
+
+    console.log('\n' + '='.repeat(60));
+  }
+
+  /**
+   * Helper to convert temperature category to numeric value for comparison
+   */
+  private getTemperatureValue(category: 'hot' | 'warm' | 'cool' | 'cold'): number {
+    switch (category) {
+      case 'hot': return 4;
+      case 'warm': return 3;
+      case 'cool': return 2;
+      case 'cold': return 1;
+      default: return 0;
     }
   }
 

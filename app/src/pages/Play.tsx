@@ -60,19 +60,58 @@ export const Play = () => {
     const currentWord = state.currentWord;
     const endWord = puzzle.end;
     
-    console.log(`Finding path from "${currentWord}" to "${endWord}"`);
+    console.log(`🔍 Finding filtered solution path from "${currentWord}" to "${endWord}"`);
+    console.log("=".repeat(60));
     
-    const solutionPath = wordGraph.findPath(currentWord, endWord);
+    // Get the synonyms that would be shown to the user
+    const availableSynonyms = wordGraph.getSynonyms(currentWord, endWord) || [];
+    console.log(`📋 Available synonyms (${availableSynonyms.length}):`, availableSynonyms);
     
-    if (solutionPath) {
-      console.log("✅ Valid solution path found:");
-      console.log("Path:", solutionPath.join(" → "));
-      console.log("Path length:", solutionPath.length);
-      console.log("Full path array:", solutionPath);
+    // Find a path using only the filtered synonyms
+    const filteredSolutionPath = wordGraph.findPathWithFilteredSynonyms(currentWord, endWord, availableSynonyms);
+    
+    if (filteredSolutionPath) {
+      console.log("✅ Valid filtered solution path found:");
+      console.log("Path:", filteredSolutionPath.join(" → "));
+      console.log("Path length:", filteredSolutionPath.length - 1, "steps");
+      console.log("Full path array:", filteredSolutionPath);
+      
+      // Also show the unfiltered path for comparison
+      const unfilteredPath = wordGraph.findPath(currentWord, endWord);
+      if (unfilteredPath && unfilteredPath.length !== filteredSolutionPath.length) {
+        console.log("\n📊 Comparison with unfiltered path:");
+        console.log("Unfiltered path:", unfilteredPath.join(" → "));
+        console.log("Unfiltered length:", unfilteredPath.length - 1, "steps");
+        console.log("Difference:", (unfilteredPath.length - filteredSolutionPath.length), "steps longer");
+      }
     } else {
-      console.log("❌ No valid path found from current word to end word");
-      console.log("This might indicate a problem with the word graph or puzzle setup");
+      console.log("❌ No valid path found using filtered synonyms");
+      console.log("This means the current filtering might be too restrictive");
+      
+      // Show what synonyms are available vs what's needed
+      const unfilteredPath = wordGraph.findPath(currentWord, endWord);
+      if (unfilteredPath) {
+        console.log("\n🔍 Analysis:");
+        console.log("Unfiltered path exists:", unfilteredPath.join(" → "));
+        console.log("Missing synonyms needed for path:");
+        unfilteredPath.slice(1, -1).forEach((word, index) => {
+          const isAvailable = availableSynonyms.includes(word);
+          console.log(`  ${index + 1}. "${word}" - ${isAvailable ? '✅ Available' : '❌ Filtered out'}`);
+        });
+      }
     }
+    
+    // Additional validation
+    const validation = wordGraph.validateFiltering(currentWord, endWord);
+    console.log("\n🔍 Filtering Validation:");
+    console.log("Valid game:", validation.isValid ? "✅ Yes" : "❌ No");
+    console.log("Analysis:", validation.analysis);
+    
+    if (validation.missingWords.length > 0) {
+      console.log("Missing critical words:", validation.missingWords);
+    }
+    
+    console.log("=".repeat(60));
   };
 
   return (
