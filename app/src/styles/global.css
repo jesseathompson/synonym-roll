@@ -170,6 +170,73 @@ body {
   padding-top: 0;
 }
 
+/* How to Play modal content */
+.how-to-play-content h6 {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-sm);
+}
+
+.how-to-play-content ol,
+.how-to-play-content ul {
+  padding-left: var(--spacing-lg);
+}
+
+.how-to-play-content li {
+  margin-bottom: var(--spacing-xs);
+  line-height: var(--line-height-normal);
+}
+
+/* Temperature indicators for modal */
+.temperature-indicator {
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.temperature-indicator.hot {
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  box-shadow: 0 0 8px rgba(255, 107, 53, 0.3);
+}
+
+.temperature-indicator.warm {
+  background: linear-gradient(135deg, #ffa726, #ff9800);
+  box-shadow: 0 0 6px rgba(255, 167, 38, 0.2);
+}
+
+.temperature-indicator.cool {
+  background: linear-gradient(135deg, #42a5f5, #2196f3);
+  box-shadow: 0 0 4px rgba(66, 165, 245, 0.2);
+}
+
+.temperature-indicator.cold {
+  background: linear-gradient(135deg, #90caf9, #64b5f6);
+  box-shadow: 0 0 2px rgba(144, 202, 249, 0.1);
+}
+
+/* Dark theme adjustments for temperature indicators */
+[data-bs-theme="dark"] .temperature-indicator {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-bs-theme="dark"] .temperature-indicator.hot {
+  box-shadow: 0 0 8px rgba(255, 107, 53, 0.4);
+}
+
+[data-bs-theme="dark"] .temperature-indicator.warm {
+  box-shadow: 0 0 6px rgba(255, 167, 38, 0.3);
+}
+
+[data-bs-theme="dark"] .temperature-indicator.cool {
+  box-shadow: 0 0 4px rgba(66, 165, 245, 0.3);
+}
+
+[data-bs-theme="dark"] .temperature-indicator.cold {
+  box-shadow: 0 0 2px rgba(144, 202, 249, 0.2);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .game-title {
