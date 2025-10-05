@@ -1,7 +1,6 @@
 ---
-description:
-globs:
-alwaysApply: true
+globs: *.tsx,*.ts,*.js
+alwaysApply: false
 ---
 This comprehensive guide outlines best practices, conventions, and standards for development with modern web technologies including ReactJS, NextJS, Redux, TypeScript, JavaScript, HTML, CSS, and UI frameworks.
 

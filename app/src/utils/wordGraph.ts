@@ -42,6 +42,7 @@ export class WordGraph {
   edgeScores: Map<string, number>; // Store edge synonymy scores
   minEdgeSynonymy: number; // Minimum synonymy score threshold
   currentGame: PlayableGame | null;
+  graphData: GraphThesaurus; // Store graph data for frequency access
 
   constructor() {
     this.adjacencyList = new Map();
@@ -51,6 +52,7 @@ export class WordGraph {
 
     // Process graph thesaurus data
     const thesaurusData = graphThesaurusData as GraphThesaurus;
+    this.graphData = thesaurusData; // Store for frequency access
 
     // Load the current game data to get metadata criteria
     this.loadCurrentGame();
@@ -102,16 +104,56 @@ export class WordGraph {
     return this.edgeScores.get(edgeKey) || 0;
   }
 
+  /**
+   * Get word frequency from the graph data
+   */
+  private getWordFrequency(word: string): number {
+    const node = this.graphData.nodes.find(n => n.word === word);
+    return node?.frequency || 5.0; // Default frequency if not found
+  }
+
+  /**
+   * Get word community from the graph data
+   */
+  private getWordCommunity(word: string): number {
+    const node = this.graphData.nodes.find(n => n.word === word);
+    return node?.community || 0; // Default community if not found
+  }
+
+  /**
+   * Adaptive filtering based on word characteristics
+   */
+  private getAdaptiveMinEdgeSynonymy(word: string, endWord: string): number {
+    const baseThreshold = this.minEdgeSynonymy;
+
+    // Get word frequencies
+    const wordFreq = this.getWordFrequency(word);
+    const endFreq = this.getWordFrequency(endWord);
+
+    // Lower threshold for common words (they have more connections)
+    if (wordFreq > 6.0 && endFreq > 6.0) {
+      return baseThreshold * 0.8; // 20% lower threshold
+    }
+
+    // Higher threshold for rare words (they need stronger connections)
+    if (wordFreq < 4.0 || endFreq < 4.0) {
+      return baseThreshold * 1.2; // 20% higher threshold
+    }
+
+    return baseThreshold;
+  }
+
   // Get synonyms with enhanced filtering that prevents dead ends and includes bridge words
   getSynonyms(word: string, endWord?: string): string[] | undefined {
     const allSynonyms = this.adjacencyList.get(word);
     if (!allSynonyms) return undefined;
 
-    // Step 1: Filter by minimum edge synonymy threshold
+    // Step 1: Filter by adaptive minimum edge synonymy threshold
     let filteredSynonyms = allSynonyms;
     if (this.minEdgeSynonymy > 0) {
+      const adaptiveThreshold = endWord ? this.getAdaptiveMinEdgeSynonymy(word, endWord) : this.minEdgeSynonymy;
       filteredSynonyms = allSynonyms.filter(synonym =>
-        this.getEdgeSynonymyScore(word, synonym) >= this.minEdgeSynonymy
+        this.getEdgeSynonymyScore(word, synonym) >= adaptiveThreshold
       );
     }
 
@@ -171,6 +213,7 @@ export class WordGraph {
 
   /**
    * Check if a word is a bridge word that connects different semantic clusters
+   * Enhanced with multiple criteria for better detection
    * @param word The word to check
    * @param startWord The starting word
    * @param endWord The target word
@@ -181,6 +224,7 @@ export class WordGraph {
     // 1. Has a different temperature category than the start word
     // 2. Is essential for reaching the end word
     // 3. Connects different semantic clusters
+    // 4. Has high betweenness centrality
 
     const startTemp = this.getTemperatureCategory(startWord, endWord);
     const wordTemp = this.getTemperatureCategory(word, endWord);
@@ -192,7 +236,18 @@ export class WordGraph {
       const pathFromWord = this.findPath(word, endWord);
 
       // If the word is on the shortest path from start to end, it's a bridge
-      return !!(pathFromStart && pathFromStart.includes(word) && pathFromWord && pathFromWord.length < pathFromStart.length);
+      const isOnCriticalPath = !!(pathFromStart && pathFromStart.includes(word) && pathFromWord && pathFromWord.length < pathFromStart.length);
+
+      // Additional check: high connectivity score
+      const connectivityScore = this.calculateConnectivityScore(word, endWord);
+      const isHighlyConnected = connectivityScore > 0.7;
+
+      // Additional check: different semantic community
+      const startCommunity = this.getWordCommunity(startWord);
+      const wordCommunity = this.getWordCommunity(word);
+      const isDifferentCommunity = startCommunity !== wordCommunity;
+
+      return isOnCriticalPath || (isHighlyConnected && isDifferentCommunity);
     }
 
     return false;
@@ -248,7 +303,7 @@ export class WordGraph {
     endWord: string
   ): typeof synonymData {
     const selectedSynonyms: typeof synonymData = [];
-    const maxSynonyms = 12;
+    const maxSynonyms = 18; // Increased from 12 for better playability
 
     // Group by path length
     const pathGroups = new Map<number, typeof synonymData>();
@@ -291,7 +346,7 @@ export class WordGraph {
       // Sort by connectivity score and add the best ones
       const highConnectivityWords = nonBridgeWords
         .sort((a, b) => b.connectivityScore - a.connectivityScore)
-        .slice(0, Math.min(remainingSlots, 3)); // Limit to prevent overwhelming
+        .slice(0, Math.min(remainingSlots, 5)); // Increased from 3 to 5
 
       selectedSynonyms.push(...highConnectivityWords);
       remainingSlots -= highConnectivityWords.length;
@@ -769,6 +824,7 @@ export class WordGraph {
 
   /**
    * Calculate the "temperature" (hot/cold) of a word relative to the target word
+   * Now includes semantic similarity, path length, and frequency weighting
    * Returns a value between 0 (coldest) and 1 (hottest)
    * @param currentWord The current word to evaluate
    * @param targetWord The target word to compare against
@@ -786,10 +842,28 @@ export class WordGraph {
       return 0; // Coldest - no path exists
     }
 
-    // Convert path length to temperature (shorter path = hotter)
-    // Use exponential decay: temperature = e^(-pathLength/2)
-    // This gives us: 1 step = ~0.61, 2 steps = ~0.37, 3 steps = ~0.22, etc.
-    const temperature = Math.exp(-pathLength / 2);
+    // Calculate semantic similarity score
+    const semanticScore = this.getEdgeSynonymyScore(currentWord, targetWord);
+
+    // Get word frequencies for weighting
+    const currentFreq = this.getWordFrequency(currentWord);
+    const targetFreq = this.getWordFrequency(targetWord);
+
+    // Frequency similarity bonus (common words are easier to connect)
+    const freqSimilarity = 1 - Math.abs(currentFreq - targetFreq) / 8; // Normalize by max frequency
+
+    // Path length component (less aggressive decay)
+    const pathComponent = Math.exp(-pathLength / 3); // Less aggressive than /2
+
+    // Semantic similarity component
+    const semanticComponent = semanticScore;
+
+    // Combine components with weights
+    const temperature = (
+      0.4 * pathComponent +      // 40% path length
+      0.4 * semanticComponent +  // 40% semantic similarity
+      0.2 * freqSimilarity       // 20% frequency similarity
+    );
 
     // Ensure temperature is between 0 and 1
     return Math.max(0, Math.min(1, temperature));

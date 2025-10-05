@@ -1,10 +1,7 @@
 ---
-description:
-globs:
-alwaysApply: true
-
+globs: *.tsx,*.ts,*.js
+alwaysApply: false
 ---
-
 # Synonym Roll Design Rules & UI/UX Guidelines
 
 ## 🎯 **Core Design Philosophy**

@@ -1,0 +1,542 @@
+---
+globs: *.py
+alwaysApply: false
+---
+# Reduce Thesaurus Project - Cursor Rules for Refactoring
+
+## Project Overview
+This is a multi-service word game system with:
+- **API Service**: FastAPI backend for word graph operations
+- **Temporal Worker**: Background processing for game generation
+- **Processing Service**: Data pipeline for building thesaurus graphs
+- **Frontend**: React-based UI for game interaction
+
+## Core Refactoring Principles
+
+### 1. Domain-Driven Design (DDD)
+- **Bounded Contexts**: Separate word graph operations, game generation, and UI concerns
+- **Entities**: Word, Game, Graph, Community as core domain entities
+- **Value Objects**: SynonymyScore, PathLength, Frequency as immutable value objects
+- **Aggregates**: Game as aggregate root with word relationships
+- **Domain Services**: WordGraphService, GameGenerationService, SynonymFilteringService
+
+### 2. Clean Architecture Layers
+┌─────────────────────────────────────────┐
+│ Frontend (UI) │
+├─────────────────────────────────────────┤
+│ API Controllers │
+├─────────────────────────────────────────┤
+│ Application Services │
+├─────────────────────────────────────────┤
+│ Domain Services │
+├─────────────────────────────────────────┤
+│ Infrastructure Layer │
+└─────────────────────────────────────────┘
+### 3. SOLID Principles
+- **Single Responsibility**: Each class/function has one reason to change
+- **Open/Closed**: Open for extension, closed for modification
+- **Liskov Substitution**: Derived classes must be substitutable for base classes
+- **Interface Segregation**: No client should depend on methods it doesn't use
+- **Dependency Inversion**: Depend on abstractions, not concretions
+
+## Code Organization Rules
+
+### Directory Structure
+reduce-thesaurus/
+├── shared/ # Shared domain models and utilities
+│ ├── domain/
+│ │ ├── entities/ # Word, Game, Graph entities
+│ │ ├── value_objects/ # SynonymyScore, PathLength, etc.
+│ │ ├── services/ # Domain services
+│ │ └── repositories/ # Repository interfaces
+│ ├── infrastructure/ # External dependencies
+│ └── utils/ # Common utilities
+├── api/ # FastAPI service
+│ ├── app/
+│ │ ├── api/ # API routes
+│ │ ├── core/ # Configuration, security
+│ │ ├── services/ # Application services
+│ │ └── dependencies/ # Dependency injection
+│ └── tests/
+├── temporal-worker/ # Temporal workflows
+│ ├── workflows/ # Workflow definitions
+│ ├── activities/ # Activity implementations
+│ ├── clients/ # Temporal clients
+│ └── tests/
+├── processing/ # Data processing pipeline
+│ ├── pipeline/ # Processing steps
+│ ├── extractors/ # Data extraction
+│ ├── transformers/ # Data transformation
+│ └── loaders/ # Data loading
+└── frontend/ # React application
+├── src/
+│ ├── components/ # Reusable UI components
+│ ├── features/ # Feature-based organization
+│ ├── services/ # API services
+│ ├── hooks/ # Custom React hooks
+│ └── utils/ # Frontend utilities
+└── tests/
+## Code Quality Standards
+
+### Python Code Rules
+
+#### Type Hints and Documentation
+```python
+# Always use type hints
+def calculate_synonymy_score(
+    word1: str, 
+    word2: str, 
+    embedding_model: Optional[WordEmbeddingModel] = None
+) -> SynonymyScore:
+    """
+    Calculate semantic similarity between two words.
+    
+    Args:
+        word1: First word for comparison
+        word2: Second word for comparison
+        embedding_model: Optional pre-trained embedding model
+        
+    Returns:
+        SynonymyScore object with similarity value and metadata
+        
+    Raises:
+        WordNotFoundError: If either word is not in the vocabulary
+        EmbeddingModelError: If embedding calculation fails
+    """
+    pass
+```
+
+#### Error Handling
+```python
+# Use custom exceptions for domain errors
+class WordGraphError(Exception):
+    """Base exception for word graph operations"""
+    pass
+
+class WordNotFoundError(WordGraphError):
+    """Raised when a word is not found in the graph"""
+    pass
+
+class InvalidPathError(WordGraphError):
+    """Raised when an invalid path is requested"""
+    pass
+
+# Always handle exceptions appropriately
+try:
+    result = word_graph.find_path(start_word, end_word)
+except WordNotFoundError as e:
+    logger.error(f"Word not found: {e}")
+    raise HTTPException(status_code=404, detail=str(e))
+except InvalidPathError as e:
+    logger.error(f"Invalid path: {e}")
+    raise HTTPException(status_code=400, detail=str(e))
+```
+
+#### Dependency Injection
+```python
+# Use dependency injection for better testability
+from abc import ABC, abstractmethod
+
+class WordGraphRepository(ABC):
+    @abstractmethod
+    async def find_word(self, word: str) -> Optional[Word]:
+        pass
+    
+    @abstractmethod
+    async def find_synonyms(self, word: str) -> List[Word]:
+        pass
+
+class NetworkXWordGraphRepository(WordGraphRepository):
+    def __init__(self, graph: nx.DiGraph):
+        self._graph = graph
+    
+    async def find_word(self, word: str) -> Optional[Word]:
+        if word in self._graph.nodes:
+            return Word.from_networkx_node(word, self._graph.nodes[word])
+        return None
+```
+
+#### Configuration Management
+```python
+# Use Pydantic for configuration
+from pydantic import BaseSettings
+
+class Settings(BaseSettings):
+    # Database
+    database_url: str = "sqlite:///./games.db"
+    
+    # Graph processing
+    min_synonymy_score: float = 0.3
+    max_synonymy_score: float = 1.0
+    
+    # API
+    api_host: str = "0.0.0.0"
+    api_port: int = 8000
+    
+    class Config:
+        env_file = ".env"
+        case_sensitive = False
+
+settings = Settings()
+```
+
+### React/JavaScript Code Rules
+
+#### Component Structure
+```jsx
+// Use functional components with hooks
+import React, { useState, useEffect, useCallback } from 'react';
+import PropTypes from 'prop-types';
+
+const WordSuggestions = ({ 
+  difficulty, 
+  onWordSelect, 
+  isLoading = false 
+}) => {
+  const [words, setWords] = useState([]);
+  const [error, setError] = useState(null);
+
+  // Use useCallback for event handlers
+  const handleWordClick = useCallback((word) => {
+    onWordSelect?.(word);
+  }, [onWordSelect]);
+
+  // Use useEffect for side effects
+  useEffect(() => {
+    const fetchWords = async () => {
+      try {
+        setError(null);
+        const response = await wordService.getSuggestions({ difficulty });
+        setWords(response.data);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
+    fetchWords();
+  }, [difficulty]);
+
+  if (isLoading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage error={error} />;
+
+  return (
+    <div className="word-suggestions">
+      {words.map(word => (
+        <WordTile 
+          key={word.id}
+          word={word}
+          onClick={handleWordClick}
+        />
+      ))}
+    </div>
+  );
+};
+
+WordSuggestions.propTypes = {
+  difficulty: PropTypes.number.isRequired,
+  onWordSelect: PropTypes.func,
+  isLoading: PropTypes.bool
+};
+
+export default WordSuggestions;
+```
+
+#### Custom Hooks
+```jsx
+// Extract reusable logic into custom hooks
+const useWordSuggestions = (difficulty) => {
+  const [words, setWords] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchWords = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await wordService.getSuggestions({ difficulty });
+      setWords(response.data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [difficulty]);
+
+  useEffect(() => {
+    fetchWords();
+  }, [fetchWords]);
+
+  return { words, loading, error, refetch: fetchWords };
+};
+```
+
+## Testing Standards
+
+### Unit Tests
+```python
+# Test domain logic in isolation
+import pytest
+from unittest.mock import Mock, patch
+
+class TestWordGraphService:
+    def test_calculate_synonymy_score(self):
+        # Arrange
+        service = WordGraphService()
+        word1 = "happy"
+        word2 = "joyful"
+        
+        # Act
+        score = service.calculate_synonymy_score(word1, word2)
+        
+        # Assert
+        assert isinstance(score, SynonymyScore)
+        assert 0.0 <= score.value <= 1.0
+        assert score.word1 == word1
+        assert score.word2 == word2
+
+    @patch('word_graph_service.load_embedding_model')
+    def test_calculate_synonymy_with_embeddings(self, mock_load_model):
+        # Arrange
+        mock_model = Mock()
+        mock_model.similarity.return_value = 0.8
+        mock_load_model.return_value = mock_model
+        
+        service = WordGraphService()
+        
+        # Act
+        score = service.calculate_synonymy_score("happy", "joyful")
+        
+        # Assert
+        assert score.value == 0.8
+        mock_model.similarity.assert_called_once_with("happy", "joyful")
+```
+
+### Integration Tests
+```python
+# Test service integration
+@pytest.mark.asyncio
+async def test_word_suggestions_api():
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        response = await ac.get("/api/words/suggest?difficulty=2.0&count=10")
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) <= 10
+        assert all(word["difficulty"] >= 1.5 for word in data)
+        assert all(word["difficulty"] <= 2.5 for word in data)
+```
+
+## Performance Guidelines
+
+### Database Optimization
+```python
+# Use connection pooling and prepared statements
+from sqlalchemy import create_engine
+from sqlalchemy.pool import QueuePool
+
+engine = create_engine(
+    database_url,
+    poolclass=QueuePool,
+    pool_size=10,
+    max_overflow=20,
+    pool_pre_ping=True
+)
+
+# Use bulk operations for large datasets
+async def bulk_insert_games(games: List[GamePair]):
+    async with get_db_session() as session:
+        await session.execute(
+            insert(GameTable),
+            [game.to_dict() for game in games]
+        )
+        await session.commit()
+```
+
+### Caching Strategy
+```python
+# Use Redis for caching
+from redis import Redis
+from functools import wraps
+
+redis_client = Redis(host='localhost', port=6379, db=0)
+
+def cache_result(expiry: int = 3600):
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            cache_key = f"{func.__name__}:{hash(str(args) + str(kwargs))}"
+            
+            # Try to get from cache
+            cached = await redis_client.get(cache_key)
+            if cached:
+                return json.loads(cached)
+            
+            # Execute function and cache result
+            result = await func(*args, **kwargs)
+            await redis_client.setex(
+                cache_key, 
+                expiry, 
+                json.dumps(result, default=str)
+            )
+            return result
+        return wrapper
+    return decorator
+
+@cache_result(expiry=1800)  # 30 minutes
+async def get_word_suggestions(difficulty: float) -> List[Word]:
+    # Expensive computation here
+    pass
+```
+
+## Security Guidelines
+
+### Input Validation
+```python
+# Use Pydantic for request validation
+from pydantic import BaseModel, validator, Field
+
+class WordSuggestionRequest(BaseModel):
+    difficulty: float = Field(..., ge=1.0, le=10.0)
+    count: int = Field(..., ge=1, le=100)
+    community: Optional[int] = Field(None, ge=0)
+    
+    @validator('difficulty')
+    def validate_difficulty(cls, v):
+        if v < 1.0 or v > 10.0:
+            raise ValueError('Difficulty must be between 1.0 and 10.0')
+        return v
+```
+
+### API Security
+```python
+# Use proper CORS and security headers
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://yourdomain.com"],  # Specific origins in production
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+
+app.add_middleware(
+    TrustedHostMiddleware, 
+    allowed_hosts=["yourdomain.com", "*.yourdomain.com"]
+)
+```
+
+## Monitoring and Logging
+
+### Structured Logging
+```python
+import structlog
+import logging
+
+# Configure structured logging
+structlog.configure(
+    processors=[
+        structlog.stdlib.filter_by_level,
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeDecoder(),
+        structlog.processors.JSONRenderer()
+    ],
+    context_class=dict,
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    wrapper_class=structlog.stdlib.BoundLogger,
+    cache_logger_on_first_use=True,
+)
+
+logger = structlog.get_logger()
+
+# Use structured logging
+logger.info(
+    "Word suggestions generated",
+    difficulty=difficulty,
+    count=len(suggestions),
+    processing_time=processing_time
+)
+```
+
+### Health Checks
+```python
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for monitoring"""
+    try:
+        # Check database connection
+        await database.execute("SELECT 1")
+        
+        # Check Redis connection
+        await redis_client.ping()
+        
+        return {
+            "status": "healthy",
+            "timestamp": datetime.utcnow().isoformat(),
+            "services": {
+                "database": "up",
+                "redis": "up"
+            }
+        }
+    except Exception as e:
+        logger.error("Health check failed", error=str(e))
+        raise HTTPException(status_code=503, detail="Service unavailable")
+```
+
+## Refactoring Priorities
+
+### Phase 1: Extract Domain Models
+1. Create shared domain entities (Word, Game, Graph)
+2. Extract value objects (SynonymyScore, PathLength)
+3. Define repository interfaces
+
+### Phase 2: Implement Clean Architecture
+1. Separate API controllers from business logic
+2. Create application services layer
+3. Implement dependency injection
+
+### Phase 3: Improve Error Handling
+1. Create custom exception hierarchy
+2. Implement proper error responses
+3. Add comprehensive logging
+
+### Phase 4: Add Testing
+1. Unit tests for domain logic
+2. Integration tests for API endpoints
+3. End-to-end tests for critical workflows
+
+### Phase 5: Performance Optimization
+1. Implement caching strategy
+2. Optimize database queries
+3. Add monitoring and metrics
+
+## Code Review Checklist
+
+- [ ] Type hints present and accurate
+- [ ] Docstrings follow Google style
+- [ ] Error handling is comprehensive
+- [ ] Functions are small and focused
+- [ ] Dependencies are injected, not hardcoded
+- [ ] Tests cover happy path and edge cases
+- [ ] Performance considerations addressed
+- [ ] Security best practices followed
+- [ ] Logging is structured and informative
+- [ ] Code follows project naming conventions
+
+## Common Anti-Patterns to Avoid
+
+1. **God Classes**: Large classes with too many responsibilities
+2. **Anemic Domain Models**: Classes with only data, no behavior
+3. **Tight Coupling**: Direct dependencies between layers
+4. **Magic Numbers**: Hardcoded values without explanation
+5. **Deep Nesting**: Complex conditional logic
+6. **Side Effects**: Functions that modify global state
+7. **Premature Optimization**: Optimizing before measuring
+8. **Copy-Paste Code**: Duplicated logic instead of abstraction
