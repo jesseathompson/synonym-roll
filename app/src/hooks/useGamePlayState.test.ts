@@ -28,7 +28,7 @@ describe('useGamePlayState Hook', () => {
 
 	it('initializes with correct state', () => {
 		const { result } = renderHook(() =>
-			useGamePlayState({ startWord: 'start', endWord: 'end' })
+			useGamePlayState({ startWord: 'start', endWord: 'end', puzzleNumber: 1 })
 		);
 
 		expect(result.current.state).toEqual({
@@ -44,7 +44,7 @@ describe('useGamePlayState Hook', () => {
 
 	it('adds a step correctly', () => {
 		const { result } = renderHook(() =>
-			useGamePlayState({ startWord: 'start', endWord: 'end' })
+			useGamePlayState({ startWord: 'start', endWord: 'end', puzzleNumber: 1 })
 		);
 
 		act(() => {
@@ -57,7 +57,7 @@ describe('useGamePlayState Hook', () => {
 
 	it('removes a step correctly', () => {
 		const { result } = renderHook(() =>
-			useGamePlayState({ startWord: 'start', endWord: 'end' })
+			useGamePlayState({ startWord: 'start', endWord: 'end', puzzleNumber: 1 })
 		);
 
 		// Add a step first
@@ -76,7 +76,7 @@ describe('useGamePlayState Hook', () => {
 
 	it('completes the game correctly', () => {
 		const { result } = renderHook(() =>
-			useGamePlayState({ startWord: 'start', endWord: 'end' })
+			useGamePlayState({ startWord: 'start', endWord: 'end', puzzleNumber: 1 })
 		);
 
 		act(() => {
@@ -88,7 +88,7 @@ describe('useGamePlayState Hook', () => {
 
 	it('resets the game correctly', () => {
 		const { result } = renderHook(() =>
-			useGamePlayState({ startWord: 'start', endWord: 'end' })
+			useGamePlayState({ startWord: 'start', endWord: 'end', puzzleNumber: 1 })
 		);
 
 		// Add steps and complete
@@ -116,7 +116,7 @@ describe('useGamePlayState Hook', () => {
 
 	it('updates elapsed time correctly when adding a step', () => {
 		const { result } = renderHook(() =>
-			useGamePlayState({ startWord: 'start', endWord: 'end' })
+			useGamePlayState({ startWord: 'start', endWord: 'end', puzzleNumber: 1 })
 		);
 
 		act(() => {
@@ -133,7 +133,7 @@ describe('useGamePlayState Hook', () => {
 
 	it('stops timer when game is completed', () => {
 		const { result } = renderHook(() =>
-			useGamePlayState({ startWord: 'start', endWord: 'end' })
+			useGamePlayState({ startWord: 'start', endWord: 'end', puzzleNumber: 1 })
 		);
 
 		act(() => {
@@ -157,7 +157,7 @@ describe('useGamePlayState Hook', () => {
 
 	it('handles adding the target word correctly', () => {
 		const { result } = renderHook(() =>
-			useGamePlayState({ startWord: 'start', endWord: 'end' })
+			useGamePlayState({ startWord: 'start', endWord: 'end', puzzleNumber: 1 })
 		);
 
 		act(() => {

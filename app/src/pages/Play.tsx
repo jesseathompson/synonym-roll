@@ -22,14 +22,15 @@ export const Play = () => {
   // Get today's puzzle
   const [puzzle] = useState(getTodaysPuzzle());
   
+  // Get today's puzzle number
+  const puzzleNumber = getTodaysPuzzleNumber();
+  
   // Use the game play state hook
   const { state, addStep, removeStep, completeGame, resetGame } = useGamePlayState({
     startWord: puzzle.start,
     endWord: puzzle.end,
+    puzzleNumber,
   });
- 
-  // Get today's puzzle number
-  const puzzleNumber = getTodaysPuzzleNumber();
 
   // Handle game completion
   useEffect(() => {
