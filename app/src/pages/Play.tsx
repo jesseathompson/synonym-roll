@@ -1,6 +1,6 @@
 import { Container, Row, Col } from "react-bootstrap";
 import { useGameState } from "../context/GameStateContext";
-import { getTodaysPuzzle, getTodaysSeed } from "../utils/gameUtils";
+import { getTodaysPuzzle, getTodaysPuzzleNumber } from "../utils/gameUtils";
 import { useState, useEffect } from "react";
 import { WordGraph } from "../utils/wordGraph";
 
@@ -29,7 +29,7 @@ export const Play = () => {
   });
  
   // Get today's puzzle number
-  const puzzleNumber = Math.floor((getTodaysSeed() % 1000000) / 100);
+  const puzzleNumber = getTodaysPuzzleNumber();
 
   // Handle game completion
   useEffect(() => {
@@ -56,6 +56,9 @@ export const Play = () => {
 
   // Debug function (can be removed in production)
   const logSolution = () => {
+    // Only run in development mode
+    if (!import.meta.env.DEV) return;
+    
     const wordGraph = new WordGraph();
     const currentWord = state.currentWord;
     const endWord = puzzle.end;
@@ -169,21 +172,23 @@ export const Play = () => {
                   </div>
                 </div>
 
-                {/* Debug Controls (can be removed in production) */}
-                <div className="debug-controls">
-                  <button 
-                    className="btn btn-secondary btn-sm me-2"
-                    onClick={logSolution}
-                  >
-                    Log Solution
-                  </button>
-                  <button 
-                    className="btn btn-warning btn-sm"
-                    onClick={completeGame}
-                  >
-                    Complete Game (Debug)
-                  </button>
-                </div>
+                {/* Debug Controls (development only) */}
+                {import.meta.env.DEV && (
+                  <div className="debug-controls">
+                    <button 
+                      className="btn btn-secondary btn-sm me-2"
+                      onClick={logSolution}
+                    >
+                      Log Solution
+                    </button>
+                    <button 
+                      className="btn btn-warning btn-sm"
+                      onClick={completeGame}
+                    >
+                      Complete Game (Debug)
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </GameBoard>

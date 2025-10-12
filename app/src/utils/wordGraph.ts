@@ -608,6 +608,9 @@ export class WordGraph {
     return nodesWithMinPath;
   }
   printGraph() {
+    // Only run in development mode
+    if (!import.meta.env.DEV) return;
+
     for (const [word, synonyms] of this.adjacencyList.entries()) {
       console.log(`${word} -> ${synonyms.join(', ')}`);
     }
@@ -644,6 +647,9 @@ export class WordGraph {
   }
 
   printPath(start: string, end: string): void {
+    // Only run in development mode
+    if (!import.meta.env.DEV) return;
+
     const path = this.findPath(start, end);
 
     if (path) {
@@ -764,6 +770,9 @@ export class WordGraph {
    * @param endWord The target word
    */
   debugSynonymFiltering(word: string, endWord: string) {
+    // Only run in development mode
+    if (!import.meta.env.DEV) return;
+
     console.log(`\n🔍 Debugging synonym filtering for "${word}" → "${endWord}"`);
     console.log('='.repeat(60));
 

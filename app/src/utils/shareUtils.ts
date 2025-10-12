@@ -1,4 +1,4 @@
-import { getTodaysSeed } from "./gameUtils";
+import { getTodaysPuzzleNumber } from "./gameUtils";
 import { WordGraph } from "./wordGraph";
 
 type ResultEmoji = "⬛" | "🟨" | "🟩" | "🟦" | "🟥" | "⬜"; // Add more as needed
@@ -50,7 +50,7 @@ const formatTime = (ms: number): string => {
  */
 export const generateShareText = ({
   title,
-  dayNumber = Math.floor((getTodaysSeed() % 1000000) / 100), // Generate puzzle number from seed
+  dayNumber = getTodaysPuzzleNumber(), // Get today's puzzle number
   score,
   streak,
   timeMs,
@@ -181,7 +181,7 @@ export const generateEnhancedShareText = ({
   lines.push("");
 
   // Footer
-  lines.push("🎲 Play at: [Your Game URL]");
+  lines.push("🎲 Play at: https://synonym-roll.com");
   lines.push("#SynonymRoll #WordGame #Puzzle");
 
   return lines.join("\n");

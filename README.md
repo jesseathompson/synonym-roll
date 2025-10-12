@@ -32,7 +32,7 @@ A daily word puzzle game where players find a path between two words using synon
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/synonym-roll.git
+   git clone https://github.com/YOUR_USERNAME/synonym-roll.git
    cd synonym-roll
    ```
 
@@ -170,7 +170,52 @@ Access at `http://localhost:6006`
 
 ## 🚀 Deployment
 
-### GitHub Pages (Recommended)
+### AWS with Custom Domain (Production)
+
+Deploy to AWS with S3, CloudFront CDN, SSL certificate, and custom domain.
+
+**Prerequisites:**
+- AWS account with CLI configured
+- Domain registered in Route 53
+- AWS CDK installed: `npm install -g aws-cdk`
+
+**Setup:**
+
+1. **Configure infrastructure**:
+   ```bash
+   cd infrastructure
+   npm install
+   cp .env.example .env
+   # Edit .env with your AWS account ID and domain
+   ```
+
+2. **Bootstrap CDK** (first time only):
+   ```bash
+   cdk bootstrap aws://ACCOUNT-ID/us-east-1
+   ```
+
+3. **Deploy**:
+   ```bash
+   cd app
+   npm run deploy:aws
+   ```
+
+This will:
+- Create SSL certificate (auto-validated via Route 53)
+- Set up S3 bucket for hosting
+- Configure CloudFront CDN with HTTPS
+- Create DNS records for your domain
+- Deploy the built application
+
+**Updates:**
+```bash
+cd app
+npm run deploy:aws:app  # Build and deploy app only
+```
+
+See [`infrastructure/README.md`](infrastructure/README.md) for detailed documentation.
+
+### GitHub Pages
 
 1. **Enable GitHub Pages**:
    - Go to repository Settings > Pages
@@ -188,7 +233,7 @@ Access at `http://localhost:6006`
 3. **Deploy**:
    - Push to main branch
    - GitHub Actions will automatically build and deploy
-   - Your game will be live at `https://yourusername.github.io/synonym-roll`
+   - Your game will be live at `https://YOUR_USERNAME.github.io/synonym-roll`
 
 ### Other Platforms
 
@@ -228,7 +273,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you encounter any issues or have questions:
 
-1. Check the [Issues](https://github.com/yourusername/synonym-roll/issues) page
+1. Check the [Issues](https://github.com/YOUR_USERNAME/synonym-roll/issues) page
 2. Create a new issue with detailed information
 3. Include steps to reproduce any bugs
 

@@ -35,8 +35,6 @@ export const SettingsModal = ({ show, onHide }: SettingsModalProps) => {
               onChange={toggleTheme}
             />
           </Form.Group>
-
-          {/* TODO: Add your game-specific settings here */}
         </Form>
       </Modal.Body>
       <Modal.Footer>

@@ -1,14 +1,14 @@
 import { Container, Row, Col, Button, Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useGameState } from "../hooks/useGameState";
-import { getTodaysSeed } from "../utils/gameUtils";
+import { getTodaysPuzzleNumber } from "../utils/gameUtils";
 
 export const Home = () => {
   const { gameState } = useGameState();
   const { lastPlayed, streak, todayCompleted } = gameState;
 
   // Get today's puzzle number
-  const puzzleNumber = Math.floor((getTodaysSeed() % 1000000) / 100);
+  const puzzleNumber = getTodaysPuzzleNumber();
 
   return (
     <Container className="py-5">

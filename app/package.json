@@ -11,7 +11,9 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "generate-social-image": "node scripts/generate-social-image.js",
-    "test-playable-games": "npx tsx ../test-playable-games.ts"
+    "test-playable-games": "npx tsx ../test-playable-games.ts",
+    "deploy:aws": "npm run build && cd ../infrastructure && npm run deploy",
+    "deploy:aws:app": "npm run build && cd ../infrastructure && npm run deploy:app"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.1",

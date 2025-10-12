@@ -21,27 +21,22 @@ A template repository for creating daily browser games like Wordle, Connections,
 2. Enable GitHub Pages:
    - Go to repository Settings > Pages
    - Under "Build and deployment", select "GitHub Actions" as the source
-3. Configure analytics and sharing:
+3. (Optional) Configure analytics:
    - Copy `.env.example` to `.env`
    - Add your Google Analytics 4 ID
-   - Add your game preview image at `/public/game-preview.png`
-4. Your game will be live at `https://yourusername.github.io/your-repo-name`
+4. Your game will be live at `https://YOUR_USERNAME.github.io/your-repo-name`
 
-## Customization
+**Note**: For production deployment with custom domain (synonym-roll.com), see the main [DEPLOYMENT.md](../DEPLOYMENT.md) for AWS deployment instructions.
 
-Look for `TODO` comments in these files:
+## Project Structure
 
-### Required Changes
-1. `src/pages/Play.tsx`
-   - Replace placeholder with your game logic
-   - Customize completion state display
+The game is fully implemented and production-ready. Key files:
 
-2. `src/pages/Home.tsx`
-   - Update game title and introduction
-   - Customize welcome message
+### Core Game Files
+1. `src/pages/Play.tsx` - Main game page with synonym selection logic
+2. `src/pages/Home.tsx` - Landing page with game introduction
 
-3. `src/types/GameState.ts`
-   - Add game-specific state properties
+3. `src/types/GameState.ts` - Game state type definitions
    - Add game-specific settings
 
 ### Optional Changes

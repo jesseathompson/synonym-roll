@@ -11,13 +11,40 @@ interface PlayableGame {
 }
 
 /**
+ * Get today's puzzle number (sequential from epoch)
+ * @returns Puzzle number starting from 1
+ */
+export const getTodaysPuzzleNumber = (): number => {
+  // Use a fixed epoch date (January 1, 2024)
+  const epoch = new Date(2025, 9, 12); // Month is 0-indexed
+  epoch.setHours(0, 0, 0, 0);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Calculate days difference in local timezone
+  const diffTime = today.getTime() - epoch.getTime();
+  const diffDays = Math.floor(diffTime / (24 * 60 * 60 * 1000));
+
+  return diffDays + 1; // Start from puzzle #1
+};
+
+/**
  * Get a deterministic puzzle for today's date
  * @returns Today's puzzle with start and end words
  */
 export const getTodaysPuzzle = () => {
   const today = new Date();
-  const daysSinceEpoch = Math.floor(today.getTime() / (24 * 60 * 60 * 1000));
-  
+  // Set to start of day in LOCAL timezone
+  today.setHours(0, 0, 0, 0);
+
+  // Calculate days since epoch in LOCAL timezone
+  const epoch = new Date(2024, 0, 1);
+  epoch.setHours(0, 0, 0, 0);
+
+  const diffTime = today.getTime() - epoch.getTime();
+  const daysSinceEpoch = Math.floor(diffTime / (24 * 60 * 60 * 1000));
+
   // Get a deterministic game based on the current day
   const games = playableGames.games as PlayableGame[];
   const gameIndex = daysSinceEpoch % games.length;
