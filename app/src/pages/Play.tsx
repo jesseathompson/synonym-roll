@@ -3,6 +3,7 @@ import { useGameState } from "../context/GameStateContext";
 import { getTodaysPuzzle, getTodaysPuzzleNumber } from "../utils/gameUtils";
 import { useState, useEffect } from "react";
 import { WordGraph } from "../utils/wordGraph";
+import { trackPageView, trackGameStart, trackWordSelected, trackGameComplete, trackGameBack, trackDebugEvent, GA_EVENTS } from "../utils/analytics";
 
 // Import components
 import { GameBoard } from "../components/features/game/GameBoard";
@@ -32,33 +33,93 @@ export const Play = () => {
     puzzleNumber,
   });
 
+  // Track page view on component mount
+  useEffect(() => {
+    trackPageView('Play', {
+      puzzle_number: puzzleNumber,
+      start_word: puzzle.start,
+      end_word: puzzle.end,
+      streak: streak,
+      today_completed: todayCompleted,
+    });
+  }, [puzzleNumber, puzzle.start, puzzle.end, streak, todayCompleted]);
+
+  // Track game start when entering play page
+  useEffect(() => {
+    if (!todayCompleted) {
+      trackGameStart({
+        puzzle_number: puzzleNumber,
+        start_word: puzzle.start,
+        end_word: puzzle.end,
+        streak: streak,
+        is_returning_player: gamesPlayed > 0,
+      });
+    }
+  }, [puzzleNumber, puzzle.start, puzzle.end, streak, todayCompleted, gamesPlayed]);
+
   // Handle game completion
   useEffect(() => {
     if (state.isCompleted && !todayCompleted) {
       const newGamesPlayed = gamesPlayed + 1;
       const newWins = wins + 1;
+      const newWinRate = newWins / newGamesPlayed;
+      
+      // Track game completion
+      trackGameComplete({
+        puzzle_number: puzzleNumber,
+        completion_time_seconds: state.elapsedTime,
+        steps_taken: state.steps.length - 1,
+        min_steps: state.minSteps || 3,
+        total_moves: state.totalMoves,
+        efficiency_percentage: state.totalMoves > 0 ? Math.round(((state.steps.length - 1) / state.totalMoves) * 100) : 100,
+        streak: streak,
+        win_rate: newWinRate,
+        games_played: newGamesPlayed,
+      });
+
       updateGameState({
         todayCompleted: true,
         gamesPlayed: newGamesPlayed,
         wins: newWins,
-        winRate: newWins / newGamesPlayed,
+        winRate: newWinRate,
         maxStreak: Math.max(maxStreak, streak),
       });
     }
-  }, [state.isCompleted, todayCompleted, gamesPlayed, wins, updateGameState, maxStreak, streak]);
+  }, [state.isCompleted, todayCompleted, gamesPlayed, wins, updateGameState, maxStreak, streak, puzzleNumber, state.elapsedTime, state.steps.length, state.minSteps, state.totalMoves]);
 
 
   const handleSynonymSelect = (word: string) => {
+    // Track word selection
+    trackWordSelected({
+      word: word,
+      step_number: state.steps.length,
+      available_synonyms_count: state.synonyms.length,
+      puzzle_number: puzzleNumber,
+    });
+    
     addStep(word);
     if (word === puzzle.end) {
       completeGame();
     }
   };
 
+  // Track back button usage
+  const handleGoBack = () => {
+    trackGameBack(puzzleNumber, state.steps.length);
+    removeStep();
+  };
+
   // Debug function (can be removed in production)
   const logSolution = () => {
     // Only run in development mode
     if (!import.meta.env.DEV) return;
+    
+    // Track debug solution log
+    trackDebugEvent(GA_EVENTS.DEBUG_SOLUTION_LOG, {
+      puzzle_number: puzzleNumber,
+      current_word: state.currentWord,
+      end_word: puzzle.end,
+    });
     
     const wordGraph = new WordGraph();
     const currentWord = state.currentWord;
@@ -168,7 +229,7 @@ export const Play = () => {
                     <GameControls
                       showBackButton={state.steps.length > 1}
                       showResetButton={false}
-                      onGoBack={removeStep}
+                      onGoBack={handleGoBack}
                     />
                   </div>
                 </div>
@@ -184,7 +245,14 @@ export const Play = () => {
                     </button>
                     <button 
                       className="btn btn-warning btn-sm"
-                      onClick={completeGame}
+                      onClick={() => {
+                        trackDebugEvent(GA_EVENTS.DEBUG_GAME_COMPLETE, {
+                          puzzle_number: puzzleNumber,
+                          current_word: state.currentWord,
+                          steps_taken: state.steps.length - 1,
+                        });
+                        completeGame();
+                      }}
                     >
                       Complete Game (Debug)
                     </button>

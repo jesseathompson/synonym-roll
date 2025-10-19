@@ -6,11 +6,47 @@ import { faInfoCircle, faCog, faSun, faMoon } from '@fortawesome/free-solid-svg-
 import { useTheme } from '../hooks/useTheme';
 import { SettingsModal } from './SettingsModal';
 import { InfoModal } from './InfoModal';
+import { trackThemeToggle, trackModal } from '../utils/analytics';
 
 export const Navigation = () => {
   const { theme, toggleTheme } = useTheme();
   const [showSettings, setShowSettings] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+
+  // Track theme toggle
+  const handleThemeToggle = () => {
+    const previousTheme = theme;
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    
+    trackThemeToggle({
+      new_theme: newTheme,
+      previous_theme: previousTheme,
+    });
+    
+    toggleTheme();
+  };
+
+  // Track modal opens
+  const handleInfoClick = () => {
+    trackModal({ modal_type: 'info', action: 'open' });
+    setShowInfo(true);
+  };
+
+  const handleSettingsClick = () => {
+    trackModal({ modal_type: 'settings', action: 'open' });
+    setShowSettings(true);
+  };
+
+  // Track modal closes
+  const handleInfoClose = () => {
+    trackModal({ modal_type: 'info', action: 'close' });
+    setShowInfo(false);
+  };
+
+  const handleSettingsClose = () => {
+    trackModal({ modal_type: 'settings', action: 'close' });
+    setShowSettings(false);
+  };
 
   return (
     <>
@@ -19,7 +55,7 @@ export const Navigation = () => {
         <Nav className="nav-icons">
           <Button
             variant="link"
-            onClick={toggleTheme}
+            onClick={handleThemeToggle}
             className="nav-link"
             aria-label="Toggle theme"
           >
@@ -28,7 +64,7 @@ export const Navigation = () => {
           <Button
             variant="link"
             className="nav-link"
-            onClick={() => setShowInfo(true)}
+            onClick={handleInfoClick}
             aria-label="Information"
           >
             <FontAwesomeIcon icon={faInfoCircle} />
@@ -36,7 +72,7 @@ export const Navigation = () => {
           <Button
             variant="link"
             className="nav-link"
-            onClick={() => setShowSettings(true)}
+            onClick={handleSettingsClick}
             aria-label="Settings"
           >
             <FontAwesomeIcon icon={faCog} />
@@ -44,8 +80,8 @@ export const Navigation = () => {
         </Nav>
       </Navbar>
 
-      <SettingsModal show={showSettings} onHide={() => setShowSettings(false)} />
-      <InfoModal show={showInfo} onHide={() => setShowInfo(false)} />
+      <SettingsModal show={showSettings} onHide={handleSettingsClose} />
+      <InfoModal show={showInfo} onHide={handleInfoClose} />
     </>
   );
 }; 

@@ -114,8 +114,120 @@ describe('gameReducer', () => {
 			targetWord: 'target',
 			isCompleted: false,
 			elapsedTime: 0,
+			totalMoves: 0, // Reset total moves
 			synonyms: ['word1', 'word2', 'word3'], // From the mock
 			minSteps: 2 // From the mock
 		});
+	});
+
+	it('increments total moves counter for ADD_STEP', () => {
+		const action = { type: 'ADD_STEP', payload: 'word1' } as const;
+		const newState = gameReducer(initialState, action);
+
+		expect(newState.totalMoves).toBe(1);
+	});
+
+	it('increments total moves counter for REMOVE_STEP', () => {
+		// Setup state with multiple steps
+		const stateWithSteps: GamePlayState = {
+			...initialState,
+			steps: ['start', 'middle'],
+			currentWord: 'middle',
+			totalMoves: 1
+		};
+
+		const action = { type: 'REMOVE_STEP' } as const;
+		const newState = gameReducer(stateWithSteps, action);
+
+		expect(newState.totalMoves).toBe(2);
+	});
+
+	it('handles multiple ADD_STEP actions correctly', () => {
+		let state = initialState;
+
+		// First step
+		state = gameReducer(state, { type: 'ADD_STEP', payload: 'word1' });
+		expect(state.totalMoves).toBe(1);
+		expect(state.steps).toEqual(['start', 'word1']);
+
+		// Second step
+		state = gameReducer(state, { type: 'ADD_STEP', payload: 'word2' });
+		expect(state.totalMoves).toBe(2);
+		expect(state.steps).toEqual(['start', 'word1', 'word2']);
+	});
+
+	it('handles backtracking with total moves tracking', () => {
+		let state = initialState;
+
+		// Add two steps
+		state = gameReducer(state, { type: 'ADD_STEP', payload: 'word1' });
+		state = gameReducer(state, { type: 'ADD_STEP', payload: 'word2' });
+		expect(state.totalMoves).toBe(2);
+
+		// Go back one step
+		state = gameReducer(state, { type: 'REMOVE_STEP' });
+		expect(state.totalMoves).toBe(3); // Incremented for backtrack
+		expect(state.steps).toEqual(['start', 'word1']);
+
+		// Go back another step
+		state = gameReducer(state, { type: 'REMOVE_STEP' });
+		expect(state.totalMoves).toBe(4); // Incremented for backtrack
+		expect(state.steps).toEqual(['start']);
+	});
+
+	it('prevents removing the first step (start word)', () => {
+		const action = { type: 'REMOVE_STEP' } as const;
+		const newState = gameReducer(initialState, action);
+
+		// State should remain unchanged
+		expect(newState).toEqual(initialState);
+		expect(newState.totalMoves).toBe(0); // No increment for invalid remove
+	});
+
+	it('handles reaching target word correctly', () => {
+		const action = { type: 'ADD_STEP', payload: 'end' } as const;
+		const newState = gameReducer(initialState, action);
+
+		expect(newState.isCompleted).toBe(true);
+		expect(newState.steps).toEqual(['start', 'end']);
+		expect(newState.currentWord).toBe('end');
+		expect(newState.synonyms).toEqual([]); // No synonyms when completed
+		expect(newState.minSteps).toBe(0); // No steps left when completed
+		expect(newState.totalMoves).toBe(1);
+	});
+
+	it('maintains synonyms array structure', () => {
+		const action = { type: 'ADD_STEP', payload: 'word1' } as const;
+		const newState = gameReducer(initialState, action);
+
+		expect(Array.isArray(newState.synonyms)).toBe(true);
+	});
+
+	it('handles INCREMENT_ELAPSED_TIME action correctly', () => {
+		const action = { type: 'INCREMENT_ELAPSED_TIME' } as const;
+		const newState = gameReducer(initialState, action);
+
+		expect(newState.elapsedTime).toBe(1);
+	});
+
+	it('handles multiple INCREMENT_ELAPSED_TIME actions', () => {
+		let state = initialState;
+
+		state = gameReducer(state, { type: 'INCREMENT_ELAPSED_TIME' });
+		expect(state.elapsedTime).toBe(1);
+
+		state = gameReducer(state, { type: 'INCREMENT_ELAPSED_TIME' });
+		expect(state.elapsedTime).toBe(2);
+
+		state = gameReducer(state, { type: 'INCREMENT_ELAPSED_TIME' });
+		expect(state.elapsedTime).toBe(3);
+	});
+
+	it('handles unknown action gracefully', () => {
+		const action = { type: 'UNKNOWN_ACTION' } as any;
+		const newState = gameReducer(initialState, action);
+
+		// Should return unchanged state
+		expect(newState).toEqual(initialState);
 	});
 });

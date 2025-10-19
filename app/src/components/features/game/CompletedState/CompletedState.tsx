@@ -5,6 +5,7 @@ import { faShare } from '@fortawesome/free-solid-svg-icons';
 import { WordTile } from '../../../common/WordTile';
 import { ShareModal } from '../../../ShareModal';
 import { WordGraph } from '../../../../utils/wordGraph';
+import { trackShareButtonClick } from '../../../../utils/analytics';
 import styles from './CompletedState.module.css';
 
 export interface CompletedStateProps {
@@ -55,6 +56,18 @@ export const CompletedState: React.FC<CompletedStateProps> = memo(({
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  // Handle share button click
+  const handleShareClick = () => {
+    trackShareButtonClick({
+      puzzle_number: dayNumber,
+      completion_time_seconds: elapsedTime,
+      steps_taken: uniqueSteps.length - 1,
+      efficiency_percentage: totalMoves > 0 ? Math.round(((uniqueSteps.length - 1) / totalMoves) * 100) : 100,
+      streak: stats?.streak || 0,
+    });
+    setShowShareModal(true);
   };
 
   return (
@@ -185,7 +198,7 @@ export const CompletedState: React.FC<CompletedStateProps> = memo(({
         <Button
           variant="primary"
           className={styles['completed-state__share-button']}
-          onClick={() => setShowShareModal(true)}
+          onClick={handleShareClick}
           aria-label="Share your game result"
         >
           <FontAwesomeIcon icon={faShare} className={styles['completed-state__share-icon']} />

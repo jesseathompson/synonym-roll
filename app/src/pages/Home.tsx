@@ -2,6 +2,8 @@ import { Container, Row, Col, Button, Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useGameState } from "../hooks/useGameState";
 import { getTodaysPuzzleNumber } from "../utils/gameUtils";
+import { trackPageView, trackEvent, GA_EVENTS } from "../utils/analytics";
+import { useEffect } from "react";
 
 export const Home = () => {
   const { gameState } = useGameState();
@@ -9,6 +11,26 @@ export const Home = () => {
 
   // Get today's puzzle number
   const puzzleNumber = getTodaysPuzzleNumber();
+
+  // Track page view on component mount
+  useEffect(() => {
+    trackPageView('Home', {
+      puzzle_number: puzzleNumber,
+      streak: streak,
+      today_completed: todayCompleted,
+      is_returning_player: !!lastPlayed,
+    });
+  }, [puzzleNumber, streak, todayCompleted, lastPlayed]);
+
+  // Track play button click
+  const handlePlayClick = () => {
+    trackEvent(GA_EVENTS.GAME_START, {
+      puzzle_number: puzzleNumber,
+      streak: streak,
+      is_returning_player: !!lastPlayed,
+      from_page: 'home',
+    });
+  };
 
   return (
     <Container className="py-5">
@@ -57,6 +79,7 @@ export const Home = () => {
                     size="lg"
                     className="btn-game"
                     disabled={todayCompleted}
+                    onClick={handlePlayClick}
                   >
                     {todayCompleted
                       ? "Come Back Tomorrow"

@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy, faCheck, faShare } from '@fortawesome/free-solid-svg-icons';
 import { generateEnhancedShareText } from '../utils/shareUtils';
 import { WordGraph } from '../utils/wordGraph';
+import { trackShareModalOpen, trackShareCopy } from '../utils/analytics';
 import styles from './ShareModal.module.css';
 
 export interface ShareModalProps {
@@ -43,6 +44,19 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
 
+  // Track modal open when it becomes visible
+  React.useEffect(() => {
+    if (show) {
+      trackShareModalOpen({
+        puzzle_number: dayNumber,
+        completion_time_seconds: elapsedTime,
+        steps_taken: steps.length - 1,
+        efficiency_percentage: totalMoves > 0 ? Math.round(((steps.length - 1) / totalMoves) * 100) : 100,
+        streak: streak,
+      });
+    }
+  }, [show, dayNumber, elapsedTime, steps.length, totalMoves, streak]);
+
   // Generate the share text
   const shareText = generateEnhancedShareText({
     dayNumber,
@@ -64,8 +78,22 @@ export const ShareModal: React.FC<ShareModalProps> = ({
       await navigator.clipboard.writeText(shareText);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      
+      // Track successful copy
+      trackShareCopy({
+        success: true,
+        method: 'clipboard',
+        puzzle_number: dayNumber,
+      });
     } catch (err) {
       console.error('Failed to copy text: ', err);
+      
+      // Track failed copy
+      trackShareCopy({
+        success: false,
+        method: 'clipboard',
+        puzzle_number: dayNumber,
+      });
     }
   };
 

@@ -7,6 +7,7 @@ import { Navigation } from './components/Navigation';
 import { Home } from './pages/Home';
 import { Play } from './pages/Play';
 import { GameStateProvider } from './context/GameStateContext';
+import { trackPageView } from './utils/analytics';
 
 function App() {
   return (

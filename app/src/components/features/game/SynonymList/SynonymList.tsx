@@ -1,5 +1,6 @@
 import React from 'react'
 import { WordTile } from '../../../common/WordTile'
+import { trackWordSelected } from '../../../../utils/analytics'
 import styles from './SynonymList.module.css'
 
 export interface SynonymListProps {
