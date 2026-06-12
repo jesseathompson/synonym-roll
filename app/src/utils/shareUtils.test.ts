@@ -28,7 +28,9 @@ describe('Share Utils', () => {
 	}
 
 	beforeEach(() => {
-		vi.clearAllMocks()
+		// resetAllMocks also drops unconsumed mockReturnValueOnce queues,
+		// so once-values can't leak between tests
+		vi.resetAllMocks()
 		mockWordGraph.getTemperatureCategory.mockReturnValue('hot')
 	})
 
@@ -163,7 +165,15 @@ describe('Share Utils', () => {
 			const shareText = generateEnhancedShareText(gameData)
 
 			// Should not crash and should include some emoji
-			expect(shareText).toContain('🔵') // Default emoji
+			expect(shareText).toContain('⚪') // Default emoji
+		})
+
+		it('shows par with golf-style scoring', () => {
+			const onPar = generateEnhancedShareText({ ...baseGameData, steps: ['happy', 'joyful', 'glad'], minSteps: 2 })
+			expect(onPar).toContain('⛳ Par 2 · 2 steps ⭐')
+
+			const overPar = generateEnhancedShareText({ ...baseGameData, steps: ['happy', 'joyful', 'merry', 'glad'], minSteps: 2 })
+			expect(overPar).toContain('⛳ Par 2 · 3 steps (+1 over par)')
 		})
 	})
 

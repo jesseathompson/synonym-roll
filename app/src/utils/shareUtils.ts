@@ -128,56 +128,41 @@ export const generateEnhancedShareText = ({
   elapsedTime: number;
   totalMoves: number;
   minSteps: number;
-  streak: number;
-  winRate: number;
-  gamesPlayed: number;
-  maxStreak: number;
+  streak?: number | null;
+  winRate?: number | null;
+  gamesPlayed?: number | null;
+  maxStreak?: number | null;
 }): string => {
   const lines: string[] = [];
+  const stepsTaken = steps.length - 1;
+  const overPar = stepsTaken - minSteps;
 
   // Header with puzzle number
   lines.push(`🧩 ${title} #${dayNumber}`);
   lines.push("");
 
-  // Word path visualization with hot/cold colors (spoiler-free)
+  // Post-game reveal: one emoji per word showing how warm each step was (spoiler-free)
   lines.push("🎯 Word Path:");
-  const pathLength = steps.length - 1; // Exclude start word from count
-  const circles = [];
-
-  // Start circle with temperature color
-  const startTemp = getTemperatureEmoji(getTemperatureCategory(steps[0], endWord));
-  circles.push(startTemp);
-
-  // Intermediate circles with temperature colors
-  for (let i = 1; i < pathLength; i++) {
-    const stepTemp = getTemperatureEmoji(getTemperatureCategory(steps[i - 1], endWord));
-    circles.push(stepTemp);
-  }
-
-  // End circle (always hot since it's the target)
-  circles.push('🔥');
-
-  lines.push(circles.join(' '));
-  lines.push(`${steps[0]} → ${steps[steps.length - 1]} (${pathLength} steps)`);
+  lines.push(generateTemperatureTrail(steps, endWord));
+  lines.push(`${steps[0]} → ${steps[steps.length - 1]}`);
+  lines.push(`⛳ Par ${minSteps} · ${stepsTaken} steps${overPar <= 0 ? " ⭐" : ` (+${overPar} over par)`}`);
   lines.push("");
 
   // Performance metrics
-  const efficiency = totalMoves > 0 ? ((steps.length - 1) / totalMoves * 100).toFixed(0) : "100";
-  const isOptimal = steps.length - 1 === minSteps;
+  const efficiency = totalMoves > 0 ? (stepsTaken / totalMoves * 100).toFixed(0) : "100";
 
   lines.push("📊 Performance:");
   lines.push(`⏱️  Time: ${formatTime(elapsedTime * 1000)}`);
-  lines.push(`👣 Steps: ${steps.length - 1}${isOptimal ? " ⭐" : ""}`);
   lines.push(`🎮 Total Moves: ${totalMoves}`);
   lines.push(`📈 Efficiency: ${efficiency}%`);
   lines.push("");
 
   // Game stats
   lines.push("🏆 Overall Stats:");
-  lines.push(`🔥 Streak: ${streak}`);
-  lines.push(`📈 Win Rate: ${Math.round(winRate * 100)}%`);
-  lines.push(`🎯 Games Played: ${gamesPlayed}`);
-  lines.push(`🏅 Best Streak: ${maxStreak}`);
+  lines.push(`🔥 Streak: ${streak ?? 0}`);
+  lines.push(`📈 Win Rate: ${Math.round((winRate ?? 0) * 100)}%`);
+  lines.push(`🎯 Games Played: ${gamesPlayed ?? 0}`);
+  lines.push(`🏅 Best Streak: ${maxStreak ?? 0}`);
   lines.push("");
 
   // Footer
@@ -273,19 +258,31 @@ export const shareResults = async (
 //   return lines.join("\n");
 // };
 
-// Helper function to get temperature category
-const getTemperatureCategory = (word: string, targetWord: string): 'hot' | 'warm' | 'cool' | 'cold' => {
-  const wordGraph = new WordGraph();
-  return wordGraph.getTemperatureCategory(word, targetWord);
-};
-
 // Helper function to get emoji for temperature category
-const getTemperatureEmoji = (temperature: 'hot' | 'warm' | 'cool' | 'cold'): string => {
+export const getTemperatureEmoji = (temperature: 'hot' | 'warm' | 'cool' | 'cold'): string => {
   switch (temperature) {
     case 'hot': return '🔥';
     case 'warm': return '🟠';
     case 'cool': return '🔵';
-    case 'cold': return '🔵';
+    case 'cold': return '⚪';
     default: return '⚪';
   }
+};
+
+/**
+ * Build the post-game temperature trail: one emoji per word in the final path,
+ * showing how close each step was to the target. The target itself is always 🔥.
+ * @param steps The full path including start and target words
+ * @param endWord The target word
+ * @returns Emoji trail string, e.g. "⚪ 🔵 🟠 🔥"
+ */
+export const generateTemperatureTrail = (steps: string[], endWord: string): string => {
+  const wordGraph = new WordGraph();
+  return steps
+    .map((word, index) =>
+      index === steps.length - 1
+        ? '🔥'
+        : getTemperatureEmoji(wordGraph.getTemperatureCategory(word, endWord))
+    )
+    .join(' ');
 };

@@ -2,7 +2,7 @@ import { Container, Row, Col } from "react-bootstrap";
 import { useGameState } from "../context/GameStateContext";
 import { getTodaysPuzzle, getTodaysPuzzleNumber } from "../utils/gameUtils";
 import { useState, useEffect } from "react";
-import { WordGraph } from "../utils/wordGraph";
+import { getSharedWordGraph } from "../utils/wordGraph";
 import { trackPageView, trackGameStart, trackWordSelected, trackGameComplete, trackGameBack, trackDebugEvent, GA_EVENTS } from "../utils/analytics";
 
 // Import components
@@ -121,7 +121,7 @@ export const Play = () => {
       end_word: puzzle.end,
     });
     
-    const wordGraph = new WordGraph();
+    const wordGraph = getSharedWordGraph();
     const currentWord = state.currentWord;
     const endWord = puzzle.end;
     
@@ -220,10 +220,19 @@ export const Play = () => {
                     endWord={puzzle.end}
                     steps={state.steps}
                     minSteps={state.minSteps || 3}
+                    currentWordDefinition={getSharedWordGraph().getDefinition(
+                      state.currentWord,
+                      state.steps[state.steps.length - 2]
+                    )}
+                    targetWordDefinition={getSharedWordGraph().getDefinition(puzzle.end)}
                   />
                   <SynonymList
                     synonyms={state.synonyms}
                     onSelect={handleSynonymSelect}
+                    visitedWords={state.visitedWords}
+                    getDefinition={(word) =>
+                      getSharedWordGraph().getDefinition(word, state.currentWord)
+                    }
                   />
                   <div className="game-controls-inline">
                     <GameControls

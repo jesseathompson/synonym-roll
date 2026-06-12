@@ -10,6 +10,7 @@ interface GraphNode {
   frequency: number;
   centrality: number;
   community: number;
+  senses?: string[]; // Deduplicated sense glosses referenced by edge sense indices
 }
 
 interface GraphEdge {
@@ -17,6 +18,8 @@ interface GraphEdge {
   target: string;
   weight: number;
   synonymy_score: number;
+  source_sense?: number; // Index into source node's senses: the sense shared with target
+  target_sense?: number; // Index into target node's senses: the sense shared with source
 }
 
 interface GraphThesaurus {
@@ -37,22 +40,34 @@ interface PlayableGame {
 
 type Memo = Map<string, number>;
 
+// Minimum number of synonym choices to offer at each position (when the
+// underlying graph has them) so no move is forced or trivially narrow.
+const MIN_SYNONYM_CHOICES = 4;
+
 export class WordGraph {
   adjacencyList: Map<string, string[]>;
   edgeScores: Map<string, number>; // Store edge synonymy scores
   minEdgeSynonymy: number; // Minimum synonymy score threshold
   currentGame: PlayableGame | null;
   graphData: GraphThesaurus; // Store graph data for frequency access
+  private nodeMap: Map<string, GraphNode>;
+  private senseGlosses: Map<string, string>; // "context:word" -> gloss of word in the sense shared with context
 
   constructor() {
     this.adjacencyList = new Map();
     this.edgeScores = new Map();
     this.minEdgeSynonymy = 0; // Default to 0 if no game is loaded
     this.currentGame = null;
+    this.nodeMap = new Map();
+    this.senseGlosses = new Map();
 
     // Process graph thesaurus data
     const thesaurusData = graphThesaurusData as GraphThesaurus;
     this.graphData = thesaurusData; // Store for frequency access
+
+    for (const node of thesaurusData.nodes) {
+      this.nodeMap.set(node.word, node);
+    }
 
     // Load the current game data to get metadata criteria
     this.loadCurrentGame();
@@ -60,7 +75,37 @@ export class WordGraph {
     // Create the adjacency list from the edges
     for (const edge of thesaurusData.edges) {
       this.addWordPair(edge.source, edge.target, edge.synonymy_score);
+      this.addSenseGlosses(edge);
     }
+  }
+
+  /**
+   * Index each edge's shared-sense glosses: for edge cat--feline, the gloss
+   * keyed "cat:feline" defines feline in the sense it shares with cat.
+   */
+  private addSenseGlosses(edge: GraphEdge) {
+    if (edge.target_sense !== undefined) {
+      const gloss = this.nodeMap.get(edge.target)?.senses?.[edge.target_sense];
+      if (gloss) this.senseGlosses.set(`${edge.source}:${edge.target}`, gloss);
+    }
+    if (edge.source_sense !== undefined) {
+      const gloss = this.nodeMap.get(edge.source)?.senses?.[edge.source_sense];
+      if (gloss) this.senseGlosses.set(`${edge.target}:${edge.source}`, gloss);
+    }
+  }
+
+  /**
+   * Definition of a word for display. When a context word (the word the player
+   * is coming from) is given and the pair shares a known sense, return the
+   * gloss for that sense — "spring" gets its jump sense next to "leap" and its
+   * coil sense next to "coil". Falls back to the word's primary definition.
+   */
+  getDefinition(word: string, context?: string): string | undefined {
+    if (context) {
+      const senseGloss = this.senseGlosses.get(`${context}:${word}`);
+      if (senseGloss) return senseGloss;
+    }
+    return this.nodeMap.get(word)?.definition || undefined;
   }
 
   private loadCurrentGame() {
@@ -108,16 +153,14 @@ export class WordGraph {
    * Get word frequency from the graph data
    */
   private getWordFrequency(word: string): number {
-    const node = this.graphData.nodes.find(n => n.word === word);
-    return node?.frequency || 5.0; // Default frequency if not found
+    return this.nodeMap.get(word)?.frequency || 5.0; // Default frequency if not found
   }
 
   /**
    * Get word community from the graph data
    */
   private getWordCommunity(word: string): number {
-    const node = this.graphData.nodes.find(n => n.word === word);
-    return node?.community || 0; // Default community if not found
+    return this.nodeMap.get(word)?.community || 0; // Default community if not found
   }
 
   /**
@@ -155,6 +198,9 @@ export class WordGraph {
       filteredSynonyms = allSynonyms.filter(synonym =>
         this.getEdgeSynonymyScore(word, synonym) >= adaptiveThreshold
       );
+      // If the threshold leaves too few choices, backfill with the
+      // best-scoring below-threshold synonyms so moves aren't forced.
+      filteredSynonyms = this.backfillScarceChoices(word, allSynonyms, filteredSynonyms, endWord);
     }
 
     // Step 2: If no end word, return score-sorted synonyms
@@ -208,7 +254,74 @@ export class WordGraph {
     // Step 4: Enhanced selection with connectivity preservation
     const selectedSynonyms = this.selectSynonymsWithConnectivity(synonymData, word, endWord);
 
-    return selectedSynonyms.map(item => item.word);
+    // Step 5: Solvability guarantee — a word strictly closer to the target
+    // must always survive selection, or the game can become unwinnable.
+    return this.ensureNextHopSurvives(word, endWord, selectedSynonyms.map(item => item.word));
+  }
+
+  /**
+   * Guarantee that at least one displayed synonym is a "next hop": a neighbor
+   * whose distance to the target is exactly one less than the current word's.
+   * The selection caps above can otherwise drop every such word for
+   * high-degree words (e.g. "be", "have"), leaving only detours that the same
+   * filtering later dead-ends. Applied at every step, this keeps every game
+   * winnable using only displayed synonyms: each word offers a neighbor one
+   * step closer, by induction down to the target itself.
+   */
+  private ensureNextHopSurvives(word: string, endWord: string, selectedWords: string[]): string[] {
+    const distance = this.findShortestPathLengthBiDirectional(word, endWord);
+    if (distance === null || distance <= 0) return selectedWords;
+
+    const isNextHop = (synonym: string): boolean =>
+      this.findShortestPathLengthBiDirectional(synonym, endWord) === distance - 1;
+
+    if (selectedWords.some(isNextHop)) return selectedWords;
+
+    const candidates = (this.adjacencyList.get(word) || [])
+      .filter(synonym => synonym !== word && isNextHop(synonym));
+    if (candidates.length === 0) return selectedWords;
+
+    const bestNextHop = candidates.reduce((best, synonym) =>
+      this.getEdgeSynonymyScore(word, synonym) > this.getEdgeSynonymyScore(word, best)
+        ? synonym
+        : best
+    );
+    return [...selectedWords, bestNextHop];
+  }
+
+  /**
+   * When the synonymy threshold leaves fewer than MIN_SYNONYM_CHOICES options,
+   * re-admit the best-scoring excluded synonyms until the minimum is met (or
+   * the graph runs out). When an end word is known, only synonyms that can
+   * still reach it are counted and backfilled, since pathless ones are dropped
+   * later. Only ever adds options, so it cannot break path validity.
+   */
+  private backfillScarceChoices(
+    word: string,
+    allSynonyms: string[],
+    filteredSynonyms: string[],
+    endWord?: string
+  ): string[] {
+    const hasPath = (synonym: string): boolean =>
+      !endWord || endWord === word ||
+      this.findShortestPathLengthBiDirectional(synonym, endWord) !== null;
+
+    const viableCount = filteredSynonyms.filter(
+      synonym => synonym !== word && hasPath(synonym)
+    ).length;
+    if (viableCount >= MIN_SYNONYM_CHOICES) {
+      return filteredSynonyms;
+    }
+
+    const included = new Set(filteredSynonyms);
+    const backfill = allSynonyms
+      .filter(synonym => !included.has(synonym) && synonym !== word && hasPath(synonym))
+      .sort((a, b) =>
+        this.getEdgeSynonymyScore(word, b) - this.getEdgeSynonymyScore(word, a)
+      )
+      .slice(0, MIN_SYNONYM_CHOICES - viableCount);
+
+    return [...filteredSynonyms, ...backfill];
   }
 
   /**
@@ -408,8 +521,9 @@ export class WordGraph {
       !criticalSynonyms.some(critical => critical.word === synonym.word)
     );
 
-    // Combine critical synonyms with best non-critical ones
-    const maxNonCritical = 12 - criticalSynonyms.length;
+    // Combine critical synonyms with best non-critical ones (a negative
+    // budget would make slice() keep words from the end of the list)
+    const maxNonCritical = Math.max(0, 12 - criticalSynonyms.length);
     const bestNonCritical = nonCriticalSynonyms
       .sort((a, b) => b.connectivityScore - a.connectivityScore)
       .slice(0, maxNonCritical);
@@ -892,4 +1006,12 @@ export class WordGraph {
     if (temperature >= 0.1) return 'cool';
     return 'cold';
   }
+}
+// Shared instance for components that only read from the graph (definitions,
+// temperatures). Building a WordGraph processes every edge, so avoid creating
+// per-render instances.
+let sharedInstance: WordGraph | null = null;
+export function getSharedWordGraph(): WordGraph {
+  sharedInstance ??= new WordGraph();
+  return sharedInstance;
 }

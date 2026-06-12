@@ -27,6 +27,19 @@
   width: 100%;
 }
 
+.completed-state__legend {
+  font-family: var(--font-game, "Outfit", sans-serif);
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--text-secondary, #c19a6b);
+  margin: 0;
+}
+
+.completed-state__unit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs, 0.25rem);
+}
+
 .completed-state__arrow {
   color: var(--text-secondary, #c19a6b);
   font-weight: 700;

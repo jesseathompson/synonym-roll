@@ -45,7 +45,11 @@ export const CompletedState: React.FC<CompletedStateProps> = memo(({
   
   // Filter out any duplicated words in the path
   const uniqueSteps = steps.filter((word, index) => steps.indexOf(word) === index);
-  
+
+  // Par comparison (golf-style): steps taken vs the optimal path length
+  const stepsTaken = uniqueSteps.length - 1;
+  const overPar = stepsTaken - minSteps;
+
   // Get temperature variant for a word
   const getTemperatureVariant = (word: string): 'hot' | 'warm' | 'cool' | 'cold' => {
     return wordGraph.getTemperatureCategory(word, endWord);
@@ -74,36 +78,33 @@ export const CompletedState: React.FC<CompletedStateProps> = memo(({
     <div className={styles['completed-state']} role="region" aria-label="Game completed">
       <h4 className={styles['completed-state__title']}>
         You completed the puzzle in {formatTime(elapsedTime)} and{' '}
-        {uniqueSteps.length - 1} steps:
+        {stepsTaken} steps
+        {overPar <= 0 ? ' — a perfect par! ⭐' : ` — ${overPar} over par`}
       </h4>
 
       <div className={styles['completed-state__path']}>
-        {/* Display the path of words from start to end */}
-        {uniqueSteps.length <= 5 ? (
-          // Show all steps if 5 or fewer
-          uniqueSteps.map((word, index) => {
-            const isFirst = index === 0;
-            const isLast = index === uniqueSteps.length - 1;
-            const variant = isFirst ? getTemperatureVariant(word) : isLast ? getTemperatureVariant(word) : getTemperatureVariant(word);
-            
-            return (
-              <React.Fragment key={`${word}-${index}`}>
-                <WordTile 
-                  word={word} 
-                  variant={variant}
-                  size="md"
-                />
-                {!isLast && (
-                  <span 
-                    className={styles['completed-state__arrow']}
-                    aria-hidden="true"
-                  >
-                    →
-                  </span>
-                )}
-              </React.Fragment>
-            );
-          })
+        {/* Display the path of words from start to end.
+            Show the whole path when possible — the temperature reveal is the payoff. */}
+        {uniqueSteps.length <= 10 ? (
+          // Show all steps if 10 or fewer
+          // Arrow + tile form one non-wrapping unit so line breaks land between words
+          uniqueSteps.map((word, index) => (
+            <div key={`${word}-${index}`} className={styles['completed-state__unit']}>
+              {index > 0 && (
+                <span
+                  className={styles['completed-state__arrow']}
+                  aria-hidden="true"
+                >
+                  →
+                </span>
+              )}
+              <WordTile
+                word={word}
+                variant={getTemperatureVariant(word)}
+                size="md"
+              />
+            </div>
+          ))
         ) : (
           // Show condensed view for more than 5 steps
           <>
@@ -153,6 +154,11 @@ export const CompletedState: React.FC<CompletedStateProps> = memo(({
         )}
       </div>
 
+      {/* Post-game reveal: now that the puzzle is solved, show how warm each step was */}
+      <p className={styles['completed-state__legend']}>
+        🔥 Tile colors reveal how close each word was to the target — from hot to cold ❄️
+      </p>
+
       {/* Stats display */}
       <div className={styles['completed-state__stats']}>
         <div className={styles['completed-state__basic-stats']}>
@@ -164,9 +170,15 @@ export const CompletedState: React.FC<CompletedStateProps> = memo(({
           </div>
           <div className={styles['completed-state__stat-item']}>
             <span className={styles['completed-state__stat-value']}>
-              {uniqueSteps.length - 1}
+              {stepsTaken}
             </span>
             <span className={styles['completed-state__stat-label']}>Steps</span>
+          </div>
+          <div className={styles['completed-state__stat-item']}>
+            <span className={styles['completed-state__stat-value']}>
+              {minSteps}
+            </span>
+            <span className={styles['completed-state__stat-label']}>Par</span>
           </div>
           <div className={styles['completed-state__stat-item']}>
             <span className={styles['completed-state__stat-value']}>

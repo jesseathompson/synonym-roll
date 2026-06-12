@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy, faCheck, faShare } from '@fortawesome/free-solid-svg-icons';
-import { generateEnhancedShareText } from '../utils/shareUtils';
-import { WordGraph } from '../utils/wordGraph';
+import { generateEnhancedShareText, generateTemperatureTrail } from '../utils/shareUtils';
 import { trackShareModalOpen, trackShareCopy } from '../utils/analytics';
 import styles from './ShareModal.module.css';
 
@@ -104,39 +103,6 @@ export const ShareModal: React.FC<ShareModalProps> = ({
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  // Generate path visualization with hot/cold colors
-  const generatePathVisualization = () => {
-    const wordGraph = new WordGraph();
-    const pathLength = steps.length - 1;
-    const circles = [];
-    
-    // Start circle with temperature color
-    const startTemp = wordGraph.getTemperatureCategory(startWord, endWord);
-    circles.push(getTemperatureEmoji(startTemp));
-    
-    // Intermediate circles with temperature colors
-    for (let i = 1; i < pathLength; i++) {
-      const stepTemp = wordGraph.getTemperatureCategory(steps[i - 1], endWord);
-      circles.push(getTemperatureEmoji(stepTemp));
-    }
-    
-    // End circle (always hot since it's the target)
-    circles.push('🔥');
-    
-    return circles.join(' ');
-  };
-
-  // Get emoji for temperature category
-  const getTemperatureEmoji = (temperature: 'hot' | 'warm' | 'cool' | 'cold'): string => {
-    switch (temperature) {
-      case 'hot': return '🔥';
-      case 'warm': return '🟠';
-      case 'cool': return '🔵';
-      case 'cold': return '🔵';
-      default: return '⚪';
-    }
-  };
-
   return (
     <Modal show={show} onHide={onHide} centered size="lg">
       <Modal.Header closeButton>
@@ -156,7 +122,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
             <div className={styles['share-modal__path']}>
               <div className={styles['share-modal__path-label']}>Word Path:</div>
               <div className={styles['share-modal__path-visual']}>
-                {generatePathVisualization()}
+                {generateTemperatureTrail(steps, endWord)}
               </div>
               <div className={styles['share-modal__path-info']}>
                 {startWord} → {endWord} ({steps.length - 1} steps)
@@ -173,6 +139,10 @@ export const ShareModal: React.FC<ShareModalProps> = ({
                 <span className={styles['share-modal__stat-value']}>
                   {steps.length - 1}{steps.length - 1 === minSteps ? ' ⭐' : ''}
                 </span>
+              </div>
+              <div className={styles['share-modal__stat-row']}>
+                <span className={styles['share-modal__stat-label']}>⛳ Par:</span>
+                <span className={styles['share-modal__stat-value']}>{minSteps}</span>
               </div>
               <div className={styles['share-modal__stat-row']}>
                 <span className={styles['share-modal__stat-label']}>🎮 Total Moves:</span>

@@ -1,7 +1,5 @@
 import React from 'react'
 import { WordTile } from '../../../common/WordTile'
-import { Thermometer } from '../../../common/Thermometer'
-import { WordGraph } from '../../../../utils/wordGraph'
 import styles from './GamePath.module.css'
 
 export interface GamePathProps {
@@ -9,170 +7,128 @@ export interface GamePathProps {
 	endWord: string
 	steps: string[]
 	minSteps: number
+	/** Definition of the player's current word, in the sense it was reached through */
+	currentWordDefinition?: string
+	/** Primary definition of the target word */
+	targetWordDefinition?: string
 	className?: string
 }
+
+const MAX_VISIBLE_PLAYED_WORDS = 5
 
 export const GamePath: React.FC<GamePathProps> = ({
 	startWord,
 	endWord,
 	steps,
 	minSteps,
+	currentWordDefinition,
+	targetWordDefinition,
 	className = ''
 }) => {
-	const wordGraph = new WordGraph()
-	
-	// Calculate temperature for each word in the path
-	const getTemperatureVariant = (word: string): 'hot' | 'warm' | 'cool' | 'cold' => {
-		return wordGraph.getTemperatureCategory(word, endWord)
-	}
-	
-	// Get temperature for the current word (last step or start word if no steps)
-	const currentWord = steps.length > 0 ? steps[steps.length - 1] : startWord
-	const currentTemperatureValue = wordGraph.getTemperature(currentWord, endWord)
-	const currentTemperature = getTemperatureVariant(currentWord)
-	
-	// Get temperature for the target word (should always be 'hot' since it's the target)
-	const targetTemperature = getTemperatureVariant(endWord)
+	// Words played after the start word
+	const playedWords = steps.slice(1)
+	const movesTaken = playedWords.length
+	const currentWord = steps[steps.length - 1]
+
+	// Par counts moves and the final move lands on the target, so the row has
+	// par - 1 intermediate slots between the start and target anchors.
+	const parSlots = Math.max(minSteps - 1, 0)
+	const slotCount = Math.max(parSlots, movesTaken)
+	const placeholderCount = Math.max(slotCount - movesTaken, 0)
+
+	// Once every par slot is filled the next move must beat par to tie it,
+	// so the guaranteed overage is movesTaken + 1 - par.
+	const movesOverPar = movesTaken > parSlots ? movesTaken + 1 - minSteps : 0
+
+	const renderPlayedTile = (word: string, index: number) => (
+		<div
+			key={`step-${index}-${word}`}
+			className={styles['game-path__step']}
+		>
+			<div className={index === movesTaken - 1 ? styles['game-path__step--current'] : ''}>
+				<WordTile word={word} variant="step" size="sm" />
+			</div>
+		</div>
+	)
+
+	// Condense long runs of played words: first word, +n chip, last two words
+	const playedTiles =
+		movesTaken <= MAX_VISIBLE_PLAYED_WORDS
+			? playedWords.map((word, index) => renderPlayedTile(word, index))
+			: [
+				renderPlayedTile(playedWords[0], 0),
+				<div key="hidden" className={styles['game-path__step']}>
+					<div className={styles['game-path__hidden-count']}>
+						+{movesTaken - 3}
+					</div>
+				</div>,
+				...playedWords
+					.slice(-2)
+					.map((word, i) => renderPlayedTile(word, movesTaken - 2 + i))
+			]
+
+	const rowItems: React.ReactNode[] = [
+		<div key="start" className={styles['game-path__anchor']}>
+			<WordTile word={startWord} variant="start" size="md" />
+			<span className={styles['game-path__anchor-label']}>Start</span>
+		</div>,
+		...playedTiles,
+		...Array.from({ length: placeholderCount }, (_, i) => (
+			<div key={`placeholder-${i}`} className={styles['game-path__step']}>
+				<div className={styles['game-path__placeholder']} aria-label="Unsolved step">
+					?
+				</div>
+			</div>
+		)),
+		<div key="end" className={styles['game-path__anchor']}>
+			<WordTile word={endWord} variant="end" size="md" />
+			<span className={styles['game-path__anchor-label']}>Target</span>
+		</div>
+	]
 
 	return (
 		<div className={`${styles['game-path']} ${className}`}>
-			{/* Start Word */}
-			<div className={styles['game-path__section']}>
-				<div className={styles['game-path__label']}>
-					Starting Word
-				</div>
-				<div className={styles['game-path__word-container']}>
-					<WordTile
-						word={startWord}
-						variant={getTemperatureVariant(startWord)}
-						size="lg"
-					/>
-				</div>
+			<div className={styles['game-path__header']}>
+				<span className={styles['game-path__chip']}>⛳ Par {minSteps}</span>
+				<span
+					className={`${styles['game-path__chip']} ${
+						movesOverPar > 0 ? styles['game-path__chip--over'] : ''
+					}`}
+				>
+					{movesOverPar > 0
+						? `${movesTaken} moves · +${movesOverPar} over par`
+						: `Moves ${movesTaken} / ${minSteps}`}
+				</span>
 			</div>
-
-			{/* Path Steps */}
-			<div className={styles['game-path__section']}>
-				<div className={styles['game-path__label']}>
-					Your Path ({steps.length} steps)
-				</div>
-				<div className={styles['game-path__path']}>
-					{steps.length <= 5 ? (
-						// Show all steps if 5 or fewer
-						<>
-							{steps.map((word, index) => (
-								<React.Fragment key={index}>
-									<div className={styles['game-path__step']}>
-										<WordTile
-											word={word}
-											variant={getTemperatureVariant(word)}
-											size="md"
-										/>
-									</div>
-									{index < steps.length - 1 && (
-										<span className={styles['game-path__arrow']}>
-											→
-										</span>
-									)}
-								</React.Fragment>
-							))}
-							{/* Show placeholder steps for remaining slots */}
-							{Array.from({ length: Math.max(0, minSteps - steps.length) }, (_, index) => (
-								<React.Fragment key={`placeholder-${index}`}>
-									{steps.length > 0 && index === 0 && (
-										<span className={styles['game-path__arrow']}>
-											→
-										</span>
-									)}
-									<div className={styles['game-path__step']}>
-										<div className={styles['game-path__placeholder']}>
-											?
-										</div>
-									</div>
-									{index < Math.max(0, minSteps - steps.length) - 1 && (
-										<span className={styles['game-path__arrow']}>
-											→
-										</span>
-									)}
-								</React.Fragment>
-							))}
-						</>
-					) : (
-						// Show condensed view for more than 5 steps
-						<>
-							{/* First word */}
-							<div className={styles['game-path__step']}>
-								<WordTile
-									word={steps[0]}
-									variant={getTemperatureVariant(steps[0])}
-									size="md"
-								/>
-							</div>
-							<span className={styles['game-path__arrow']}>→</span>
-							
-							{/* Hidden count */}
-							<div className={styles['game-path__step']}>
-								<div className={styles['game-path__hidden-count']}>
-									+{steps.length - 2}
-								</div>
-							</div>
-							<span className={styles['game-path__arrow']}>→</span>
-							
-							{/* Last two words */}
-							{steps.slice(-2).map((word, index) => (
-								<React.Fragment key={`last-${index}`}>
-									<div className={styles['game-path__step']}>
-										<WordTile
-											word={word}
-											variant={getTemperatureVariant(word)}
-											size="md"
-										/>
-									</div>
-									{index < 1 && (
-										<span className={styles['game-path__arrow']}>
-											→
-										</span>
-									)}
-								</React.Fragment>
-							))}
-							
-							{/* Show placeholder steps for remaining slots */}
-							{Array.from({ length: Math.max(0, minSteps - steps.length) }, (_, index) => (
-								<React.Fragment key={`placeholder-${index}`}>
-									<span className={styles['game-path__arrow']}>
-										→
-									</span>
-									<div className={styles['game-path__step']}>
-										<div className={styles['game-path__placeholder']}>
-											?
-										</div>
-									</div>
-								</React.Fragment>
-							))}
-						</>
+			<div className={styles['game-path__path']}>
+				{/* Arrow + tile form one non-wrapping unit so line breaks land between steps */}
+				{rowItems.map((item, index) => (
+					<div key={`unit-${index}`} className={styles['game-path__unit']}>
+						{index > 0 && (
+							<span className={styles['game-path__arrow']} aria-hidden="true">
+								→
+							</span>
+						)}
+						{item}
+					</div>
+				))}
+			</div>
+			{(currentWordDefinition || targetWordDefinition) && (
+				<dl className={styles['game-path__definitions']}>
+					{currentWordDefinition && (
+						<div className={styles['game-path__definition']}>
+							<dt>📍 {currentWord}</dt>
+							<dd>{currentWordDefinition}</dd>
+						</div>
 					)}
-				</div>
-			</div>
-
-			{/* End Word */}
-			<div className={styles['game-path__section']}>
-				<div className={styles['game-path__label']}>
-					Target Word
-				</div>
-				<div className={styles['game-path__word-container']}>
-					<WordTile
-						word={endWord}
-						variant={targetTemperature}
-						size="lg"
-					/>
-				</div>
-				<div className={styles['game-path__thermometer']}>
-					<Thermometer
-						temperature={currentTemperatureValue}
-						size="md"
-						showLabels={true}
-					/>
-				</div>
-			</div>
+					{targetWordDefinition && (
+						<div className={styles['game-path__definition']}>
+							<dt>🎯 {endWord}</dt>
+							<dd>{targetWordDefinition}</dd>
+						</div>
+					)}
+				</dl>
+			)}
 		</div>
 	)
 }

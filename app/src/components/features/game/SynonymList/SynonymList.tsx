@@ -1,6 +1,5 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { WordTile } from '../../../common/WordTile'
-import { trackWordSelected } from '../../../../utils/analytics'
 import styles from './SynonymList.module.css'
 
 export interface SynonymListProps {
@@ -9,15 +8,23 @@ export interface SynonymListProps {
 	isLoading?: boolean
 	selectedWord?: string
 	disabled?: boolean
+	/** Words the player has already stepped on this game — shown faded */
+	visitedWords?: string[]
+	/** Looks up the definition of a candidate word (in the sense shared with the current word) */
+	getDefinition?: (word: string) => string | undefined
 }
 
-export const SynonymList: React.FC<SynonymListProps> = ({ 
-	synonyms, 
-	onSelect, 
+export const SynonymList: React.FC<SynonymListProps> = ({
+	synonyms,
+	onSelect,
 	isLoading = false,
 	selectedWord,
-	disabled = false
+	disabled = false,
+	visitedWords = [],
+	getDefinition
 }) => {
+	const [showDefinitions, setShowDefinitions] = useState(false)
+
 	// Sort synonyms alphabetically
 	const sortedSynonyms = [...synonyms].sort()
 
@@ -45,27 +52,68 @@ export const SynonymList: React.FC<SynonymListProps> = ({
 	}
 
 	return (
-		<div 
-			className={styles['synonym-list__container']} 
+		<div
+			className={styles['synonym-list__container']}
 			role="list"
 			aria-label="Available synonyms"
 		>
-			<div className={styles['synonym-list__grid']}>
-				{sortedSynonyms.map((synonym, index) => (
-					<div 
-						key={`${synonym}-${index}`} 
-						className={styles['synonym-list__item']} 
-						role="listitem"
+			{getDefinition && (
+				<div className={styles['synonym-list__toolbar']}>
+					<button
+						type="button"
+						className={`${styles['synonym-list__definitions-toggle']} ${
+							showDefinitions ? styles['synonym-list__definitions-toggle--active'] : ''
+						}`}
+						onClick={() => setShowDefinitions(prev => !prev)}
+						aria-pressed={showDefinitions}
 					>
-						<WordTile
-							word={synonym}
-							variant={selectedWord === synonym ? 'selected' : 'neutral'}
-							onClick={() => onSelect(synonym)}
-							size="md"
-							disabled={disabled}
-						/>
-					</div>
-				))}
+						📖 Definitions
+					</button>
+				</div>
+			)}
+			<div
+				className={`${styles['synonym-list__grid']} ${
+					showDefinitions ? styles['synonym-list__grid--definitions'] : ''
+				}`}
+			>
+				{sortedSynonyms.map((synonym, index) => {
+					const isVisited = visitedWords.includes(synonym)
+					const definition = getDefinition?.(synonym)
+
+					return (
+						<div
+							key={`${synonym}-${index}`}
+							className={`${styles['synonym-list__item']} ${
+								isVisited ? styles['synonym-list__item--visited'] : ''
+							}`}
+							role="listitem"
+							title={isVisited ? 'Already explored' : undefined}
+						>
+							<div className={styles['synonym-list__tile-wrap']}>
+								<WordTile
+									word={synonym}
+									variant={selectedWord === synonym ? 'selected' : 'neutral'}
+									onClick={() => onSelect(synonym)}
+									size="md"
+									disabled={disabled}
+								/>
+								{isVisited && (
+									<span
+										className={styles['synonym-list__visited-mark']}
+										aria-label="Already explored"
+									>
+										✓
+									</span>
+								)}
+							</div>
+							{showDefinitions && definition && (
+								<span className={styles['synonym-list__definition']}>
+									{definition}
+								</span>
+							)}
+						</div>
+					)
+				})}
 			</div>
 		</div>
 	)

@@ -25,7 +25,8 @@ describe('gameReducer', () => {
 			elapsedTime: 0,
 			totalMoves: 0,
 			synonyms: ['word1', 'word2', 'word3'],
-			minSteps: 2
+			minSteps: 2,
+			visitedWords: ['start']
 		};
 	});
 
@@ -48,7 +49,34 @@ describe('gameReducer', () => {
 		expect(newState.currentWord).toBe('end');
 		expect(newState.isCompleted).toBe(true);
 		expect(newState.synonyms).toEqual([]);
-		expect(newState.minSteps).toBe(0);
+		expect(newState.minSteps).toBe(2); // Par stays fixed even on completion
+	});
+
+	it('remembers visited words through backtracks', () => {
+		let state = gameReducer(initialState, { type: 'ADD_STEP', payload: 'word1' });
+		expect(state.visitedWords).toEqual(['start', 'word1']);
+
+		state = gameReducer(state, { type: 'REMOVE_STEP' });
+		expect(state.visitedWords).toEqual(['start', 'word1']); // Kept after going back
+
+		state = gameReducer(state, { type: 'ADD_STEP', payload: 'word2' });
+		expect(state.visitedWords).toEqual(['start', 'word1', 'word2']);
+
+		// Revisiting a word doesn't duplicate it
+		state = gameReducer(state, { type: 'REMOVE_STEP' });
+		state = gameReducer(state, { type: 'ADD_STEP', payload: 'word1' });
+		expect(state.visitedWords).toEqual(['start', 'word1', 'word2']);
+	});
+
+	it('keeps par (minSteps) frozen during play', () => {
+		// Mock graph would return 2 if recomputed; start from a different par to prove it isn't
+		const stateWithPar: GamePlayState = { ...initialState, minSteps: 4 };
+
+		let state = gameReducer(stateWithPar, { type: 'ADD_STEP', payload: 'word1' });
+		expect(state.minSteps).toBe(4);
+
+		state = gameReducer(state, { type: 'REMOVE_STEP' });
+		expect(state.minSteps).toBe(4);
 	});
 
 	it('handles REMOVE_STEP action correctly', () => {
@@ -98,7 +126,8 @@ describe('gameReducer', () => {
 			elapsedTime: 45,
 			totalMoves: 2,
 			synonyms: ['word1', 'word2'],
-			minSteps: 1
+			minSteps: 1,
+			visitedWords: ['start', 'middle', 'almost']
 		};
 
 		const action = {
@@ -116,7 +145,8 @@ describe('gameReducer', () => {
 			elapsedTime: 0,
 			totalMoves: 0, // Reset total moves
 			synonyms: ['word1', 'word2', 'word3'], // From the mock
-			minSteps: 2 // From the mock
+			minSteps: 2, // From the mock
+			visitedWords: ['new']
 		});
 	});
 
@@ -192,7 +222,7 @@ describe('gameReducer', () => {
 		expect(newState.steps).toEqual(['start', 'end']);
 		expect(newState.currentWord).toBe('end');
 		expect(newState.synonyms).toEqual([]); // No synonyms when completed
-		expect(newState.minSteps).toBe(0); // No steps left when completed
+		expect(newState.minSteps).toBe(2); // Par is fixed for the puzzle
 		expect(newState.totalMoves).toBe(1);
 	});
 

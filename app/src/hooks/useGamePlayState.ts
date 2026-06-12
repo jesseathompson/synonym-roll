@@ -102,27 +102,39 @@ export function useGamePlayState({ startWord, endWord, puzzleNumber }: UseGamePl
 	// Try to load saved state first
 	const savedState = loadGamePlayState(puzzleNumber, startWord, endWord);
 
-	// Initialize synonyms and minimum steps based on current position
+	// Initialize synonyms based on current position
 	const initialSynonyms = wordGraph.getSynonyms(
 		savedState?.currentWord || startWord,
 		endWord
 	) || [];
-	const initialMinSteps = wordGraph.findShortestPathLengthBiDirectional(
-		savedState?.currentWord || startWord,
+
+	// Par is always measured from the start word and fixed for the whole puzzle.
+	// Restored saves get it recomputed so legacy saves holding a live
+	// distance-to-target can't leak it into the UI.
+	const par = wordGraph.findShortestPathLengthBiDirectional(
+		startWord,
 		endWord
 	) ?? undefined;
 
 	// Create initial state from saved or fresh
-	const initialState: GamePlayState = savedState || {
-		steps: [startWord],
-		currentWord: startWord,
-		targetWord: endWord,
-		isCompleted: false,
-		elapsedTime: 0,
-		totalMoves: 0,
-		synonyms: initialSynonyms,
-		minSteps: initialMinSteps,
-	};
+	const initialState: GamePlayState = savedState
+		? {
+			...savedState,
+			minSteps: par,
+			// Saves from before visited-word tracking at least know the path walked
+			visitedWords: savedState.visitedWords ?? savedState.steps,
+		}
+		: {
+			steps: [startWord],
+			currentWord: startWord,
+			targetWord: endWord,
+			isCompleted: false,
+			elapsedTime: 0,
+			totalMoves: 0,
+			synonyms: initialSynonyms,
+			minSteps: par,
+			visitedWords: [startWord],
+		};
 
 	// Create reducer
 	const [state, dispatch] = useReducer(gameReducer, initialState);

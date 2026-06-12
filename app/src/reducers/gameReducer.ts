@@ -20,8 +20,9 @@ export interface GamePlayState {
 	isCompleted: boolean;
 	elapsedTime: number;
 	totalMoves: number; // Track total moves including go back actions
-	minSteps?: number; // Optional minimum steps to complete
+	minSteps?: number; // Fixed par: optimal steps from the start word, never recomputed mid-game
 	synonyms: string[]; // Current available synonyms
+	visitedWords: string[]; // Every word stepped on this game, kept through backtracks
 }
 
 /**
@@ -39,11 +40,8 @@ export const gameReducer = (state: GamePlayState, action: GameAction): GamePlayS
 				? []
 				: wordGraph.getSynonyms(action.payload, state.targetWord) || [];
 
-			// Calculate minimum steps left to reach target
-			const minSteps = isComplete
-				? 0
-				: wordGraph.findShortestPathLengthBiDirectional(action.payload, state.targetWord) ?? undefined;
-
+			// minSteps is the puzzle's fixed par (optimal path from the start word).
+			// It is never recomputed mid-game, so the UI can't leak distance-to-target.
 			return {
 				...state,
 				steps: newSteps,
@@ -51,7 +49,9 @@ export const gameReducer = (state: GamePlayState, action: GameAction): GamePlayS
 				isCompleted: isComplete,
 				totalMoves: state.totalMoves + 1, // Increment total moves
 				synonyms,
-				minSteps,
+				visitedWords: state.visitedWords.includes(action.payload)
+					? state.visitedWords
+					: [...state.visitedWords, action.payload],
 			};
 		}
 
@@ -65,9 +65,8 @@ export const gameReducer = (state: GamePlayState, action: GameAction): GamePlayS
 			const newSteps = state.steps.slice(0, -1);
 			const currentWord = newSteps[newSteps.length - 1];
 
-			// Recalculate synonyms and minimum steps
+			// Recalculate synonyms (par stays fixed)
 			const synonyms = wordGraph.getSynonyms(currentWord, state.targetWord) || [];
-			const minSteps = wordGraph.findShortestPathLengthBiDirectional(currentWord, state.targetWord) ?? undefined;
 
 			return {
 				...state,
@@ -75,7 +74,6 @@ export const gameReducer = (state: GamePlayState, action: GameAction): GamePlayS
 				currentWord,
 				totalMoves: state.totalMoves + 1, // Increment total moves for go back action
 				synonyms,
-				minSteps,
 			};
 		}
 
@@ -111,6 +109,7 @@ export const gameReducer = (state: GamePlayState, action: GameAction): GamePlayS
 				totalMoves: 0, // Reset total moves
 				synonyms,
 				minSteps,
+				visitedWords: [start],
 			};
 		}
 
